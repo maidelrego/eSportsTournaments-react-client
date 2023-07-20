@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  background: #232323;
+  background: #2C3E50;
   color: #cdcdcd;
   padding: 20px;
   z-index: 1;
@@ -18,8 +18,8 @@
 }
 
 .menu-logo img {
-  max-height: 40px;
-  max-width: 100px;
+  max-height: 100px;
+  max-width: 200px;
   flex-shrink: 0;
 }
 
@@ -30,11 +30,11 @@
 }
 
 .menu-container a:hover {
-  color: #049edf;
+  color: #35B2B2;
 }
 
 a.nav-item.nav-link.active {
-  color: #049edf;
+  color: #35B2B2;
 }
 
 .menu-container input {
@@ -60,9 +60,8 @@ a.nav-item.nav-link.active {
   border-radius: 3px;
   z-index: 1;
   transform-origin: 4px 0px;
-  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
-              background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
-              opacity 0.55s ease;
+  transition: transform 0.5s cubic-bezier(0.77, 0.2, 0.05, 1),
+    background 0.5s cubic-bezier(0.77, 0.2, 0.05, 1), opacity 0.55s ease;
 }
 
 .menu-container span:first-child {
@@ -75,7 +74,7 @@ a.nav-item.nav-link.active {
 
 .menu-container input:checked ~ span {
   opacity: 1;
-  transform: rotate(45deg) translate(3px,-1px);
+  transform: rotate(45deg) translate(3px, -1px);
   background: #232323;
 }
 
@@ -85,7 +84,7 @@ a.nav-item.nav-link.active {
 }
 
 .menu-container input:checked ~ span:nth-child(3) {
-  transform: rotate(-45deg) translate(-5px,11px);
+  transform: rotate(-45deg) translate(-5px, 11px);
 }
 
 .menu ul {
@@ -98,12 +97,12 @@ a.nav-item.nav-link.active {
 }
 
 /* mobile styles */
-@media only screen and (max-width: 767px) { 
+@media only screen and (max-width: 767px) {
   .menu-container {
     flex-direction: column;
     align-items: flex-end;
   }
-  
+
   .menu-logo {
     position: absolute;
     left: 0;
@@ -112,7 +111,7 @@ a.nav-item.nav-link.active {
   }
 
   .menu-logo img {
-    max-height: 30px;
+    max-height: 40px;
   }
 
   .menu {
@@ -128,7 +127,7 @@ a.nav-item.nav-link.active {
     /* to stop flickering of text in safari */
     transform-origin: 0% 0%;
     transform: translateX(0%);
-    transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+    transition: transform 0.5s cubic-bezier(0.77, 0.2, 0.05, 1);
   }
 
   .menu-container input:checked ~ .menu {
@@ -137,7 +136,7 @@ a.nav-item.nav-link.active {
 }
 
 /* desktop styles */
-@media only screen and (min-width: 768px) { 
+@media only screen and (min-width: 768px) {
   .menu-container {
     width: 100%;
   }

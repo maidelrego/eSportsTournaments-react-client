@@ -10,7 +10,7 @@ export const MainLayout = () => {
       </div>
       <div className="col-11 md:col-11 lg:col-11">
         <Routes>
-          <Route path="/" element={<Navigate to="/marvel" />} />
+          <Route path="/" element={<Navigate to="create-tourney" />} />
           <Route path="create-tourney" element={<CreateTourney />} />
         </Routes>
       </div>

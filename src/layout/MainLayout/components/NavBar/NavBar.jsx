@@ -2,10 +2,12 @@ import "./navBar.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../../../auth/context/AuthContext";
+import logo from "../../../../assets/img/logo.png";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
+  
 
   const handleLogout = () => {
     logout();
@@ -23,7 +25,7 @@ export const Navbar = () => {
 
           <Link className="menu-logo" to="/">
             <img
-              src="https://wweb.dev/resources/navigation-generator/logo-placeholder.png"
+              src={logo}
               alt="My Awesome Website"
             />
           </Link>
@@ -52,7 +54,7 @@ export const Navbar = () => {
               </li>
             </ul>
             <ul>
-              <li>
+              <li style={{cursor: 'pointer'}}>
                 <a>
                   <i
                     className="pi pi-user mr-2"
@@ -61,7 +63,7 @@ export const Navbar = () => {
                   {user}
                 </a>
               </li>
-              <li>
+              <li style={{cursor: 'pointer'}}>
                 <a onClick={handleLogout}>
                   Logout
                 </a>

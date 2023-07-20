@@ -107,7 +107,7 @@ export const CreateTourney = () => {
     <>
       <div className="grid">
         <div className="col-12 text-center">
-          <h1>Create Tourney</h1>
+          <h1 className="text-color">Create Tourney</h1>
         </div>
       </div>
       <div className="grid">
@@ -136,11 +136,11 @@ export const CreateTourney = () => {
 
       <div className="grid justify-content-center mt-5">
         <div className="col-12 md:col-6 mt-2">
-          <span className="font-bold text-2xl">Number of players</span>
+          <span className="font-bold text-2xl text-color">Number of players</span>
         </div>
 
         <div className="col-6">
-          <div className="p-inputgroup w-8rem">
+          <div className="p-inputgroup w-9rem">
             <Button icon="pi pi-minus" onClick={playerCountDecrement} />
             <InputText
               readOnly
@@ -155,13 +155,13 @@ export const CreateTourney = () => {
         </div>
 
         <div className="col-12 md:col-6 mt-2">
-          <span className="font-bold text-2xl">
+          <span className="font-bold text-2xl text-color">
             Number of games against each team
           </span>
         </div>
 
         <div className="col-6">
-          <div className="p-inputgroup w-8rem">
+          <div className="p-inputgroup w-9rem">
             <Button icon="pi pi-minus" onClick={decrementGamesCount} />
             <InputText
               readOnly
