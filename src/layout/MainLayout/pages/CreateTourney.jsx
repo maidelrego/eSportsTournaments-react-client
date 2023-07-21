@@ -179,8 +179,8 @@ export const CreateTourney = () => {
       <div className="grid mt-5">
         {form.map((item, index) => (
           <div className="mr-2 col" key={index}>
-            <Card className="createCard">
-              <div className="field text-center">
+            <Card className="createCard card p-fluid">
+              <div className="field">
                 <InputText
                   type="text"
                   placeholder="Name"
@@ -189,7 +189,6 @@ export const CreateTourney = () => {
                   onChange={(e) => handleChange(e, index)}
                 />
               </div>
-              <div className="field text-center">
                 <AutoComplete
                   field="name"
                   name="team"
@@ -200,7 +199,7 @@ export const CreateTourney = () => {
                   onChange={(e) => handleChange(e, index)}
                   itemTemplate={itemTemplate}
                 />
-              </div>
+          
             </Card>
           </div>
         ))}
