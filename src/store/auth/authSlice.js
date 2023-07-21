@@ -10,7 +10,7 @@ export const authStatusName = {
 export const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        authStatus: authStatusName.not_authenticated,
+        authStatus: authStatusName.checking,
         user: {},
         errorMessage: ''
     },
@@ -25,10 +25,12 @@ export const authSlice = createSlice({
            state.user = {};
            state.errorMessage = payload;
         },
-        // onChenking: (state, { payload } ) => {
-        //    state.authStatus = authStatusName.checking;
+        onChenking: ( state ) => {
+           state.authStatus = authStatusName.checking;
+           state.user = {};
+           state.errorMessage = null;
 
-        // },
+        },
     }
 });
 // Action creators are generated for each case reducer function

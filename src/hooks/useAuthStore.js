@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"
-import { doAPIPost } from "../services/api";
-import { onLogin, onLogout } from "../store/auth/authSlice";
+import { doAPIGet, doAPIPost } from "../services/api";
+import { onChenking, onLogin, onLogout } from "../store/auth/authSlice";
 
 
 
@@ -11,8 +11,10 @@ export const useAuthStore = () => {
     const dispatch = useDispatch();
 
     const startLogin = async ({email, password }) =>{
-         
-        doAPIPost("auth/login", {email, password }).then((res) => {
+        
+        dispatch(onChenking());
+
+        await doAPIPost("auth/login", {email, password }).then((res) => {
             if (res.status === 201) {
               const { token, ...user } = res.data;
               delete user.password;  
@@ -21,7 +23,26 @@ export const useAuthStore = () => {
          
             } else {
                dispatch(onLogout(res.message))
- 
+
+            }
+          });
+    }
+    const startCheckAuthToken = async () =>{
+        
+        const token = localStorage.getItem('token');
+        if(!token) return dispatch(onLogout());
+
+        await doAPIGet("auth/check-auth-status").then((res) => {
+            if (res.status === 200) {
+              const { token, ...user } = res.data;
+
+              localStorage.setItem('token',token);
+              dispatch(onLogin(user));   
+         
+            } else {
+              localStorage.clear();
+              dispatch(onLogout(res.message))
+
             }
           });
     }
@@ -38,7 +59,8 @@ export const useAuthStore = () => {
 
         //methods
         startLogin,
-        dispatch
+        dispatch,
+        startCheckAuthToken
     }
 
 }

@@ -60,7 +60,7 @@ function doAPIGet(path, params, timeout = null) {
   const req = timeoutWatcher(apicall, timeoutOpts)
     .then((res) => {
       console.debug("DATA BACK", res);
-      return res.data;
+      return res;
     })
     .catch((err) => {
       return err.response.data;

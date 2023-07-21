@@ -1,19 +1,26 @@
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PrivateRoutes } from './PrivateRoutes'
 import { PublicRoutes } from './PublicRoutes'
 import { Login } from '../auth/pages/Login'
 import { MainLayout } from '../layout/MainLayout/routes/MainLayoutRoutes'
 import { Register } from '../auth/pages/Register'
-import { useCheckAuth } from '../hooks/useCheckAuth'
+import { useAuthStore } from '../hooks/useAuthStore'
 import { authStatusName } from '../store/auth/authSlice'
+
 
 export const AppRouter = () => {
   
-    // const { status } = useCheckAuth();
+     const { authStatus, startCheckAuthToken } = useAuthStore();
+     
+     useEffect(() => {
+        startCheckAuthToken();
+    },[])
 
-    // if(status == authStatusName.checking ){
-    //    return  <Loading/>
-    // }
+    if(authStatus == authStatusName.checking ){
+       return  <h3>Cargando.....</h3> //Loading component here!!
+    }
+    
   
   return (
     <>

@@ -8,10 +8,8 @@ export const Navbar = () => {
   const { user , dispatch} = useAuthStore();
 
    const handleLogout = () => {
-    
      dispatch(onLogout());
-     localStorage.removeItem('token');
-
+     localStorage.clear();
   };
 
   return (
