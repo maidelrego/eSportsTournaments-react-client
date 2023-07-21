@@ -18,7 +18,7 @@ function timeoutWatcher(promise, options = {}) {
 
 function addAuthHeader(opts = {}) {
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("tourneyForgeToken");
 
   if (!opts.headers) {
     opts.headers = {};
