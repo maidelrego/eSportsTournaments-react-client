@@ -1,17 +1,17 @@
 import "./navBar.css";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../../../../auth/context/AuthContext";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../../../../assets/img/logo.png";
+import { useAuthStore } from "../../../../hooks/useAuthStore";
+import { onLogout } from "../../../../store/auth/authSlice";
 
 export const Navbar = () => {
-  const navigate = useNavigate();
-  const { user, logout } = useContext(AuthContext);
-  
+  const { user , dispatch} = useAuthStore();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login", { replace: true });
+   const handleLogout = () => {
+    
+     dispatch(onLogout());
+     localStorage.removeItem('token');
+
   };
 
   return (
@@ -60,7 +60,7 @@ export const Navbar = () => {
                     className="pi pi-user mr-2"
                     style={{ fontSize: "1.5rem" }}
                   ></i>
-                  {user}
+                  {user?.fullName}
                 </a>
               </li>
               <li style={{cursor: 'pointer'}}>

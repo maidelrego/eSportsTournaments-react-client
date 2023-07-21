@@ -1,29 +1,16 @@
-import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
 import { InputText } from "primereact/inputtext";
 import { Message } from "primereact/message";
 import { Button } from "primereact/button";
 import logo from "../../assets/img/logo.png";
-import { doAPIPost } from "../../services/api";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useAuthStore } from "../../hooks/useAuthStore";
 
 export const Login = () => {
-  const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { startLogin } = useAuthStore();
 
-  const onLogin = (data) => {
-    console.log("LOGIN");
-    doAPIPost("auth/login", data).then((res) => {
-      if (res.status === 201) {
-        login(res.data.fullName) // FOR NOW, WE NEED TO SET THE STORE INSIDE THIS FUNCTION
-        const lastPath = localStorage.getItem("lastPath") || "/"
-        navigate(lastPath, { replace: true });
-      } else {
-        console.log("ERROR");
-      }
-    });
+  const onLogin = async(data) => {
+      await startLogin(data);
   };
 
   return (
@@ -50,7 +37,7 @@ export const Login = () => {
         })}
         onSubmit={async (values) => {
           delete values.submit;
-          await onLogin(values);
+          onLogin(values);
         }}
       >
         {({

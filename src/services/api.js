@@ -17,13 +17,8 @@ function timeoutWatcher(promise, options = {}) {
 }
 
 function addAuthHeader(opts = {}) {
-  var token = "";
 
-  const authUser = JSON.parse(localStorage.getItem("eSportsTourneyUser"));
-
-  if (authUser) {
-    token = authUser.token;
-  }
+  const token = localStorage.getItem("token");
 
   if (!opts.headers) {
     opts.headers = {};

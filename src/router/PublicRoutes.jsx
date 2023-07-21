@@ -1,14 +1,15 @@
-import  { useContext } from 'react'
 import { Navigate } from 'react-router-dom'
-import { AuthContext } from '../auth/context/AuthContext'
 import PropTypes from 'prop-types'
+import { useAuthStore } from '../hooks/useAuthStore'
+import { authStatusName } from '../store/auth/authSlice';
 
 export const PublicRoutes = ({ children }) => {
 
-  const { logged } = useContext(AuthContext)
+  const { authStatus } = useAuthStore();
 
   return (
-    (!logged) ? children : <Navigate to="/" />
+    (authStatus != authStatusName.authenticated) ? children : <Navigate to="/" />
+
   )
 }
 

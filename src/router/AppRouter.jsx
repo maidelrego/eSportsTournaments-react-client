@@ -4,8 +4,17 @@ import { PublicRoutes } from './PublicRoutes'
 import { Login } from '../auth/pages/Login'
 import { MainLayout } from '../layout/MainLayout/routes/MainLayoutRoutes'
 import { Register } from '../auth/pages/Register'
+import { useCheckAuth } from '../hooks/useCheckAuth'
+import { authStatusName } from '../store/auth/authSlice'
 
 export const AppRouter = () => {
+  
+    // const { status } = useCheckAuth();
+
+    // if(status == authStatusName.checking ){
+    //    return  <Loading/>
+    // }
+  
   return (
     <>
       <Routes>
