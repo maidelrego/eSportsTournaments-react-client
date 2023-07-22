@@ -1,11 +1,12 @@
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
 import { useState } from "react";
+import { InputText } from "primereact/inputtext";
+import { AutoComplete } from "primereact/autocomplete";
+import { Card } from "primereact/card";
+import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { useForm } from "../../../hooks/useForm";
-import { Card } from "primereact/card";
-import { AutoComplete } from "primereact/autocomplete";
-import axios from "axios";
+import { useTourneyStore } from "../../../hooks/useTourneyStore";
+import { onAddGame, onAddPlayer, onRemoveGame, onRemovePlayer, onSetType } from "../../../store/tourney/tourneySlice";
 
 const initialForm = [
   {
@@ -19,17 +20,21 @@ const initialForm = [
 ];
 
 export const CreateTourney = () => {
-  const [name, setName] = useState("");
-  const [selectedType, setselectedType] = useState(null);
-  const [gamesCount, setGamesCount] = useState(1);
-  const { form, setForm, handleChange } = useForm(initialForm);
-  const [playerCount, setPlayerCount] = useState(2);
-  const [filteredCountries, setFilteredCountries] = useState(null);
+  const { 
+         filteredCountries, 
+         startSearchTeam,
+         typeOptions,
+         dispatch,
+         type,
+         players,
+         games
+         } = useTourneyStore();
 
-  console.log("FORM", form);
+  const [name, setName] = useState("");
+  const { form, setForm, handleChange } = useForm(initialForm);
 
   const playerCountIncrement = () => {
-    setPlayerCount((prevCount) => prevCount + 1);
+    dispatch(onAddPlayer());
     setForm([
       ...form,
       {
@@ -40,13 +45,30 @@ export const CreateTourney = () => {
   };
 
   const playerCountDecrement = () => {
-    if (playerCount === 2) {
+    if (players === 2) {
       return;
     }
-    setPlayerCount((prevCount) => prevCount - 1);
+    dispatch(onRemovePlayer());
     setForm(form.slice(0, form.length - 1));
   };
 
+  
+  const search = async (event) => {
+    startSearchTeam(event.query);
+  };
+  
+  const incrementGamesCount = () => {
+    if (games === 3) return;
+    dispatch(onAddGame());
+  };
+  
+  const decrementGamesCount = () => {
+    if (games === 0) {
+      return;
+    }
+    dispatch(onRemoveGame());
+  };
+  
   const itemTemplate = (item) => {
     return (
       <div className="flex align-items-center">
@@ -61,51 +83,15 @@ export const CreateTourney = () => {
     );
   };
 
-  const search = async (event) => {
-    const headers = {
-      "x-rapidapi-key": "4ada01814adea2bb727b810423982de7",
-      "x-rapidapi-host": "v3.football.api-sports.io",
-    };
+  const onSaveTourney = () => {
+  
+     
 
-    const teams = await axios.get(
-      `https://v3.football.api-sports.io/teams?search=${event.query}`,
-      { headers }
-    );
-
-    console.log("TEAMS", teams.data.response);
-
-    const teamsArray = teams.data.response.map((team) => {
-      return {
-        name: team.team.name,
-        logo: team.team.logo,
-      };
-    });
-
-    console.log("TEAMS ARRAY", teamsArray);
-
-    setFilteredCountries(teamsArray);
-  };
-
-  const incrementGamesCount = () => {
-    if (gamesCount === 3) return;
-    setGamesCount((prevCount) => prevCount + 1);
-  };
-
-  const decrementGamesCount = () => {
-    if (gamesCount === 0) {
-      return;
-    }
-    setGamesCount((prevCount) => prevCount - 1);
-  };
-
-  const typeOptions = [
-    { name: "League", code: 1 },
-    { name: "Cup", code: 2 },
-  ];
+  }
 
   return (
     <>
-      <div className="grid">
+     <div className="grid">
         <div className="col-12 text-center">
           <h1 className="text-color">Create Tourney</h1>
         </div>
@@ -124,8 +110,8 @@ export const CreateTourney = () => {
       <div className="grid mt-1">
         <div className="col-12">
           <Dropdown
-            value={selectedType}
-            onChange={(e) => setselectedType(e.value)}
+            value={type}
+            onChange={(e) => dispatch(onSetType(e.value))}
             options={typeOptions}
             optionLabel="name"
             placeholder="Select a Type"
@@ -144,8 +130,7 @@ export const CreateTourney = () => {
             <Button icon="pi pi-minus" onClick={playerCountDecrement} />
             <InputText
               readOnly
-              value={playerCount}
-              onChange={(e) => setPlayerCount(e.target.value)}
+              value={players}
               pt={{
                 root: { className: "text-center font-bold" },
               }}
@@ -165,8 +150,7 @@ export const CreateTourney = () => {
             <Button icon="pi pi-minus" onClick={decrementGamesCount} />
             <InputText
               readOnly
-              value={gamesCount}
-              onChange={(e) => setGamesCount(e.target.value)}
+              value={games}
               pt={{
                 root: { className: "text-center font-bold" },
               }}
@@ -203,6 +187,9 @@ export const CreateTourney = () => {
             </Card>
           </div>
         ))}
+      </div>
+      <div className="grid mt-5">
+         <Button label="Submit" icon="pi pi-check" />
       </div>
     </>
   );
