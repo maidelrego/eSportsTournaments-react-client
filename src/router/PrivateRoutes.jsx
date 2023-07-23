@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { useAuthStore } from '../hooks/useAuthStore'
+import { useAuthStore } from '../hooks'
 import { authStatusName } from '../store/auth/authSlice';
 
 

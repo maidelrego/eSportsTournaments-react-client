@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { doAPIGet, doAPIPost } from "../services/api";
-import { onChenking, onLogin, onLogout } from "../store/auth/authSlice";
+import { onChenking, onLogin, onLogout, onSetMyTournaments } from "../store/auth/authSlice";
 
 export const useAuthStore = () => {
-  const { authStatus, user } = useSelector((state) => state.auth);
+  const { authStatus, user, myTournaments } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 
@@ -11,6 +11,7 @@ export const useAuthStore = () => {
     dispatch(onChenking());
 
     await doAPIPost("auth/login", { email, password }).then((res) => {
+      console.log(res);
       if (res.status === 201) {
         const { token, ...user } = res.data;
         delete user.password;
@@ -38,14 +39,26 @@ export const useAuthStore = () => {
     });
   };
 
+  const startGetMyTournaments = async () => {
+    console.log("startGetMyTournaments");
+    doAPIGet("tournaments/byAdminId").then((res) => {
+      console.log(res.data);
+      dispatch(onSetMyTournaments(res.data));
+    })
+  };
+
+
   return {
     //properties
     authStatus,
     user,
+    myTournaments,
+
 
     //methods
     startLogin,
     dispatch,
     startCheckAuthToken,
+    startGetMyTournaments
   };
 };

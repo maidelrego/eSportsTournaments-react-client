@@ -5,7 +5,7 @@ import { PublicRoutes } from "./PublicRoutes";
 import { Login } from "../auth/pages/Login";
 import { MainLayout } from "../layout/MainLayout/routes/MainLayoutRoutes";
 import { Register } from "../auth/pages/Register";
-import { useAuthStore } from "../hooks/useAuthStore";
+import { useAuthStore } from "../hooks";
 import { authStatusName } from "../store/auth/authSlice";
 
 export const AppRouter = () => {

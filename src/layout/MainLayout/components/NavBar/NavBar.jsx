@@ -1,7 +1,7 @@
 import "./navBar.css";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../../../assets/img/logo.png";
-import { useAuthStore } from "../../../../hooks/useAuthStore";
+import { useAuthStore } from "../../../../hooks";
 import { onLogout } from "../../../../store/auth/authSlice";
 
 export const Navbar = () => {

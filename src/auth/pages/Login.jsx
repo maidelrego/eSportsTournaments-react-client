@@ -4,7 +4,7 @@ import { Button } from "primereact/button";
 import logo from "../../assets/img/logo.png";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useAuthStore } from "../../hooks/useAuthStore";
+import { useAuthStore } from "../../hooks";
 
 export const Login = () => {
   const { startLogin } = useAuthStore();

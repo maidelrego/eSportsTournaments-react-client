@@ -11,6 +11,7 @@ export const authSlice = createSlice({
   initialState: {
     authStatus: authStatusName.checking,
     user: {},
+    myTournaments: [],
     errorMessage: "",
   },
   reducers: {
@@ -29,7 +30,10 @@ export const authSlice = createSlice({
       state.user = {};
       state.errorMessage = null;
     },
+    onSetMyTournaments: (state, { payload }) => {
+      state.myTournaments = payload;
+    }
   },
 });
 // Action creators are generated for each case reducer function
-export const { onLogin, onChenking, onLogout } = authSlice.actions;
+export const { onLogin, onChenking, onLogout, onSetMyTournaments } = authSlice.actions;
