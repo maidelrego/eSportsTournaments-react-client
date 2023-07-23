@@ -26,7 +26,6 @@ export const useForm = (initialForm = []) => {
     setForm(newForm);
   };
 
-
   
   const handleChange = (event, index) => {
     const { name, value } = event.target;

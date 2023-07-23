@@ -7,9 +7,9 @@ import { onLogout } from "../../../../store/auth/authSlice";
 export const Navbar = () => {
   const { user , dispatch} = useAuthStore();
 
-   const handleLogout = () => {
-     dispatch(onLogout());
-     localStorage.clear();
+  const handleLogout = () => {
+    dispatch(onLogout());
+    localStorage.clear();
   };
 
   return (

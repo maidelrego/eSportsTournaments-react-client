@@ -13,6 +13,8 @@ module.exports = {
   plugins: ['react-refresh'],
   rules: {
     'indent': ['error', 2],
+    // no more than 2 empty lines
+    'no-multiple-empty-lines': ['error', { max: 2 }],
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },

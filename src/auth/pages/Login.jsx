@@ -10,7 +10,7 @@ export const Login = () => {
   const { startLogin } = useAuthStore();
 
   const onLogin = async(data) => {
-      await startLogin(data);
+    await startLogin(data);
   };
 
   return (

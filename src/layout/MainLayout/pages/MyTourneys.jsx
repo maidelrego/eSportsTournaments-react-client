@@ -4,7 +4,6 @@ import { useAuthStore } from "../../../hooks";
 
 export const MyTourneys = () => {
   const { myTournaments, startGetMyTournaments } = useAuthStore()
-
   
 
   useEffect(() => {
