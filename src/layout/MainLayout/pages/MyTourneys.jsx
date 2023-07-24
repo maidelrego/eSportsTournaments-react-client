@@ -3,6 +3,7 @@ import { useAuthStore } from "../../../hooks";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
+import { TourneyCardSleton } from "../../../ui/skeletons/TourneyCardSkeleton";
 
 export const MyTourneys = () => {
   const { myTournaments, startGetMyTournaments } = useAuthStore();
@@ -21,9 +22,9 @@ export const MyTourneys = () => {
     <>
       <h1 className="text-color text-center">My Tourneys</h1>
       <div className="grid mt-5">
-        {myTournaments.map((item) => (
-          <div className="mr-2 col-12 md:col-4" key={item.id}>
-            <div className="surface-card shadow-2 border-round p-3 tourneyCard">
+        {myTournaments.length > 0 ? myTournaments.map((item) => (
+          <div className="col-12 md:col-4" key={item.id}>
+            <div className="surface-card shadow-2 border-round p-3">
               <div className="flex flex-column align-items-center border-bottom-1 surface-border pb-3">
                 <span className="text-xl text-900 font-medium mb-2">
                   {item.name}
@@ -50,7 +51,11 @@ export const MyTourneys = () => {
               </div>
             </div>
           </div>
-        ))}
+        ) ) : (
+          <div className="col-12">
+            <TourneyCardSleton />
+          </div>
+        )}
       </div>
     </>
   );
