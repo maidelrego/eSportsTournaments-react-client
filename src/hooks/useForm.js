@@ -25,7 +25,11 @@ export const useForm = (initialForm = []) => {
     });
     setForm(newForm);
   };
-
+  
+     
+  const onResetForm = () => {
+    setForm(initialForm);
+  }
   
   const handleChange = (event, index) => {
     const { name, value } = event.target;
@@ -37,7 +41,7 @@ export const useForm = (initialForm = []) => {
       });
       return;
     }
-
+ 
     const newForm = form.map((item, i) => {
       if (i === index) {
         return {
@@ -94,6 +98,7 @@ export const useForm = (initialForm = []) => {
     handleChange,
     handleSwitch,
     handleFiles,
-    handleAutoComplete
+    handleAutoComplete,
+    onResetForm
   };
 };

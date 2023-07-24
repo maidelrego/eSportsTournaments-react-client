@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onSetfilteredCountries } from "../store/tourney/tourneySlice";
-// import { doAPIPost } from "../services/api";
+import { onResetState, onSetfilteredCountries } from "../store/tourney/tourneySlice";
+import { doAPIPost } from "../services/api";
+import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
@@ -29,19 +30,19 @@ export const useTourneyStore = () => {
     dispatch(onSetfilteredCountries(teamsArray));
   };
 
-  // const startSaveTourney = async( data ) => {
-
-  //     await doAPIPost("/", { email, password }).then((res) => {
-  //         if (res.status === 201) {
-  //           const { token, ...user } = res.data;
-  //           delete user.password;
-  //           localStorage.setItem("tourneyForgeToken", token);
-  //           dispatch(onLogin(user));
-  //         } else {
-  //           dispatch(onLogout(res.message));
-  //         }
-  //       });
-  // }
+  const startSaveTourney = async( data ) => {
+    dispatch(setLoading(true));
+    await doAPIPost("tournaments",data).then((res) => {
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        dispatch(onResetState())
+        dispatch(setSuccessToast('Tournament created successfully!'));   
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast('Something went wrong, check logs'));
+      }  
+    });
+  }
 
   return {
     //properties
@@ -57,5 +58,6 @@ export const useTourneyStore = () => {
     //methods
     startSearchTeam,
     dispatch,
+    startSaveTourney
   };
 };

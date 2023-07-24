@@ -1,4 +1,5 @@
 import { useState } from "react";
+import validator from "validator";
 import { InputText } from "primereact/inputtext";
 import { AutoComplete } from "primereact/autocomplete";
 import { Card } from "primereact/card";
@@ -14,6 +15,8 @@ import {
   onSetType,
   onSetSport,
 } from "../../../store/tourney/tourneySlice";
+import { gamesIsValid } from "../../../helper/gamesValidator";
+import { setErrorToast } from "../../../store/ui/uiSlice";
 
 const initialForm = [
   {
@@ -26,10 +29,18 @@ const initialForm = [
   },
 ];
 
+const requestValidations ={
+  name: [(value) => !validator.isEmpty(value),'Invalid Name' ],
+  type: [(value) => value !== null,'Invalid type' ],
+  sport:[(value) => value !== null,'Invalid sport' ],
+  teams: [ (value) => gamesIsValid(value), 'Invalid teams' ],
+}
+
 export const CreateTourney = () => {
   const {
     filteredCountries,
     startSearchTeam,
+    startSaveTourney,
     tourneyTypeOptions,
     sportTypeOptions,
     dispatch,
@@ -40,7 +51,8 @@ export const CreateTourney = () => {
   } = useTourneyStore();
 
   const [name, setName] = useState("");
-  const { form, setForm, handleChange } = useForm(initialForm);
+  const [checkValidator, setCheckValidator] = useState([]);
+  const { form, setForm, handleChange, onResetForm } = useForm(initialForm);
 
   const playerCountIncrement = () => {
     dispatch(onAddPlayer());
@@ -92,9 +104,47 @@ export const CreateTourney = () => {
   };
   
 
-  // const onSaveTourney = () => {
+  const onSaveTourney = () => {
+    const request = {
+      name,
+      type,
+      sport,
+      games,
+      teams:form
+    }
+   
+    const {checkValues, isValid} = validateRequest(request, requestValidations)
+    setCheckValidator(checkValues);
+    
+    if(!isValid){
+      dispatch(setErrorToast('There are empty fields'));
+      return;
+    }
+   
+    startSaveTourney(request);
+    onResetForm();
+  }
 
-  // }
+  const validateRequest = ( request,validations = {} ) => {
+      
+    const checkValues = [];
+    let isValid = true;
+
+    for (const reqField of Object.keys(validations)) {
+        
+      const [fn,errorMessage = '' ] = validations[reqField];
+
+      if(fn(request[reqField])){
+        checkValues[reqField] = null; 
+      }else{
+        isValid = false;
+        checkValues[reqField] = errorMessage;
+      }
+    }
+
+    
+    return {checkValues, isValid};
+  }
 
   return (
     <>
@@ -108,7 +158,7 @@ export const CreateTourney = () => {
           <InputText
             type="text"
             placeholder="Name"
-            className="w-full md:w-20rem"
+            className={`w-full md:w-20rem ${checkValidator['name'] && checkValidator['name'] !== null ? 'p-invalid' : ''}`}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -123,7 +173,7 @@ export const CreateTourney = () => {
             optionLabel="value"
             optionValue="key"
             placeholder="Game Type"
-            className="w-full md:w-20rem"
+            className={`w-full md:w-20rem ${checkValidator['sport'] && checkValidator['sport'] !== null ? 'p-invalid' : ''}`}
           />
         </div>
         
@@ -135,7 +185,7 @@ export const CreateTourney = () => {
             optionLabel="value"
             optionValue="key"
             placeholder="Tournament Type"
-            className="w-full md:w-20rem"
+            className={`w-full md:w-20rem ${checkValidator['type'] && checkValidator['type'] !== null ? 'p-invalid' : ''}`}
           />
         </div>
       </div>
@@ -210,7 +260,7 @@ export const CreateTourney = () => {
         ))}
       </div>
       <div className="grid mt-5">
-        <Button label="Submit" icon="pi pi-check" />
+        <Button label="Submit" icon="pi pi-check" onClick={onSaveTourney} />
       </div>
     </>
   );

@@ -42,6 +42,13 @@ export const tourneySlice = createSlice({
     onRemoveGame: (state) => {
       state.games = state.games - 1;
     },
+    onResetState: (state) => {
+      state.name = "";
+      state.type = null;
+      state.sport = null;
+      state.players = 2;
+      state.games = 1;
+    },
   },
 });
 // Action creators are generated for each case reducer function
@@ -53,4 +60,5 @@ export const {
   onRemovePlayer,
   onSetType,
   onSetSport,
+  onResetState
 } = tourneySlice.actions;

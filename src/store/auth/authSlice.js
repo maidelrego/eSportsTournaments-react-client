@@ -25,7 +25,7 @@ export const authSlice = createSlice({
       state.user = {};
       state.errorMessage = payload;
     },
-    onChenking: (state) => {
+    onChenking: (state) => { 
       state.authStatus = authStatusName.checking;
       state.user = {};
       state.errorMessage = null;

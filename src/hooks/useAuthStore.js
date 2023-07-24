@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { doAPIGet, doAPIPost } from "../services/api";
 import { onChenking, onLogin, onLogout, onSetMyTournaments } from "../store/auth/authSlice";
-import { setLoading } from "../store/ui/uiSlice";
+import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 
 export const useAuthStore = () => {
   const { authStatus, user, myTournaments } = useSelector((state) => state.auth);
@@ -39,12 +39,18 @@ export const useAuthStore = () => {
   };
 
   const startGetMyTournaments = async () => {
-    setLoading(true);
+    dispatch(setLoading(true));
     doAPIGet("tournaments/byAdminId").then((res) => {
-      console.log(res.data);
-      dispatch(onSetMyTournaments(res.data));
-    })
-    setLoading(false);
+      if (res.status === 200) {
+        dispatch(onSetMyTournaments(res.data));
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast('Tournaments loaded successfully!'));
+
+      }else{
+        dispatch(setLoading(false));
+        dispatch(setErrorToast('Something went wrong, check logs'));
+      }
+    });
   };
 
 
