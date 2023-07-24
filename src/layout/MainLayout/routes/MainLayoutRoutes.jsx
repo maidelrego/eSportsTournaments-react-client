@@ -2,6 +2,7 @@ import { Navbar } from "../components/NavBar/NavBar";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { CreateTourney } from "../pages";
 import { MyTourneys } from "../pages";
+import { Tournament } from "../pages/Tournament";
 
 export const MainLayout = () => {
   return (
@@ -14,6 +15,7 @@ export const MainLayout = () => {
           <Route path="/" element={<Navigate to="create-tourney" />} />
           <Route path="create-tourney" element={<CreateTourney />} />
           <Route path="my-tourneys" element={<MyTourneys />} />
+          <Route path="/my-tourneys/:id" element={<Tournament />} />
         </Routes>
       </div>
     </div>
