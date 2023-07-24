@@ -5,7 +5,7 @@ import { onSetfilteredCountries } from "../store/tourney/tourneySlice";
 
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
-  const { filteredCountries, typeOptions, name, type, players, games } =
+  const { filteredCountries, tourneyTypeOptions, sportTypeOptions, name, sport, type, players, games } =
     useSelector((state) => state.tourney);
 
   const startSearchTeam = async (query) => {
@@ -46,8 +46,10 @@ export const useTourneyStore = () => {
   return {
     //properties
     filteredCountries,
-    typeOptions,
+    tourneyTypeOptions,
+    sportTypeOptions,
     name,
+    sport,  
     type,
     players,
     games,

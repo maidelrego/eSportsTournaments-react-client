@@ -11,7 +11,6 @@ export const useAuthStore = () => {
   const startLogin = async ({ email, password }) => {
     dispatch(onChenking());
     await doAPIPost("auth/login", { email, password }).then((res) => {
-      console.log(res);
       if (res.status === 201) {
         const { token, ...user } = res.data;
         delete user.password;
@@ -40,13 +39,12 @@ export const useAuthStore = () => {
   };
 
   const startGetMyTournaments = async () => {
-    console.log("startGetMyTournaments");
     setLoading(true);
     doAPIGet("tournaments/byAdminId").then((res) => {
       console.log(res.data);
       dispatch(onSetMyTournaments(res.data));
-      setLoading(false);
     })
+    setLoading(false);
   };
 
 

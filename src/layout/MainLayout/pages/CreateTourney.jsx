@@ -12,6 +12,7 @@ import {
   onRemoveGame,
   onRemovePlayer,
   onSetType,
+  onSetSport,
 } from "../../../store/tourney/tourneySlice";
 
 const initialForm = [
@@ -29,9 +30,11 @@ export const CreateTourney = () => {
   const {
     filteredCountries,
     startSearchTeam,
-    typeOptions,
+    tourneyTypeOptions,
+    sportTypeOptions,
     dispatch,
     type,
+    sport,
     players,
     games,
   } = useTourneyStore();
@@ -114,11 +117,24 @@ export const CreateTourney = () => {
       <div className="grid mt-1">
         <div className="col-12">
           <Dropdown
+            value={sport}
+            onChange={(e) => dispatch(onSetSport(e.value))}
+            options={sportTypeOptions}
+            optionLabel="value"
+            optionValue="key"
+            placeholder="Game Type"
+            className="w-full md:w-20rem"
+          />
+        </div>
+        
+        <div className="col-12">
+          <Dropdown
             value={type}
             onChange={(e) => dispatch(onSetType(e.value))}
-            options={typeOptions}
-            optionLabel="name"
-            placeholder="Select a Type"
+            options={tourneyTypeOptions}
+            optionLabel="value"
+            optionValue="key"
+            placeholder="Tournament Type"
             className="w-full md:w-20rem"
           />
         </div>
@@ -168,7 +184,7 @@ export const CreateTourney = () => {
 
       <div className="grid mt-5">
         {form.map((item, index) => (
-          <div className="mr-2 col" key={index}>
+          <div className="mr-2 col-12 md:col" key={index}>
             <Card className="createCard card p-fluid">
               <div className="field">
                 <InputText

@@ -1,18 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { tournamentTypeOptions, sportTypeOptions } from "../../lib/formSelections";
 
 export const tourneySlice = createSlice({
   name: "tourney",
   initialState: {
     name: "",
-    type: "",
+    type: null,
+    sport: null,
     players: 2,
     games: 1,
     filteredCountries: [],
     teams: [],
-    typeOptions: [
-      { name: "League", code: 1 },
-      { name: "Cup", code: 2 },
-    ],
+    tourneyTypeOptions: tournamentTypeOptions,
+    sportTypeOptions: sportTypeOptions
   },
   reducers: {
     onCreateTourney: (state /* action */) => {
@@ -26,6 +26,9 @@ export const tourneySlice = createSlice({
     },
     onSetType: (state, { payload }) => {
       state.type = payload;
+    },
+    onSetSport: (state, { payload }) => {
+      state.sport = payload;
     },
     onAddPlayer: (state) => {
       state.players = state.players + 1;
@@ -49,4 +52,5 @@ export const {
   onRemoveGame,
   onRemovePlayer,
   onSetType,
+  onSetSport,
 } = tourneySlice.actions;
