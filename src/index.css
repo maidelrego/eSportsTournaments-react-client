@@ -8,3 +8,13 @@ body {
 .createCard {
   border: 1px solid #ccc;
 }
+
+.activeLinkClass {
+  background-color: white !important;
+}
+
+@media screen and (max-width: 600px) {
+  .logo {
+   height: 40px;
+  }
+}
