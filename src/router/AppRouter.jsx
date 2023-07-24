@@ -7,6 +7,7 @@ import { MainLayout } from "../layout/MainLayout/routes/MainLayoutRoutes";
 import { Register } from "../auth/pages/Register";
 import { useAuthStore } from "../hooks";
 import { authStatusName } from "../store/auth/authSlice";
+import { AppSpinner } from "../ui/components/AppSpinner";
 
 export const AppRouter = () => {
   const { authStatus, startCheckAuthToken } = useAuthStore();
@@ -15,8 +16,8 @@ export const AppRouter = () => {
     startCheckAuthToken();
   }, []);
 
-  if (authStatus == authStatusName.checking) {
-    return <h3>Cargando.....</h3>; //Loading component here!!
+  if (authStatus === authStatusName.checking) {
+    return <AppSpinner />; //Loading component here!!
   }
 
   return (
