@@ -22,10 +22,12 @@ const initialForm = [
   {
     playerName: "",
     team: "",
+    logoUrl: "",
   },
   {
     playerName: "",
     team: "",
+    logoUrl: "",
   },
 ];
 
@@ -61,6 +63,7 @@ export const CreateTourney = () => {
       {
         playerName: "",
         team: "",
+        logoUrl: "",
       },
     ]);
   };
@@ -145,6 +148,7 @@ export const CreateTourney = () => {
     
     return {checkValues, isValid};
   }
+  console.log('form', form);
 
   return (
     <>

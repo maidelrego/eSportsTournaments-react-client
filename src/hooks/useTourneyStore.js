@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { onResetState, onSetfilteredCountries } from "../store/tourney/tourneySlice";
-import { doAPIPost } from "../services/api";
+import { doAPIDelete, doAPIPost } from "../services/api";
 import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 
 export const useTourneyStore = () => {
@@ -44,6 +44,19 @@ export const useTourneyStore = () => {
     });
   }
 
+  const startDeleteTourney = async( id ) => {
+    dispatch(setLoading(true));
+    await doAPIDelete(`tournaments/${id}`).then((res) => {
+      if (res.status === 200) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast('Tournament deleted successfully!'));   
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast('Something went wrong, check logs'));
+      }
+    });
+  }
+
   return {
     //properties
     filteredCountries,
@@ -58,6 +71,7 @@ export const useTourneyStore = () => {
     //methods
     startSearchTeam,
     dispatch,
-    startSaveTourney
+    startSaveTourney,
+    startDeleteTourney
   };
 };

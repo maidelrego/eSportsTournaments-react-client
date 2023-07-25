@@ -47,44 +47,7 @@ export const useForm = (initialForm = []) => {
         return {
           ...item,
           [name]: value.name ? value.name : value,
-        };
-      }
-      console.log(item);
-      return item;
-    });
-    setForm(newForm);
-  };
-
-  const handleSwitch = (event, index) => {
-    const { name, checked } = event.target;
-    
-    // before setting new value to form, check if it's a win
-    // if it is, set all other wins to false
-    
-    const winner = form.find((item) => item.win === true);
-
-    if (winner && name === "win" && checked === true) {
-      const newForm = form.map((item, i) => {
-        if (i === index) {
-          return {
-            ...item,
-            [name]: checked,
-          };
-        }
-        return {
-          ...item,
-          win: false,
-        };
-      });
-      setForm(newForm);
-      return;
-    }
-
-    const newForm = form.map((item, i) => {
-      if (i === index) {
-        return {
-          ...item,
-          [name]: checked,
+          logoUrl: value.logo ? value.logo : null,
         };
       }
       return item;
@@ -96,7 +59,6 @@ export const useForm = (initialForm = []) => {
     form,
     setForm,
     handleChange,
-    handleSwitch,
     handleFiles,
     handleAutoComplete,
     onResetForm

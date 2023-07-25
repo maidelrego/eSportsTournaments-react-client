@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { FifaTable } from "../components/Tournaments";
 import { TabView, TabPanel } from "primereact/tabview";
 import { TeamCard } from "../components/Teams/TeamCard";
+import { Games } from "../components/Tournaments/Games";
 
 export const Tournament = () => {
   const { state } = useLocation();
@@ -32,7 +33,7 @@ export const Tournament = () => {
               <FifaTable />
             </TabPanel>
             <TabPanel rightIcon="pi pi-calendar mr-2" header="Calendar" headerTemplate={tab1HeaderTemplate}>
-              <h1>Second Page</h1>
+              <Games teams={teams} />
             </TabPanel>
             <TabPanel rightIcon="pi pi-users mr-2" header="Teams" headerTemplate={tab1HeaderTemplate}>
               <TeamCard teams={teams} />

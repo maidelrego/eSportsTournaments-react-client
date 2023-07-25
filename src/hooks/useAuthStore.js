@@ -1,10 +1,20 @@
 import { useDispatch, useSelector } from "react-redux";
 import { doAPIGet, doAPIPost } from "../services/api";
-import { onChenking, onLogin, onLogout, onSetMyTournaments } from "../store/auth/authSlice";
-import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
+import {
+  onChenking,
+  onLogin,
+  onLogout,
+  onSetMyTournaments,
+} from "../store/auth/authSlice";
+import {
+  setErrorToast,
+  setLoading,
+} from "../store/ui/uiSlice";
 
 export const useAuthStore = () => {
-  const { authStatus, user, myTournaments } = useSelector((state) => state.auth);
+  const { authStatus, user, myTournaments } = useSelector(
+    (state) => state.auth
+  );
 
   const dispatch = useDispatch();
 
@@ -41,18 +51,16 @@ export const useAuthStore = () => {
   const startGetMyTournaments = async () => {
     dispatch(setLoading(true));
     doAPIGet("tournaments/byAdminId").then((res) => {
+      console.log(res.data);
       if (res.status === 200) {
         dispatch(onSetMyTournaments(res.data));
         dispatch(setLoading(false));
-        dispatch(setSuccessToast('Tournaments loaded successfully!'));
-
-      }else{
+      } else {
         dispatch(setLoading(false));
-        dispatch(setErrorToast('Something went wrong, check logs'));
+        dispatch(setErrorToast("Something went wrong, check logs"));
       }
     });
   };
-
 
   return {
     //properties
@@ -60,11 +68,10 @@ export const useAuthStore = () => {
     user,
     myTournaments,
 
-
     //methods
     startLogin,
     dispatch,
     startCheckAuthToken,
-    startGetMyTournaments
+    startGetMyTournaments,
   };
 };
