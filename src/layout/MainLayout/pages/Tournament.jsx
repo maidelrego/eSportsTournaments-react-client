@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { FifaTable } from "../components/Tournaments/FifaTable";
+import { FifaTable } from "../components/Tournaments";
 import { TabView, TabPanel } from "primereact/tabview";
 import { TeamCard } from "../components/Teams/TeamCard";
 

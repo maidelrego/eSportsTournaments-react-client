@@ -234,7 +234,7 @@ export const CreateTourney = () => {
 
       <div className="grid mt-5">
         {form.map((item, index) => (
-          <div className="mr-2 col-12 md:col" key={index}>
+          <div className="col-12 md:col-3" key={index}>
             <Card className="createCard card p-fluid">
               <div className="field">
                 <InputText
