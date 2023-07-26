@@ -51,7 +51,6 @@ export const useAuthStore = () => {
   const startGetMyTournaments = async () => {
     dispatch(setLoading(true));
     doAPIGet("tournaments/byAdminId").then((res) => {
-      console.log(res.data);
       if (res.status === 200) {
         dispatch(onSetMyTournaments(res.data));
         dispatch(setLoading(false));

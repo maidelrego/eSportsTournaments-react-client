@@ -1,12 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onResetState, onSetfilteredCountries } from "../store/tourney/tourneySlice";
+import { onResetState } from "../store/tourney/tourneySlice";
 import { doAPIDelete, doAPIPost } from "../services/api";
 import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
+import { useNavigate } from "react-router-dom";
 
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
-  const { filteredCountries, tourneyTypeOptions, sportTypeOptions, name, sport, type, players, games } =
+  const navigate = useNavigate();
+  const { tournamentName, sport, type, players, games, teams } =
     useSelector((state) => state.tourney);
 
   const startSearchTeam = async (query) => {
@@ -27,7 +29,7 @@ export const useTourneyStore = () => {
       };
     });
 
-    dispatch(onSetfilteredCountries(teamsArray));
+    return teamsArray;
   };
 
   const startSaveTourney = async( data ) => {
@@ -36,7 +38,8 @@ export const useTourneyStore = () => {
       if (res.status === 201) {
         dispatch(setLoading(false));
         dispatch(onResetState())
-        dispatch(setSuccessToast('Tournament created successfully!'));   
+        dispatch(setSuccessToast('Tournament created successfully!'));
+        navigate('/my-tourneys');   
       } else {
         dispatch(setLoading(false));
         dispatch(setErrorToast('Something went wrong, check logs'));
@@ -59,15 +62,12 @@ export const useTourneyStore = () => {
 
   return {
     //properties
-    filteredCountries,
-    tourneyTypeOptions,
-    sportTypeOptions,
-    name,
+    tournamentName,
     sport,  
     type,
     players,
     games,
-
+    teams,
     //methods
     startSearchTeam,
     dispatch,

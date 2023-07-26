@@ -7,7 +7,7 @@ import { Games } from "../components/Tournaments/Games";
 export const Tournament = () => {
   const { state } = useLocation();
   const { teams } = state
-
+  
   if (!state) {
     return <Navigate to={"/my-tourneys"} />;
   }
@@ -25,7 +25,7 @@ export const Tournament = () => {
     <>
       <div className="grid">
         <div className="col-12">
-          <h1 className="text-center text-color">Tournament: {state.name}</h1>
+          <h1 className="text-center text-color">Tournament: {state.tournamentName}</h1>
         </div>
         <div className="col-12 mt-5">
           <TabView>

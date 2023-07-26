@@ -1,64 +1,86 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { tournamentTypeOptions, sportTypeOptions } from "../../lib/formSelections";
+
 
 export const tourneySlice = createSlice({
   name: "tourney",
   initialState: {
-    name: "",
+    tournamentName: "",
     type: null,
     sport: null,
     players: 2,
     games: 1,
-    filteredCountries: [],
-    teams: [],
-    tourneyTypeOptions: tournamentTypeOptions,
-    sportTypeOptions: sportTypeOptions
+    teams: [
+      {
+        playerName: "",
+        teamName: "",
+        logoUrl: "",
+      },
+      {
+        playerName: "",
+        teamName: "",
+        logoUrl: "",
+      },
+    ],
   },
   reducers: {
-    onCreateTourney: (state /* action */) => {
-      state.counter += 1;
+    onFormChange: (state, { payload }) => {
+      const { name, value, index } = payload;
+
+      if (index === undefined) {
+        state[name] = value;
+        return;
+      } else {
+        state.teams[index][name] =  value.name ? value.name : value,
+        state.teams[index].logoUrl = value.logo;
+      }
     },
-    onSetfilteredCountries: (state, { payload }) => {
-      state.filteredCountries = payload;
+    onIncrementTeams: (state, { payload }) => {
+      state.teams.push(payload);
     },
-    onSetName: (state, { payload }) => {
-      state.name = payload;
-    },
-    onSetType: (state, { payload }) => {
-      state.type = payload;
-    },
-    onSetSport: (state, { payload }) => {
-      state.sport = payload;
+    onDecrementTeams: (state) => {
+      state.teams.pop();
     },
     onAddPlayer: (state) => {
       state.players = state.players + 1;
     },
-    onAddGame: (state) => {
-      state.games = state.games + 1;
-    },
     onRemovePlayer: (state) => {
       state.players = state.players - 1;
+    },
+    onAddGame: (state) => {
+      state.games = state.games + 1;
     },
     onRemoveGame: (state) => {
       state.games = state.games - 1;
     },
     onResetState: (state) => {
-      state.name = "";
+      state.tournamentName = "";
       state.type = null;
       state.sport = null;
       state.players = 2;
       state.games = 1;
+      state.teams = [
+        {
+          playerName: "",
+          teamName: "",
+          logoUrl: "",
+        },
+        {
+          playerName: "",
+          teamName: "",
+          logoUrl: "",
+        },
+      ];
     },
   },
 });
 // Action creators are generated for each case reducer function
 export const {
-  onSetfilteredCountries,
+  onFormChange,
+  onDecrementTeams,
+  onIncrementTeams,
   onAddGame,
   onAddPlayer,
   onRemoveGame,
   onRemovePlayer,
-  onSetType,
-  onSetSport,
   onResetState
 } = tourneySlice.actions;

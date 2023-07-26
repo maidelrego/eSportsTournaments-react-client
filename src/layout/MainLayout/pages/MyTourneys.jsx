@@ -48,7 +48,7 @@ export const MyTourneys = () => {
             <div className="surface-card shadow-2 border-round p-3">
               <div className="flex justify-content-around surface-border pb-3">
                 <span className="text-xl align-items-center flex text-900 font-medium">
-                  {item.name}
+                  {item.tournamentName}
                 </span>
 
                 <Button

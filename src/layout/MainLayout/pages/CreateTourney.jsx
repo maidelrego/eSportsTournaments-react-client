@@ -5,67 +5,56 @@ import { AutoComplete } from "primereact/autocomplete";
 import { Card } from "primereact/card";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
-import { useForm } from "../../../hooks/useForm";
 import { useTourneyStore } from "../../../hooks/useTourneyStore";
+import { Message } from "primereact/message";
+import {
+  tournamentTypeOptions,
+  sportTypeOptions,
+} from "../../../lib/formSelections";
 import {
   onAddGame,
   onAddPlayer,
   onRemoveGame,
   onRemovePlayer,
-  onSetType,
-  onSetSport,
+  onFormChange,
+  onDecrementTeams,
+  onIncrementTeams,
 } from "../../../store/tourney/tourneySlice";
 import { gamesIsValid } from "../../../helper/gamesValidator";
 import { setErrorToast } from "../../../store/ui/uiSlice";
 
-const initialForm = [
-  {
-    playerName: "",
-    team: "",
-    logoUrl: "",
-  },
-  {
-    playerName: "",
-    team: "",
-    logoUrl: "",
-  },
-];
-
-const requestValidations ={
-  name: [(value) => !validator.isEmpty(value),'Invalid Name' ],
-  type: [(value) => value !== null,'Invalid type' ],
-  sport:[(value) => value !== null,'Invalid sport' ],
-  teams: [ (value) => gamesIsValid(value), 'Invalid teams' ],
-}
+const requestValidations = {
+  tournamentName: [(value) => !validator.isEmpty(value), "Tournament name is required"],
+  type: [(value) => value !== null, "Type is required"],
+  sport: [(value) => value !== null, "Sport is required"],
+  teams: [(value) => gamesIsValid(value), "Invalid teams"],
+};
 
 export const CreateTourney = () => {
+  const [checkValidator, setCheckValidator] = useState([]);
+  const [filteredTeams, setFilteredTeams] = useState([]);
+
   const {
-    filteredCountries,
     startSearchTeam,
     startSaveTourney,
-    tourneyTypeOptions,
-    sportTypeOptions,
     dispatch,
+    tournamentName,
     type,
     sport,
     players,
     games,
+    teams,
   } = useTourneyStore();
-
-  const [name, setName] = useState("");
-  const [checkValidator, setCheckValidator] = useState([]);
-  const { form, setForm, handleChange, onResetForm } = useForm(initialForm);
 
   const playerCountIncrement = () => {
     dispatch(onAddPlayer());
-    setForm([
-      ...form,
-      {
+    dispatch(
+      onIncrementTeams({
         playerName: "",
-        team: "",
+        teamName: "",
         logoUrl: "",
-      },
-    ]);
+      })
+    );
   };
 
   const playerCountDecrement = () => {
@@ -73,11 +62,13 @@ export const CreateTourney = () => {
       return;
     }
     dispatch(onRemovePlayer());
-    setForm(form.slice(0, form.length - 1));
+    dispatch(onDecrementTeams());
   };
 
   const search = async (event) => {
-    startSearchTeam(event.query);
+    startSearchTeam(event.query).then((data) => {
+      setFilteredTeams(data);
+    });
   };
 
   const incrementGamesCount = () => {
@@ -105,50 +96,48 @@ export const CreateTourney = () => {
       </div>
     );
   };
-  
 
   const onSaveTourney = () => {
     const request = {
-      name,
+      tournamentName,
       type,
       sport,
       games,
-      teams:form
-    }
-   
-    const {checkValues, isValid} = validateRequest(request, requestValidations)
+      teams,
+    };
+
+    const { checkValues, isValid } = validateRequest(
+      request,
+      requestValidations
+    );
+
     setCheckValidator(checkValues);
-    
-    if(!isValid){
+
+    if (!isValid) {
       dispatch(setErrorToast('There are empty fields'));
       return;
     }
-   
-    startSaveTourney(request);
-    onResetForm();
-  }
 
-  const validateRequest = ( request,validations = {} ) => {
-      
+    startSaveTourney(request);
+  };
+
+  const validateRequest = (request, validations = {}) => {
     const checkValues = [];
     let isValid = true;
 
     for (const reqField of Object.keys(validations)) {
-        
-      const [fn,errorMessage = '' ] = validations[reqField];
+      const [fn, errorMessage = ""] = validations[reqField];
 
-      if(fn(request[reqField])){
-        checkValues[reqField] = null; 
-      }else{
+      if (fn(request[reqField])) {
+        checkValues[reqField] = null;
+      } else {
         isValid = false;
         checkValues[reqField] = errorMessage;
       }
     }
 
-    
-    return {checkValues, isValid};
-  }
-  console.log('form', form);
+    return { checkValues, isValid };
+  };
 
   return (
     <>
@@ -161,10 +150,14 @@ export const CreateTourney = () => {
         <div className="col-12">
           <InputText
             type="text"
-            placeholder="Name"
-            className={`w-full md:w-20rem ${checkValidator['name'] && checkValidator['name'] !== null ? 'p-invalid' : ''}`}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="Tournament Name *"
+            className={`w-full md:w-20rem ${
+              checkValidator["tournamentName"] && checkValidator["tournamentName"] !== null
+                ? "p-invalid"
+                : ""
+            }`}
+            value={tournamentName}
+            onChange={(e) => dispatch(onFormChange({ name: 'tournamentName', value: e.target.value }))}
           />
         </div>
       </div>
@@ -172,24 +165,32 @@ export const CreateTourney = () => {
         <div className="col-12">
           <Dropdown
             value={sport}
-            onChange={(e) => dispatch(onSetSport(e.value))}
+            onChange={(e) => dispatch(onFormChange({ name: 'sport', value: e.target.value }))}
             options={sportTypeOptions}
             optionLabel="value"
             optionValue="key"
-            placeholder="Game Type"
-            className={`w-full md:w-20rem ${checkValidator['sport'] && checkValidator['sport'] !== null ? 'p-invalid' : ''}`}
+            placeholder="Game Type *"
+            className={`w-full md:w-20rem ${
+              checkValidator["sport"] && checkValidator["sport"] !== null
+                ? "p-invalid"
+                : ""
+            }`}
           />
         </div>
-        
+
         <div className="col-12">
           <Dropdown
             value={type}
-            onChange={(e) => dispatch(onSetType(e.value))}
-            options={tourneyTypeOptions}
+            onChange={(e) => dispatch(onFormChange({ name: 'type', value: e.target.value }))}
+            options={tournamentTypeOptions}
             optionLabel="value"
             optionValue="key"
-            placeholder="Tournament Type"
-            className={`w-full md:w-20rem ${checkValidator['type'] && checkValidator['type'] !== null ? 'p-invalid' : ''}`}
+            placeholder="Tournament Type *"
+            className={`w-full md:w-20rem ${
+              checkValidator["type"] && checkValidator["type"] !== null
+                ? "p-invalid"
+                : ""
+            }`}
           />
         </div>
       </div>
@@ -235,28 +236,31 @@ export const CreateTourney = () => {
           </div>
         </div>
       </div>
-
-      <div className="grid mt-5">
-        {form.map((item, index) => (
+      
+      {
+        checkValidator["teams"] && checkValidator["teams"] !== null
+          ? <Message className="mt-3 mb-2" severity="error" text="One or more teams is missing information" />
+          : null
+      }
+      <div className="grid">
+        {teams.map((item, index) => (
           <div className="col-12 md:col-3" key={index}>
             <Card className="createCard card p-fluid">
               <div className="field">
                 <InputText
                   type="text"
-                  placeholder="Name"
-                  value={form[index].playerName}
-                  name="playerName"
-                  onChange={(e) => handleChange(e, index)}
+                  placeholder="Player Name *"
+                  value={teams[index].playerName}
+                  onChange={(e) => dispatch(onFormChange({ name: 'playerName', value: e.target.value, index }))}
                 />
               </div>
               <AutoComplete
                 field="name"
-                name="team"
-                placeholder="Team"
-                value={form[index].team}
-                suggestions={filteredCountries}
+                placeholder="Team Name *"
+                value={teams[index].teamName}
+                suggestions={filteredTeams}
                 completeMethod={search}
-                onChange={(e) => handleChange(e, index)}
+                onChange={(e) => dispatch(onFormChange({ name: 'teamName', value: e.target.value, index }))}
                 itemTemplate={itemTemplate}
               />
             </Card>
