@@ -1,5 +1,5 @@
 import { Navigate, useLocation, useParams } from "react-router-dom";
-import { FifaTable } from "../components/Tournaments";
+import { Standings } from "../components/Tournaments";
 import { TabView, TabPanel } from "primereact/tabview";
 import { TeamCard } from "../components/Teams/TeamCard";
 import { Games } from "../components/Tournaments/Games";
@@ -10,10 +10,11 @@ export const Tournament = () => {
   const { state } = useLocation();
   const { teams } = state
   const { id = null } = useParams();
-  const { startGetGamesByTournament, gamesList } = useTourneyStore();
+  const { startGetGamesByTournament, startGetTournamentStandings, gamesList, standings } = useTourneyStore();
 
   useEffect(() => {
     startGetGamesByTournament(id)
+    startGetTournamentStandings(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
@@ -40,7 +41,7 @@ export const Tournament = () => {
         <div className="col-12 mt-5">
           <TabView>
             <TabPanel rightIcon="pi pi-table mr-2" header="Standings" headerTemplate={tab1HeaderTemplate}>
-              <FifaTable />
+              <Standings standings={standings} />
             </TabPanel>
             <TabPanel rightIcon="pi pi-calendar mr-2" header="Calendar" headerTemplate={tab1HeaderTemplate}>
               <Games gamesList={gamesList} />

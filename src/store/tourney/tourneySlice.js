@@ -10,6 +10,7 @@ export const tourneySlice = createSlice({
     players: 2,
     games: 1,
     gamesList: [],
+    standings: [],
     teams: [
       {
         playerName: "",
@@ -56,6 +57,9 @@ export const tourneySlice = createSlice({
     onSetGames: (state, {payload}) => {
       state.gamesList = payload;
     },
+    onSetStandings: (state, {payload}) => {
+      state.standings = payload;
+    },
     initGamesById: (state, {payload}) => {
       const index = state.gamesList.findIndex(game => game.id === payload.id);
 
@@ -96,5 +100,6 @@ export const {
   onRemovePlayer,
   onResetState,
   onSetGames,
-  initGamesById
+  initGamesById,
+  onSetStandings
 } = tourneySlice.actions;
