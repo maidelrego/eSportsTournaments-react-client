@@ -24,7 +24,7 @@ export const TeamCard = (props) => {
             <div className="surface-card shadow-2 border-round p-3">
               <div className="flex flex-column align-items-center border-bottom-1 surface-border pb-3">
                 <img
-                  src="https://logos-download.com/wp-content/uploads/2016/05/Real_Madrid_CF_Logo_2001.png"
+                  src={team.logoUrl}
                   style={{ width: "70px", height: "80px" }}
                 />
                 <span className="text-xl text-900 font-medium mb-2 mt-2">

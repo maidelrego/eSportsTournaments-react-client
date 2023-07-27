@@ -1,14 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onResetState } from "../store/tourney/tourneySlice";
-import { doAPIDelete, doAPIPost } from "../services/api";
+import { onResetState, onSetGames } from "../store/tourney/tourneySlice";
+import { doAPIDelete, doAPIGet, doAPIPost, doAPIPut } from "../services/api";
 import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
 
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { tournamentName, sport, type, players, games, teams } =
+  const { tournamentName, sport, type, players, games, teams, gamesList } =
     useSelector((state) => state.tourney);
 
   const startSearchTeam = async (query) => {
@@ -60,6 +60,31 @@ export const useTourneyStore = () => {
     });
   }
 
+  const startGetGamesByTournament = async( id ) => {
+    dispatch(setLoading(true));
+    await doAPIGet(`/games/tournament/${id}`).then((res) => {
+      if (res.status === 200) {
+        dispatch(setLoading(false));
+        dispatch(onSetGames(res.data))
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast('Something went wrong, check logs'));
+      }
+    });
+  }
+  const startSaveGames = async( id,game ) => {
+    dispatch(setLoading(true));
+    await doAPIPut(`games/${id}`,game).then((res) => {
+      if (res.status === 200) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast('Game saved successfully!'));   
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast('Something went wrong, check logs'));
+      }
+    });
+  }
+
   return {
     //properties
     tournamentName,
@@ -68,10 +93,13 @@ export const useTourneyStore = () => {
     players,
     games,
     teams,
+    gamesList,
     //methods
     startSearchTeam,
     dispatch,
     startSaveTourney,
-    startDeleteTourney
+    startDeleteTourney,
+    startGetGamesByTournament,
+    startSaveGames
   };
 };

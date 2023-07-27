@@ -9,6 +9,7 @@ export const tourneySlice = createSlice({
     sport: null,
     players: 2,
     games: 1,
+    gamesList: [],
     teams: [
       {
         playerName: "",
@@ -52,6 +53,9 @@ export const tourneySlice = createSlice({
     onRemoveGame: (state) => {
       state.games = state.games - 1;
     },
+    onSetGames: (state, {payload}) => {
+      state.gamesList = payload;
+    },
     onResetState: (state) => {
       state.tournamentName = "";
       state.type = null;
@@ -82,5 +86,6 @@ export const {
   onAddPlayer,
   onRemoveGame,
   onRemovePlayer,
-  onResetState
+  onResetState,
+  onSetGames
 } = tourneySlice.actions;
