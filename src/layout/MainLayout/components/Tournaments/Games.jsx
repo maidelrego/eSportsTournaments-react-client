@@ -24,6 +24,14 @@ export const Games = ({ gamesList }) => {
     await startSaveGames(gameId, game);
     await startGetTournamentStandings(id)
   };
+
+  const disable = (index) => {
+    if ([null, ''].includes(form[index].score1) || [null, ''].includes(form[index].score2)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   
   return (
     <>
@@ -52,7 +60,7 @@ export const Games = ({ gamesList }) => {
                         type="number"
                         name="score1"
                         className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                        value={form[index].score1}
+                        value={form[index].score1 || ''}
                         onChange={(e) => handleChange(e, index)}
                       />
                       <span className="flex align-items-center justify-content-center mr-2 ml-2 xl:font-bold">
@@ -62,7 +70,7 @@ export const Games = ({ gamesList }) => {
                         type="number"
                         name="score2"
                         className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                        value={form[index].score2}
+                        value={form[index].score2 || ''}
                         onChange={(e) => handleChange(e, index)}
                       />
                     </div>
@@ -72,6 +80,7 @@ export const Games = ({ gamesList }) => {
                         icon="pi pi-check"
                         size="small"
                         rounded
+                        disabled={disable(index)}
                         onClick={() => handleSave(game.id)}
                       />
                     </div>
@@ -89,7 +98,6 @@ export const Games = ({ gamesList }) => {
                     <span className="mt-2 text-xs xl:text-lg">
                       ({game.team2.userName})
                     </span>
-                    {/* <Button icon="pi pi-save" severity="success" rounded text onClick={() => handleSave(game.id)} /> */}
                   </div>
                 </div>
               </Fieldset>
