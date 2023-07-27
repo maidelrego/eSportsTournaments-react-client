@@ -20,7 +20,7 @@ export const Games = ({gamesList}) => {
     delete game.logoUrl;
     delete game.createdAt;
    
-    startSaveGames(id,game);
+    startSaveGames(id, game);
   }
 
   return (
@@ -42,25 +42,33 @@ export const Games = ({gamesList}) => {
                   <span className="mt-2 text-xs xl:text-lg">
                     ({game.team1.userName})
                   </span>
-                  <Button icon="pi pi-save" severity="success" rounded text onClick={() => handleSave(game.id)} />
+                 
                 </div>
-                <InputText
-                  type="number"
-                  name="score1"
-                  className="p-inputtext-sm mt-5 mb-5 w-2rem xl:w-4rem xl:mt-4 mb-4 text-center xl:text-4xl xl:font-bold"
-                  value={form[index].score1}
-                  onChange={(e) => handleChange(e, index)}
-                />
-                <span className="flex align-items-center justify-content-center mr-2 ml-2 xl:font-bold">
+                <div>
+                  <div className="flex flex-wrap flex-row">
+                    <InputText
+                      type="number"
+                      name="score1"
+                      className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
+                      value={form[index].score1}
+                      onChange={(e) => handleChange(e, index)}
+                    />
+                    <span className="flex align-items-center justify-content-center mr-2 ml-2 xl:font-bold">
                   -
-                </span>
-                <InputText
-                  type="number"
-                  name="score2"
-                  className="p-inputtext-sm mt-5 mb-5 w-2rem xl:w-4rem xl:mt-4 mb-4 text-center xl:text-4xl xl:font-bold"
-                  value={form[index].score2}
-                  onChange={(e) => handleChange(e, index)}
-                />
+                    </span>
+                    <InputText
+                      type="number"
+                      name="score2"
+                      className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
+                      value={form[index].score2}
+                      onChange={(e) => handleChange(e, index)}
+                    />
+                  </div>
+                  <div className="flex flex-wrap flex-row align-items-center justify-content-center">
+                    <Button label="Save" icon="pi pi-check" size="small" rounded onClick={() => handleSave(game.id)} />
+                  </div>
+                </div>
+                
                 <div className="flex flex-column align-items-center justify-content-center ml-3">
                   <Avatar
                     image={game.team2.logoUrl}
@@ -73,6 +81,7 @@ export const Games = ({gamesList}) => {
                   <span className="mt-2 text-xs xl:text-lg">
                     ({game.team2.userName})
                   </span>
+                  {/* <Button icon="pi pi-save" severity="success" rounded text onClick={() => handleSave(game.id)} /> */}
                 </div>
               </div>
             </Fieldset>

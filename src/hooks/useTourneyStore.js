@@ -4,6 +4,7 @@ import { onResetState, onSetGames } from "../store/tourney/tourneySlice";
 import { doAPIDelete, doAPIGet, doAPIPost, doAPIPut } from "../services/api";
 import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
+import { initGamesById } from "../store/tourney/tourneySlice";
 
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
@@ -72,12 +73,13 @@ export const useTourneyStore = () => {
       }
     });
   }
-  const startSaveGames = async( id,game ) => {
+  const startSaveGames = async( id, game ) => {
     dispatch(setLoading(true));
     await doAPIPut(`games/${id}`,game).then((res) => {
       if (res.status === 200) {
         dispatch(setLoading(false));
-        dispatch(setSuccessToast('Game saved successfully!'));   
+        dispatch(setSuccessToast('Game saved successfully!')); 
+        dispatch(initGamesById(res.data)); 
       } else {
         dispatch(setLoading(false));
         dispatch(setErrorToast('Something went wrong, check logs'));

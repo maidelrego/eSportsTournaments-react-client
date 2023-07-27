@@ -56,6 +56,14 @@ export const tourneySlice = createSlice({
     onSetGames: (state, {payload}) => {
       state.gamesList = payload;
     },
+    initGamesById: (state, {payload}) => {
+      const index = state.gamesList.findIndex(game => game.id === payload.id);
+
+      if (index === -1) {
+        console.log('GAME NOT FOUND TO SET BY ID', payload)
+      }
+      state.gamesList[index] = payload;
+    },
     onResetState: (state) => {
       state.tournamentName = "";
       state.type = null;
@@ -87,5 +95,6 @@ export const {
   onRemoveGame,
   onRemovePlayer,
   onResetState,
-  onSetGames
+  onSetGames,
+  initGamesById
 } = tourneySlice.actions;

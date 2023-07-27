@@ -30,6 +30,10 @@ input[type=number] {
   padding: 0 !important;
 }
 
+.p-fieldset .p-fieldset-content {
+  padding: 0 !important;
+}
+
 @media screen and (max-width: 600px) {
   .logo {
    height: 40px;

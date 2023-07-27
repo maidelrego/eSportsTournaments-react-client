@@ -14,6 +14,7 @@ export const Tournament = () => {
 
   useEffect(() => {
     startGetGamesByTournament(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
   
