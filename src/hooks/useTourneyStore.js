@@ -13,7 +13,7 @@ export const useTourneyStore = () => {
 
   const startSearchTeam = async (query) => {
     const headers = {
-      "x-rapidapi-key": "4ada01814adea2bb727b810423982de7",
+      "x-rapidapi-key": "35b9bf5686fd51279a2125a63f28fdae",
       "x-rapidapi-host": "v3.football.api-sports.io",
     };
 

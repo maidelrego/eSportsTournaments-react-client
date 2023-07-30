@@ -5,6 +5,8 @@ import { TeamCard } from "../components/Teams/TeamCard";
 import { Games } from "../components/Tournaments/Games";
 import { useTourneyStore } from "../../../hooks";
 import { useEffect } from "react";
+import { SingleElimination } from "../components/Tournaments/SingleEliminationBracket";
+import { generateEliminationStructure } from "../../../helper/generateEliminationStructure";
 
 export const Tournament = () => {
   const { state } = useLocation();
@@ -48,6 +50,9 @@ export const Tournament = () => {
             </TabPanel>
             <TabPanel rightIcon="pi pi-users mr-2" header="Teams" headerTemplate={tab1HeaderTemplate}>
               <TeamCard teams={teams} />
+            </TabPanel>
+            <TabPanel rightIcon="pi pi-users mr-2" header="Brackets" headerTemplate={tab1HeaderTemplate}>
+              <SingleElimination simpleSmallBracket={generateEliminationStructure(gamesList)} />;
             </TabPanel>
           </TabView>
         </div>

@@ -12,7 +12,7 @@ export const Games = ({ gamesList }) => {
   console.log(gamesList);
   const { id = null } = useParams();
   const { form, handleChange } = useForm(gamesList);
-  const { startSaveGames, startGetTournamentStandings } = useTourneyStore();
+  const { startSaveGames, startGetTournamentStandings,startGetGamesByTournament } = useTourneyStore();
 
   const handleSave = async (gameId) => {
     const game = form.find((game) => game.id === gameId);
@@ -22,7 +22,8 @@ export const Games = ({ gamesList }) => {
     delete game.logoUrl;
     delete game.createdAt;
     await startSaveGames(gameId, game);
-    await startGetTournamentStandings(id)
+    await startGetTournamentStandings(id);
+    await startGetGamesByTournament(id);
   };
 
   const disable = (index) => {
@@ -43,15 +44,15 @@ export const Games = ({ gamesList }) => {
                 <div className="flex justify-content-center flex-wrap">
                   <div className="flex flex-column align-items-center justify-content-center mr-3">
                     <Avatar
-                      image={game.team1.logoUrl}
+                      image={game.team1?.logoUrl}
                       className="mb-2"
                       size="large"
                     />
                     <span className="text-xs xl:text-xl">
-                      {game.team1.teamName}
+                      {game.team1?.teamName}
                     </span>
                     <span className="mt-2 text-xs xl:text-lg">
-                      ({game.team1.userName})
+                      ({game.team1?.userName})
                     </span>
                   </div>
                   <div>
@@ -88,15 +89,15 @@ export const Games = ({ gamesList }) => {
 
                   <div className="flex flex-column align-items-center justify-content-center ml-3">
                     <Avatar
-                      image={game.team2.logoUrl}
+                      image={game.team2?.logoUrl}
                       className="mb-2"
                       size="large"
                     />
                     <span className="text-xs xl:text-xl">
-                      {game.team2.teamName}
+                      {game.team2?.teamName}
                     </span>
                     <span className="mt-2 text-xs xl:text-lg">
-                      ({game.team2.userName})
+                      ({game.team2?.userName})
                     </span>
                   </div>
                 </div>

@@ -16,7 +16,7 @@ export const Standings = ({ standings }) => {
     return (
       <div className="flex align-items-center">
         <img
-          src={rowData.team.logoUrl}
+          src={rowData.team?.logoUrl}
           alt={rowData.team.teamName}
           className="mr-2"
           width="30"

@@ -43,7 +43,11 @@ export const tourneySlice = createSlice({
       state.teams.pop();
     },
     onAddPlayer: (state) => {
-      state.players = state.players + 1;
+      if(state.type == 2){
+        state.players = 16;
+      }else{
+        state.players = state.players + 1;
+      }
     },
     onRemovePlayer: (state) => {
       state.players = state.players - 1;
