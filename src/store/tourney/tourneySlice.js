@@ -6,6 +6,7 @@ export const tourneySlice = createSlice({
   initialState: {
     tournamentName: "",
     type: null,
+    numberOfTeams: null,
     sport: null,
     players: 2,
     games: 1,
@@ -36,6 +37,17 @@ export const tourneySlice = createSlice({
         state.teams[index].logoUrl = value.logo;
       }
     },
+    onPushNumberOfTeams: (state, { payload }) => {
+      state.teams = [];
+      for (let i = 0; i < payload; i++) {
+        state.teams.push({
+          playerName: "",
+          teamName: "",
+          logoUrl: "",
+        });
+      }
+      state.players = payload;
+    },
     onIncrementTeams: (state, { payload }) => {
       state.teams.push(payload);
     },
@@ -43,11 +55,7 @@ export const tourneySlice = createSlice({
       state.teams.pop();
     },
     onAddPlayer: (state) => {
-      if(state.type == 2){
-        state.players = 16;
-      }else{
-        state.players = state.players + 1;
-      }
+      state.players = state.players + 1;
     },
     onRemovePlayer: (state) => {
       state.players = state.players - 1;
@@ -105,5 +113,6 @@ export const {
   onResetState,
   onSetGames,
   initGamesById,
-  onSetStandings
+  onSetStandings,
+  onPushNumberOfTeams,
 } = tourneySlice.actions;

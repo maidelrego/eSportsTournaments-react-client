@@ -46,14 +46,19 @@ export const Tournament = () => {
               <Standings standings={standings} />
             </TabPanel>
             <TabPanel rightIcon="pi pi-calendar mr-2" header="Calendar" headerTemplate={tab1HeaderTemplate}>
-              <Games gamesList={gamesList} />
+              <Games gamesList={gamesList} tournamentType={state.type} />
             </TabPanel>
             <TabPanel rightIcon="pi pi-users mr-2" header="Teams" headerTemplate={tab1HeaderTemplate}>
               <TeamCard teams={teams} />
             </TabPanel>
-            <TabPanel rightIcon="pi pi-users mr-2" header="Brackets" headerTemplate={tab1HeaderTemplate}>
-              <SingleElimination simpleSmallBracket={generateEliminationStructure(gamesList)} />;
-            </TabPanel>
+            {
+              state.type === 2 && (
+                <TabPanel rightIcon="pi pi-users mr-2" header="Brackets" headerTemplate={tab1HeaderTemplate}>
+                  <SingleElimination simpleSmallBracket={generateEliminationStructure(gamesList)} />;
+                </TabPanel>
+              )
+            }
+           
           </TabView>
         </div>
         <div className="col-12">

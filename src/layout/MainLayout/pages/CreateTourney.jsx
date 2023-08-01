@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import validator from "validator";
 import { InputText } from "primereact/inputtext";
 import { AutoComplete } from "primereact/autocomplete";
@@ -10,6 +10,7 @@ import { Message } from "primereact/message";
 import {
   tournamentTypeOptions,
   sportTypeOptions,
+  numberOfTeamsInKnockout
 } from "../../../lib/formSelections";
 import {
   onAddGame,
@@ -24,7 +25,10 @@ import { gamesIsValid } from "../../../helper/gamesValidator";
 import { setErrorToast } from "../../../store/ui/uiSlice";
 
 const requestValidations = {
-  tournamentName: [(value) => !validator.isEmpty(value), "Tournament name is required"],
+  tournamentName: [
+    (value) => !validator.isEmpty(value),
+    "Tournament name is required",
+  ],
   type: [(value) => value !== null, "Type is required"],
   sport: [(value) => value !== null, "Sport is required"],
   teams: [(value) => gamesIsValid(value), "Invalid teams"],
@@ -37,9 +41,11 @@ export const CreateTourney = () => {
   const {
     startSearchTeam,
     startSaveTourney,
+    setKnokoutTeams,
     dispatch,
     tournamentName,
     type,
+    numberOfTeams,
     sport,
     players,
     games,
@@ -55,6 +61,12 @@ export const CreateTourney = () => {
         logoUrl: "",
       })
     );
+  };
+
+  const setKnockoutTeams = async (e) => {
+    console.log("e", e.target.value);
+    await dispatch(onFormChange({ name: "numberOfTeams", value: e.target.value }))
+    setKnokoutTeams(e.target.value);
   };
 
   const playerCountDecrement = () => {
@@ -104,6 +116,7 @@ export const CreateTourney = () => {
       sport,
       games,
       teams,
+      numberOfTeams
     };
 
     const { checkValues, isValid } = validateRequest(
@@ -114,9 +127,11 @@ export const CreateTourney = () => {
     setCheckValidator(checkValues);
 
     if (!isValid) {
-      dispatch(setErrorToast('There are empty fields'));
+      dispatch(setErrorToast("There are empty fields"));
       return;
     }
+
+    delete request.numberOfTeams;
 
     startSaveTourney(request);
   };
@@ -136,8 +151,23 @@ export const CreateTourney = () => {
       }
     }
 
+    if (request.type === 2) {
+      if (!validator.isNumeric(String(request.numberOfTeams))) {
+        isValid = false;
+        checkValues["numberOfTeams"] = "Number of teams must be a valid number";
+      } else {
+        checkValues["numberOfTeams"] = null;
+      }
+    }
+
     return { checkValues, isValid };
   };
+
+  useEffect(() => {
+    if (type === 1) {
+      dispatch(onFormChange({ name: "numberOfTeams", value: null }));
+    }
+  }, [type, dispatch]);
 
   return (
     <>
@@ -152,12 +182,17 @@ export const CreateTourney = () => {
             type="text"
             placeholder="Tournament Name *"
             className={`w-full md:w-20rem ${
-              checkValidator["tournamentName"] && checkValidator["tournamentName"] !== null
+              checkValidator["tournamentName"] &&
+              checkValidator["tournamentName"] !== null
                 ? "p-invalid"
                 : ""
             }`}
             value={tournamentName}
-            onChange={(e) => dispatch(onFormChange({ name: 'tournamentName', value: e.target.value }))}
+            onChange={(e) =>
+              dispatch(
+                onFormChange({ name: "tournamentName", value: e.target.value })
+              )
+            }
           />
         </div>
       </div>
@@ -165,7 +200,9 @@ export const CreateTourney = () => {
         <div className="col-12">
           <Dropdown
             value={sport}
-            onChange={(e) => dispatch(onFormChange({ name: 'sport', value: e.target.value }))}
+            onChange={(e) =>
+              dispatch(onFormChange({ name: "sport", value: e.target.value }))
+            }
             options={sportTypeOptions}
             optionLabel="value"
             optionValue="key"
@@ -181,7 +218,9 @@ export const CreateTourney = () => {
         <div className="col-12">
           <Dropdown
             value={type}
-            onChange={(e) => dispatch(onFormChange({ name: 'type', value: e.target.value }))}
+            onChange={(e) =>
+              dispatch(onFormChange({ name: "type", value: e.target.value }))
+            }
             options={tournamentTypeOptions}
             optionLabel="value"
             optionValue="key"
@@ -193,56 +232,78 @@ export const CreateTourney = () => {
             }`}
           />
         </div>
+
+        {type === 2 && (
+          <div className="col-12">
+            <Dropdown
+              value={numberOfTeams}
+              onChange={(e) => setKnockoutTeams(e) }
+              options={numberOfTeamsInKnockout}
+              optionLabel="value"
+              optionValue="key"
+              placeholder="Number of Teams *"
+              className={`w-full md:w-20rem ${
+                checkValidator["numberOfTeams"] && checkValidator["numberOfTeams"] !== null
+                  ? "p-invalid"
+                  : ""
+              }`}
+            />
+          </div>
+        )}
       </div>
 
-      <div className="grid justify-content-center mt-5">
-        <div className="col-12 md:col-6 mt-2">
-          <span className="font-bold text-2xl text-color">
+      {type === 1 && (
+        <div className="grid justify-content-center mt-5">
+          <div className="col-12 md:col-6 mt-2">
+            <span className="font-bold text-2xl text-color">
             Number of players
-          </span>
-        </div>
-
-        <div className="col-6">
-          <div className="p-inputgroup w-9rem">
-            <Button icon="pi pi-minus" onClick={playerCountDecrement} />
-            <InputText
-              readOnly
-              value={players}
-              pt={{
-                root: { className: "text-center font-bold" },
-              }}
-            />
-            <Button icon="pi pi-plus" onClick={playerCountIncrement} />
+            </span>
           </div>
-        </div>
 
-        <div className="col-12 md:col-6 mt-2">
-          <span className="font-bold text-2xl text-color">
+          <div className="col-6">
+            <div className="p-inputgroup w-9rem">
+              <Button icon="pi pi-minus" onClick={playerCountDecrement} />
+              <InputText
+                readOnly
+                value={players}
+                pt={{
+                  root: { className: "text-center font-bold" },
+                }}
+              />
+              <Button icon="pi pi-plus" onClick={playerCountIncrement} />
+            </div>
+          </div>
+
+          <div className="col-12 md:col-6 mt-2">
+            <span className="font-bold text-2xl text-color">
             Number of games against each team
-          </span>
-        </div>
+            </span>
+          </div>
 
-        <div className="col-6">
-          <div className="p-inputgroup w-9rem">
-            <Button icon="pi pi-minus" onClick={decrementGamesCount} />
-            <InputText
-              readOnly
-              value={games}
-              pt={{
-                root: { className: "text-center font-bold" },
-              }}
-            />
-            <Button icon="pi pi-plus" onClick={incrementGamesCount} />
+          <div className="col-6">
+            <div className="p-inputgroup w-9rem">
+              <Button icon="pi pi-minus" onClick={decrementGamesCount} />
+              <InputText
+                readOnly
+                value={games}
+                pt={{
+                  root: { className: "text-center font-bold" },
+                }}
+              />
+              <Button icon="pi pi-plus" onClick={incrementGamesCount} />
+            </div>
           </div>
         </div>
-      </div>
-      
-      {
-        checkValidator["teams"] && checkValidator["teams"] !== null
-          ? <Message className="mt-3 mb-2" severity="error" text="One or more teams is missing information" />
-          : null
-      }
-      <div className="grid">
+      )}
+
+      {checkValidator["teams"] && checkValidator["teams"] !== null ? (
+        <Message
+          className="mt-5"
+          severity="error"
+          text="One or more teams is missing information"
+        />
+      ) : null}
+      <div className="grid mt-2">
         {teams.map((item, index) => (
           <div className="col-12 md:col-3" key={index}>
             <Card className="createCard card p-fluid">
@@ -251,7 +312,15 @@ export const CreateTourney = () => {
                   type="text"
                   placeholder="Player Name *"
                   value={teams[index].playerName}
-                  onChange={(e) => dispatch(onFormChange({ name: 'playerName', value: e.target.value, index }))}
+                  onChange={(e) =>
+                    dispatch(
+                      onFormChange({
+                        name: "playerName",
+                        value: e.target.value,
+                        index,
+                      })
+                    )
+                  }
                 />
               </div>
               <AutoComplete
@@ -260,7 +329,15 @@ export const CreateTourney = () => {
                 value={teams[index].teamName}
                 suggestions={filteredTeams}
                 completeMethod={search}
-                onChange={(e) => dispatch(onFormChange({ name: 'teamName', value: e.target.value, index }))}
+                onChange={(e) =>
+                  dispatch(
+                    onFormChange({
+                      name: "teamName",
+                      value: e.target.value,
+                      index,
+                    })
+                  )
+                }
                 itemTemplate={itemTemplate}
               />
             </Card>
@@ -268,7 +345,7 @@ export const CreateTourney = () => {
         ))}
       </div>
       <div className="grid mt-5">
-        <Button label="Submit" icon="pi pi-check" onClick={onSaveTourney} />
+        <Button label="Create Tourney" icon="pi pi-check" onClick={onSaveTourney} />
       </div>
     </>
   );

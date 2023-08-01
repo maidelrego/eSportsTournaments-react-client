@@ -400,10 +400,10 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.44.0.tgz"
   integrity sha512-Ag+9YM4ocKQx9AarydN0KY2j0ErMHNIocPDrVo8zAE44xLTjEtz81OdR68/cydGtk6m6jDb5Za3r2useMzYmSw==
 
-"@g-loot/react-tournament-brackets@1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@g-loot/react-tournament-brackets/-/react-tournament-brackets-1.0.17.tgz#cb87c7b7bb4dbe0a82c6f00d457b63544ab64427"
-  integrity sha512-6k8JjE1Iq0lfMakV9GVZsfFQDKmStYYtc8bCl28IoJ6affJwgal4dAEDz6CWwUXkWBzG4Tq/dGGQ0QpGf5ZJxg==
+"@g-loot/react-tournament-brackets@^1.0.30":
+  version "1.0.30"
+  resolved "https://registry.yarnpkg.com/@g-loot/react-tournament-brackets/-/react-tournament-brackets-1.0.30.tgz#04e933506724b75aad38ccec83a8dbfc4377c99b"
+  integrity sha512-vbLjBtoOaZzxGpGM7J/XVHV8XY+1oktxgVTDv1orL+GolfIH8nueuEBZ/bt/m5wSZSFCFypmzVpVDPhmJGjKgA==
 
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"

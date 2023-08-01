@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@g-loot/react-tournament-brackets": "1.0.17",
+    "@g-loot/react-tournament-brackets": "^1.0.30",
     "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.4.0",
     "formik": "^2.4.2",

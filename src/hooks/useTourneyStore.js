@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onResetState, onSetGames, initGamesById, onSetStandings } from "../store/tourney/tourneySlice";
+import { onResetState, onSetGames, initGamesById, onSetStandings, onPushNumberOfTeams } from "../store/tourney/tourneySlice";
 import { doAPIDelete, doAPIGet, doAPIPost, doAPIPut } from "../services/api";
 import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
@@ -8,12 +8,12 @@ import { useNavigate } from "react-router-dom";
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { tournamentName, sport, type, players, games, teams, gamesList, standings } =
+  const { tournamentName, sport, type, numberOfTeams, players, games, teams, gamesList, standings } =
     useSelector((state) => state.tourney);
 
   const startSearchTeam = async (query) => {
     const headers = {
-      "x-rapidapi-key": "35b9bf5686fd51279a2125a63f28fdae",
+      "x-rapidapi-key": "4ada01814adea2bb727b810423982de7",
       "x-rapidapi-host": "v3.football.api-sports.io",
     };
 
@@ -100,11 +100,26 @@ export const useTourneyStore = () => {
     });
   }
 
+  const setKnokoutTeams = (number) => {
+    switch (number) {
+    case 1:
+      dispatch(onPushNumberOfTeams(16)); 
+      break;
+    case 2:
+      dispatch(onPushNumberOfTeams(8)); 
+      break;
+    case 3:
+      dispatch(onPushNumberOfTeams(4));
+      break;
+    }
+  }
+
   return {
     //properties
     tournamentName,
     sport,  
     type,
+    numberOfTeams,
     players,
     games,
     teams,
@@ -117,6 +132,7 @@ export const useTourneyStore = () => {
     startDeleteTourney,
     startGetGamesByTournament,
     startSaveGames,
-    startGetTournamentStandings
+    startGetTournamentStandings,
+    setKnokoutTeams
   };
 };
