@@ -13,9 +13,7 @@ import {
   numberOfTeamsInKnockout
 } from "../../../lib/formSelections";
 import {
-  onAddGame,
   onAddPlayer,
-  onRemoveGame,
   onRemovePlayer,
   onFormChange,
   onDecrementTeams,
@@ -48,7 +46,6 @@ export const CreateTourney = () => {
     numberOfTeams,
     sport,
     players,
-    games,
     teams,
   } = useTourneyStore();
 
@@ -83,18 +80,6 @@ export const CreateTourney = () => {
     });
   };
 
-  const incrementGamesCount = () => {
-    if (games === 3) return;
-    dispatch(onAddGame());
-  };
-
-  const decrementGamesCount = () => {
-    if (games === 0) {
-      return;
-    }
-    dispatch(onRemoveGame());
-  };
-
   const itemTemplate = (item) => {
     return (
       <div className="flex align-items-center">
@@ -114,7 +99,6 @@ export const CreateTourney = () => {
       tournamentName,
       type,
       sport,
-      games,
       teams,
       numberOfTeams
     };
@@ -271,26 +255,6 @@ export const CreateTourney = () => {
                 }}
               />
               <Button icon="pi pi-plus" onClick={playerCountIncrement} />
-            </div>
-          </div>
-
-          <div className="col-12 md:col-6 mt-2">
-            <span className="font-bold text-2xl text-color">
-            Number of games against each team
-            </span>
-          </div>
-
-          <div className="col-6">
-            <div className="p-inputgroup w-9rem">
-              <Button icon="pi pi-minus" onClick={decrementGamesCount} />
-              <InputText
-                readOnly
-                value={games}
-                pt={{
-                  root: { className: "text-center font-bold" },
-                }}
-              />
-              <Button icon="pi pi-plus" onClick={incrementGamesCount} />
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { Button } from "primereact/button";
 import { useTourneyStore } from "../../../../hooks";
 import { useParams } from "react-router-dom";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { getKnokoutStages } from "../../../../lib/helpers";
+import { getKnokoutStages } from "../../../../helper/getKnokoutStages";
 
 export const KnokoutGames = ({ gamesList }) => {
   console.log(gamesList);
