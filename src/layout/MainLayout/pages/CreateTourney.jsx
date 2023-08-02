@@ -309,7 +309,7 @@ export const CreateTourney = () => {
         ))}
       </div>
       <div className="grid mt-5">
-        <Button label="Create Tourney" icon="pi pi-check" onClick={onSaveTourney} />
+        <Button label="Create Tourney" className="px-4 py-3 p-button-raised p-button-rounded" icon="pi pi-check" onClick={onSaveTourney} />
       </div>
     </>
   );

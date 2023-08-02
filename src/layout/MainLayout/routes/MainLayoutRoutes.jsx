@@ -1,6 +1,6 @@
 import { Navbar } from "../components/NavBar/NavBar";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { CreateTourney } from "../pages";
+import { ContactUs, CreateTourney, JoinTourney } from "../pages";
 import { MyTourneys } from "../pages";
 import { Tournament } from "../pages/Tournament";
 import { ToastContainer } from "react-toastify";
@@ -17,7 +17,9 @@ export const MainLayout = () => {
         <Routes>
           <Route path="/" element={<Navigate to="create-tourney" />} />
           <Route path="create-tourney" element={<CreateTourney />} />
+          <Route path="join-tourney" element={<JoinTourney />} />
           <Route path="my-tourneys" element={<MyTourneys />} />
+          <Route path="contact-us" element={<ContactUs />} />
           <Route path="/my-tourneys/:id" element={<Tournament />} />
         </Routes>
       </div>

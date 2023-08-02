@@ -29,10 +29,22 @@ export const Navbar = () => {
       className: `mr-3 ${linkIsActive('/create-tourney')}`  
     },
     {
+      label: 'Join Tourney',
+      icon: 'pi pi-sign-in',
+      command: () => navigate('/join-tourney'),
+      className: `mr-3 ${linkIsActive('/join-tourney')}`
+    },
+    {
       label: 'My Tourneys',
-      icon: 'pi pi-fw pi-calendar',
+      icon: 'pi pi-calendar',
       command: () => navigate('/my-tourneys'),
       className: `mr-3 ${linkIsActive('/my-tourneys')}`
+    },
+    {
+      label: 'Contact Us',
+      icon: 'pi pi-envelope',
+      command: () => navigate('/contact-us'),
+      className: `mr-3 ${linkIsActive('/contact-us')}`
     },
     {
       label: user?.fullName,
@@ -48,8 +60,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <Menubar className="menuBar" model={items} start={start}
-      />
+      <Menubar className="menuBar" model={items} start={start}/>
     </>
   );
 };
