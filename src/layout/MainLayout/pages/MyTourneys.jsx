@@ -8,8 +8,6 @@ import { ShareTournament } from "../components/Tournaments";
 import { useTourneyStore } from "../../../hooks";
 import moment from "moment";
 import { translateFormSelection } from "../../../helper/translateFormSelections";
-import { Chip } from 'primereact/chip';
-
 
 export const MyTourneys = () => {
   const { myTournaments, startGetMyTournaments } = useAuthStore();
@@ -49,9 +47,14 @@ export const MyTourneys = () => {
         {myTournaments.map((item) => (
           <div className="col-12 md:col-4" key={item.id}>
             <div className="bg-primary text-color p-3 flex justify-content-between align-items-center flex-wrap">
-              <span className="text-2xl md:text-4xl align-items-center flex text-900 font-medium">
-                {item.tournamentName}
-              </span>
+              <div className="flex flex-column align-items-start">
+                <span style={{color: '#2c3e50' }} className="text-2xl md:text-4xl font-medium mb-1">
+                  {item.tournamentName}
+                </span>
+                <span className="bg-blue-50 text-blue-400 border-round inline-flex py-1 px-2 text-sm">
+                  {item.type === 1 ? 'Guest' : 'Host'}
+                </span>
+              </div>
               <div>
                 <Button
                   icon="pi pi-refresh"
@@ -70,25 +73,42 @@ export const MyTourneys = () => {
               </div>
             </div>
             <div className="surface-card shadow-2 p-3">
-              <div className="flex flex-column justify-content-center border-bottom-1 surface-border pb-3 pt-3">
-                <span className="text-color text-lg font-bold mb-2">
-                  Winner: <span className="text-orange-500">In progress...</span>
-                </span>
-                <span className="text-color text-lg  font-bold mb-2">
-                
-                  Type:<Chip className="ml-2" style={{ height: '30px' }} label={translateFormSelection(item.type, 'tournamentTypeOptions')} />
-                </span>
-                <span className="text-color text-lg  font-bold mb-2">
-                  Games played: <Chip className="ml-2" style={{ height: '30px' }} label='4/7'/>
-                </span>
-                <span className="text-color font-bold mb-2">
-                  Players:<Chip className="ml-2" style={{ height: '30px' }} label={item.teams.length}/>
-                </span>
-                <span className="text-color text-lg  font-bold mb-2">
-                
-                  Created on:<Chip className="ml-2" style={{ height: '30px' }} label={moment(item.createdAt).format('MM/DD/YYYY hh:mm A')}/>
-                </span>
-              </div>
+              <ul className="list-none m-0 p-0 border-bottom-1 surface-border mb-3">
+                <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
+                  <span className="text-600 font-medium text-sm">Winner</span>
+                  <span className="text-900 font-medium text-sm">
+                    In progress...
+                  </span>
+                </li>
+                <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
+                  <span className="text-600 font-medium text-sm">Type</span>
+                  <span className="text-900 font-medium text-sm">
+                    {translateFormSelection(item.type, "tournamentTypeOptions")}
+                  </span>
+                </li>
+                <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
+                  <span className="text-600 font-medium text-sm">
+                    Games played
+                  </span>
+                  <span className="text-900 font-medium text-sm">
+                    {item.gamesPlayed} / {item.gamesTotal}
+                  </span>
+                </li>
+                <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
+                  <span className="text-600 font-medium text-sm">Players</span>
+                  <span className="text-900 font-medium text-sm">
+                    {item.teams.length}
+                  </span>
+                </li>
+                <li className="px-0 py-2 flex justify-content-between align-items-center">
+                  <span className="text-600 font-medium text-sm">
+                    Created On
+                  </span>
+                  <span className="text-900 font-medium text-sm">
+                    {moment(item.createdAt).format("MM/DD/YYYY hh:mm A")}
+                  </span>
+                </li>
+              </ul>
               <div className="flex justify-content-between pt-3">
                 <Button
                   label="View"
