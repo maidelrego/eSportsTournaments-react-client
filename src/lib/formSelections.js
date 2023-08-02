@@ -1,4 +1,4 @@
-export const tournamentTypeOptions = [
+const tournamentTypeOptions = [
   {
     value: "League",
     key: 1,
@@ -9,22 +9,14 @@ export const tournamentTypeOptions = [
   }
 ];
 
-export const sportTypeOptions = [
+const sportTypeOptions = [
   {
     value: "FIFA",
     key: 1,
-  },
-  // {
-  //   value: "Madden",
-  //   key: 2,
-  // },
-  // {
-  //   value: "NBA 2K",
-  //   key: 3,
-  // }
+  }
 ];
 
-export const numberOfTeamsInKnockout = [
+const numberOfTeamsInKnockout = [
   {
     value: '16 Teams (Round of 16, Round of 8, Semi-Finals, Finals)',
     key: 1,
@@ -38,3 +30,9 @@ export const numberOfTeamsInKnockout = [
     key: 3,
   }
 ];
+
+export default {
+  tournamentTypeOptions,
+  sportTypeOptions,
+  numberOfTeamsInKnockout
+}

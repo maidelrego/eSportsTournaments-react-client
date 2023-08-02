@@ -8,11 +8,6 @@ import { Button } from "primereact/button";
 import { useTourneyStore } from "../../../hooks/useTourneyStore";
 import { Message } from "primereact/message";
 import {
-  tournamentTypeOptions,
-  sportTypeOptions,
-  numberOfTeamsInKnockout
-} from "../../../lib/formSelections";
-import {
   onAddPlayer,
   onRemovePlayer,
   onFormChange,
@@ -21,6 +16,11 @@ import {
 } from "../../../store/tourney/tourneySlice";
 import { gamesIsValid } from "../../../helper/gamesValidator";
 import { setErrorToast } from "../../../store/ui/uiSlice";
+import formSelections from "../../../lib/formSelections";
+
+const tournamentTypeOptions = formSelections.tournamentTypeOptions;
+const sportTypeOptions = formSelections.sportTypeOptions;
+const numberOfTeamsInKnockout = formSelections.numberOfTeamsInKnockout;
 
 const requestValidations = {
   tournamentName: [

@@ -19,6 +19,7 @@ export const ShareTournament = () => {
     <>
       <Button
         label="Share"
+        severity="secondary"
         rounded
         outlined
         icon="pi pi-share-alt"
