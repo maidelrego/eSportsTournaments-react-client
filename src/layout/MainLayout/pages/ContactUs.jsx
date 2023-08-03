@@ -38,7 +38,7 @@ export const ContactUs = () => {
                 <InputTextarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder='Message' autoResize className="w-full mb-3"/>
                 <ReCAPTCHA
                   className='mb-3'
-                  sitekey="6Ld4PHcnAAAAAPuIfPxcuk0b1lVcNlEvrYRmUCpP"
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                   onChange={onChange}
                 />
                 <Button disabled={validate()} label="Contact Us" icon="pi pi-envelope" className="w-full px-4 py-3 p-button-raised p-button-rounded " />

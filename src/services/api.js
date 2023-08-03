@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create();
-// const baseURL = process.env.NODE_ENV === "production" ? process.env.REACT_APP_PROD_URL : process.env.REACT_APP_DEV_URL;
-const baseURL = "http://localhost:3000/";
+const baseURL = import.meta.env.VITE_NODE_ENV === "production" ? import.meta.env.VITE_PROD_URL : import.meta.env.VITE_DEV_URL;
+// const baseURL = "http://localhost:3000/";
 const apiServer = baseURL + "api/v1/";
 
 function timeoutWatcher(promise, options = {}) {
@@ -63,7 +63,7 @@ function doAPIGet(path, params, timeout = null) {
       return res;
     })
     .catch((err) => {
-      return err.response.data;
+      return err.response;
     });
   return req;
 }
@@ -80,7 +80,7 @@ function doAPIPost(path, params) {
     })
     .catch((err) => {
       console.log(err);
-      return err.response.data;
+      return err.response;
     });
 }
 function doAPIPut(path, params) {
@@ -96,7 +96,7 @@ function doAPIPut(path, params) {
       return data;
     })
     .catch((err) => {
-      return err.response.data;
+      return err.response;
     });
 }
 function doAPIDelete(path) {
@@ -107,7 +107,7 @@ function doAPIDelete(path) {
       return data;
     })
     .catch((err) => {
-      return err.response.data;
+      return err.response;
     });
 }
 

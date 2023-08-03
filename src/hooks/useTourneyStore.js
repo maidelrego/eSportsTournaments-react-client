@@ -114,6 +114,26 @@ export const useTourneyStore = () => {
     }
   }
 
+  const startGenerateJWT = async (data) => {
+    const res = await doAPIPost("tournaments/generateJWT", data)
+    if (!res.data) return
+    return res.data
+  }
+
+  const startJoinTournament = async (token) => {
+    dispatch(setLoading(true));
+    await doAPIPost('tournaments/join', token).then((res) => {
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast('Tournament joined successfully!'));
+      } else {
+        dispatch(setLoading(false));
+        console.log(res)
+        dispatch(setErrorToast(res.data.message));
+      }
+    });
+  }
+
   return {
     //properties
     tournamentName,
@@ -133,6 +153,8 @@ export const useTourneyStore = () => {
     startGetGamesByTournament,
     startSaveGames,
     startGetTournamentStandings,
-    setKnokoutTeams
+    setKnokoutTeams,
+    startGenerateJWT,
+    startJoinTournament
   };
 };

@@ -119,7 +119,7 @@ export const MyTourneys = () => {
                   className="w-full mr-2"
                   onClick={() => handleViewTournament(item.id, item)}
                 />
-                <ShareTournament />
+                <ShareTournament uniqueId={item.uniqueId}/>
               </div>
             </div>
           </div>
