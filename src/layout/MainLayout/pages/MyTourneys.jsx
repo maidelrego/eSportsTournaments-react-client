@@ -8,16 +8,27 @@ import { ShareTournament } from "../components/Tournaments";
 import { useTourneyStore } from "../../../hooks";
 import moment from "moment";
 import { translateFormSelection } from "../../../helper/translateFormSelections";
+import { getRoles, permission }  from "../../../helper/getRoles";
+import { useSelector } from "react-redux";
 
 export const MyTourneys = () => {
   const { myTournaments, startGetMyTournaments } = useAuthStore();
   console.log(myTournaments);
   const { startDeleteTourney } = useTourneyStore();
+  const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   const handleViewTournament = (id, data) => {
     navigate(`/my-tourneys/${id}`, { state: data });
   };
+
+  const getWinner = (item) => {
+    if (item.gamesPlayed === item.gamesTotal) {
+      return item.standings[0].team.userName
+    } else {
+      return 'In progress.......'
+    }
+  }
 
   useEffect(() => {
     startGetMyTournaments();
@@ -52,32 +63,34 @@ export const MyTourneys = () => {
                   {item.tournamentName}
                 </span>
                 <span className="bg-blue-50 text-blue-400 border-round inline-flex py-1 px-2 text-sm">
-                  {item.type === 1 ? 'Guest' : 'Host'}
+                  {getRoles(item.sharedAdmins, item.sharedGuests, user.id)}
                 </span>
               </div>
-              <div>
-                <Button
-                  icon="pi pi-refresh"
-                  severity="secondary"
-                  size="small"
-                  className="mr-3"
-                  style={{ width: "20px", height: "30px" }}
-                />
-                <Button
-                  icon="pi pi-trash"
-                  severity="secondary"
-                  size="small"
-                  style={{ width: "20px", height: "30px" }}
-                  onClick={() => confirm2(item.id)}
-                />
-              </div>
+              {permission(item.sharedAdmins, item.sharedGuests, user.id) && (
+                <div>
+                  <Button
+                    icon="pi pi-refresh"
+                    severity="secondary"
+                    size="small"
+                    className="mr-3"
+                    style={{ width: "20px", height: "30px" }}
+                  />
+                  <Button
+                    icon="pi pi-trash"
+                    severity="secondary"
+                    size="small"
+                    style={{ width: "20px", height: "30px" }}
+                    onClick={() => confirm2(item.id)}
+                  />
+                </div>
+              )} 
             </div>
             <div className="surface-card shadow-2 p-3">
               <ul className="list-none m-0 p-0 border-bottom-1 surface-border mb-3">
                 <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
                   <span className="text-600 font-medium text-sm">Winner</span>
                   <span className="text-900 font-medium text-sm">
-                    In progress...
+                    {getWinner(item)}
                   </span>
                 </li>
                 <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
@@ -119,7 +132,12 @@ export const MyTourneys = () => {
                   className="w-full mr-2"
                   onClick={() => handleViewTournament(item.id, item)}
                 />
-                <ShareTournament uniqueId={item.uniqueId}/>
+                {
+                  permission(item.sharedAdmins, item.sharedGuests, user.id) && (
+                    <ShareTournament uniqueId={item.uniqueId}/>
+                  )
+                }
+                
               </div>
             </div>
           </div>

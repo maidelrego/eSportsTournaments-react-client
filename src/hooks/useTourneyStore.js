@@ -77,8 +77,8 @@ export const useTourneyStore = () => {
     dispatch(setLoading(true));
     doAPIGet(`/tournaments/standings/${id}`).then((res) => {
       if (res.status === 200) {
-        dispatch(setLoading(false));
         dispatch(onSetStandings(res.data))
+        dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
         dispatch(setErrorToast('Something went wrong, check logs'));
@@ -126,9 +126,9 @@ export const useTourneyStore = () => {
       if (res.status === 201) {
         dispatch(setLoading(false));
         dispatch(setSuccessToast('Tournament joined successfully!'));
+        navigate('/my-tourneys');
       } else {
         dispatch(setLoading(false));
-        console.log(res)
         dispatch(setErrorToast(res.data.message));
       }
     });

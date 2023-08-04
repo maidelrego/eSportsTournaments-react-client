@@ -61,7 +61,6 @@ export const CreateTourney = () => {
   };
 
   const setKnockoutTeams = async (e) => {
-    console.log("e", e.target.value);
     await dispatch(onFormChange({ name: "numberOfTeams", value: e.target.value }))
     setKnokoutTeams(e.target.value);
   };

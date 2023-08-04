@@ -9,15 +9,19 @@ import { useTourneyStore } from "../../../../hooks";
 import { useParams } from "react-router-dom";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { getKnokoutStages } from "../../../../helper/getKnokoutStages";
+import { useEffect } from "react";
 
 export const KnokoutGames = ({ gamesList }) => {
-  console.log(gamesList);
   const { id = null } = useParams();
-  const { form, handleChange } = useForm(gamesList);
+  const { form, handleChange, setForm } = useForm(gamesList);
   const { startSaveGames, startGetTournamentStandings,startGetGamesByTournament } = useTourneyStore();
 
+  useEffect(() => {
+    setForm(gamesList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gamesList]);
+
   const arrayOfRounds = [...new Set(form.map((game) => game.tournamentRoundText))]
-  console.log(arrayOfRounds);
 
   const handleSave = async (gameId) => {
     const game = form.find((game) => game.id === gameId);

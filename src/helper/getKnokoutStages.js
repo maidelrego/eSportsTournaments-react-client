@@ -1,6 +1,4 @@
 export const getKnokoutStages = (stageNumber, numberOfRounds) => {
-  console.log('stageNumber', stageNumber)
-  console.log('numberOfRounds', numberOfRounds)
   let string = ''
 
   switch (numberOfRounds) {
