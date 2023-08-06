@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onResetState, onSetGames, initGamesById, onSetStandings, onPushNumberOfTeams } from "../store/tourney/tourneySlice";
+import { onResetState, onSetGames, initGamesById, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
 import { doAPIDelete, doAPIGet, doAPIPost, doAPIPut } from "../services/api";
 import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
@@ -155,6 +155,8 @@ export const useTourneyStore = () => {
     startGetTournamentStandings,
     setKnokoutTeams,
     startGenerateJWT,
-    startJoinTournament
+    startJoinTournament,
+    onResetGamesList,
+    onResetStandings
   };
 };

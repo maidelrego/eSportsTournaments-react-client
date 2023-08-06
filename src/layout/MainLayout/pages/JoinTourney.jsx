@@ -28,6 +28,7 @@ export const JoinTourney = () => {
             />
             <div className="flex justify-content-end mt-4">
               <Button
+                disabled={!tournamentToken}
                 label="Join"
                 icon="pi pi-external-link"
                 rounded

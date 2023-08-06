@@ -99,6 +99,12 @@ export const tourneySlice = createSlice({
         },
       ];
     },
+    onResetGamesList: (state) => {
+      state.gamesList = [];
+    },
+    onResetStandings: (state) => {
+      state.standings = [];
+    },
   },
 });
 // Action creators are generated for each case reducer function
@@ -115,4 +121,6 @@ export const {
   initGamesById,
   onSetStandings,
   onPushNumberOfTeams,
+  onResetGamesList,
+  onResetStandings,
 } = tourneySlice.actions;

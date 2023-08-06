@@ -9,18 +9,22 @@ import { SingleElimination } from "../components/Tournaments/SingleEliminationBr
 import { generateEliminationStructure } from "../../../helper/generateEliminationStructure";
 
 export const Tournament = () => {
-  const { state } = useLocation();
-  const { teams } = state
   const { id = null } = useParams();
-  const { startGetGamesByTournament, startGetTournamentStandings, gamesList, standings } = useTourneyStore();
-
+  const { state } = useLocation();
+  const { startGetGamesByTournament, startGetTournamentStandings, gamesList, standings, dispatch, onResetGamesList, onResetStandings } = useTourneyStore();
+  
   useEffect(() => {
+    if (!state) return;
     startGetGamesByTournament(id)
     startGetTournamentStandings(id)
+    
+    return () => {
+      dispatch(onResetGamesList())
+      dispatch(onResetStandings())
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  
-  
+
   if (!state) {
     return <Navigate to={"/my-tourneys"} />;
   }
@@ -49,7 +53,7 @@ export const Tournament = () => {
               <Games gamesList={gamesList} tournamentType={state.type} />
             </TabPanel>
             <TabPanel rightIcon="pi pi-users mr-2" header="Teams" headerTemplate={tab1HeaderTemplate}>
-              <TeamCard teams={teams} />
+              <TeamCard teams={state.teams} />
             </TabPanel>
             {
               state.type === 2 && (
