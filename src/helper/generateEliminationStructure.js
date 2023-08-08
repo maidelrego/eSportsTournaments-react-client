@@ -10,7 +10,7 @@ export const generateEliminationStructure = (data = []) => {
     participants: [
       {
         id: game.team1?.id,
-        resultText: game.score1,
+        resultText: game.score1 === null ? '' : game.score1 + "",
         isWinner: game.score1 > game.score2,
         status: game.score1 === null ? null : "PLAYED",
         name: game.team1?.teamName,
@@ -18,7 +18,7 @@ export const generateEliminationStructure = (data = []) => {
       },
       {
         id: game.team2?.id,
-        resultText: game.score2,
+        resultText: game.score2 === null ? '' : game.score2 + "",
         isWinner: game.score2 > game.score1,
         status: game.score2 === null ? null : "PLAYED",
         name: game.team2?.teamName,
@@ -26,6 +26,8 @@ export const generateEliminationStructure = (data = []) => {
       },
     ],
   }));
+
+  console.log('asdasdas', jsonStructure);
 
   return jsonStructure;
 };

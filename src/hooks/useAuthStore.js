@@ -10,6 +10,7 @@ import {
   setErrorToast,
   setLoading,
 } from "../store/ui/uiSlice";
+import { useNavigate } from "react-router-dom";
 
 export const useAuthStore = () => {
   const { authStatus, user, myTournaments } = useSelector(
@@ -17,6 +18,7 @@ export const useAuthStore = () => {
   );
 
   const dispatch = useDispatch();
+  const navigate  = useNavigate();
 
   const startLogin = async ({ email, password }) => {
     dispatch(onChenking());
@@ -31,6 +33,21 @@ export const useAuthStore = () => {
       }
     });
   };
+
+  const startRegister = async ({ email, password, fullName }) => {
+    dispatch(setLoading(true));
+
+    await doAPIPost("auth/register", { email, password, fullName }).then((res) => {
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        navigate('/login');
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast("Something went wrong, check logs"));
+      }
+    });
+  };
+
 
   const startCheckAuthToken = async () => {
     const token = localStorage.getItem("tourneyForgeToken");
@@ -72,5 +89,6 @@ export const useAuthStore = () => {
     dispatch,
     startCheckAuthToken,
     startGetMyTournaments,
+    startRegister
   };
 };

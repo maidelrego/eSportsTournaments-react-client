@@ -100,7 +100,7 @@ export const KnokoutGames = ({ gamesList }) => {
                                       type="number"
                                       name="score1"
                                       className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                                      value={form[index].score1 || ""}
+                                      value={form[index].score1 + ''  || ""}
                                       onChange={(e) => handleChange(e, index)}
                                     />
                                     <span className="flex align-items-center justify-content-center mr-2 ml-2 xl:font-bold">
@@ -110,7 +110,7 @@ export const KnokoutGames = ({ gamesList }) => {
                                       type="number"
                                       name="score2"
                                       className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                                      value={form[index].score2 || ""}
+                                      value={form[index].score2 + '' || ""}
                                       onChange={(e) => handleChange(e, index)}
                                     />
                                   </div>
