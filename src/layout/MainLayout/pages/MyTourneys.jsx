@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 export const MyTourneys = () => {
   const { myTournaments, startGetMyTournaments } = useAuthStore();
   console.log(myTournaments);
-  const { startDeleteTourney } = useTourneyStore();
+  const { startDeleteTourney, startRestartTourney } = useTourneyStore();
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
@@ -29,7 +29,7 @@ export const MyTourneys = () => {
 
   const toast = useRef(null);
 
-  const confirm2 = (tournamentId) => {
+  const confirmDelete = (tournamentId) => {
     confirmDialog({
       message: "Do you want to delete this Tournament?",
       header: "Delete Confirmation",
@@ -43,6 +43,20 @@ export const MyTourneys = () => {
     });
   };
 
+  const consfirmRestart = (tournament) => {
+    confirmDialog({
+      message: "This tournament will be restarted. Same settings will be used and original tournament will not be changed ",
+      header: "Restart Confirmation",
+      icon: "pi pi-info-circle",
+      acceptClassName: "p-button-danger",
+      accept() {
+        startRestartTourney(tournament).then(() => {
+          startGetMyTournaments();
+        });
+      },
+    });
+  }
+
   return (
     <>
       <h1 className="text-color text-center">My Tourneys</h1>
@@ -54,7 +68,7 @@ export const MyTourneys = () => {
                 <span style={{color: '#2c3e50' }} className="text-2xl md:text-4xl font-medium mb-1">
                   {item.tournamentName}
                 </span>
-                <span className="bg-blue-50 text-blue-400 border-round inline-flex py-1 px-2 text-sm">
+                <span className="bg-blue-50 text-blue-400 border-round inline-flex py-1 px-2 text-lg">
                   {getRoles(item.sharedAdmins, item.sharedGuests, user.id)}
                 </span>
               </div>
@@ -66,13 +80,14 @@ export const MyTourneys = () => {
                     size="small"
                     className="mr-3"
                     style={{ width: "20px", height: "30px" }}
+                    onClick={() => consfirmRestart(item)}
                   />
                   <Button
                     icon="pi pi-trash"
                     severity="secondary"
                     size="small"
                     style={{ width: "20px", height: "30px" }}
-                    onClick={() => confirm2(item.id)}
+                    onClick={() => confirmDelete(item.id)}
                   />
                 </div>
               )} 

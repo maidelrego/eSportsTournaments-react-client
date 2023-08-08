@@ -4,7 +4,8 @@ import { onResetState, onSetGames, initGamesById, onSetStandings, onPushNumberOf
 import { doAPIDelete, doAPIGet, doAPIPost, doAPIPut } from "../services/api";
 import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
-
+import { restartTournamentData } from "../helper/restartTournamentData";
+ 
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,14 +33,16 @@ export const useTourneyStore = () => {
     return teamsArray;
   };
 
-  const startSaveTourney = async( data ) => {
+  const startSaveTourney = async( data, restart = false ) => {
     dispatch(setLoading(true));
     await doAPIPost("tournaments",data).then((res) => {
       if (res.status === 201) {
         dispatch(setLoading(false));
         dispatch(onResetState())
         dispatch(setSuccessToast('Tournament created successfully!'));
-        navigate('/my-tourneys');   
+        if (!restart) {
+          navigate('/my-tourneys');
+        }  
       } else {
         dispatch(setLoading(false));
         dispatch(setErrorToast('Something went wrong, check logs'));
@@ -134,6 +137,18 @@ export const useTourneyStore = () => {
     });
   }
 
+  const startRestartTourney = async (tournament) => {
+    dispatch(setLoading(true));
+    
+
+    const data = await restartTournamentData(tournament);
+
+    console.log(data);
+
+    return await startSaveTourney(data, true);
+
+  }
+
   return {
     //properties
     tournamentName,
@@ -156,6 +171,7 @@ export const useTourneyStore = () => {
     setKnokoutTeams,
     startGenerateJWT,
     startJoinTournament,
+    startRestartTourney,
     onResetGamesList,
     onResetStandings
   };

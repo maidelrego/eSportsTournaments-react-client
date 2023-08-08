@@ -99,6 +99,7 @@ function doAPIPut(path, params) {
       return err.response;
     });
 }
+
 function doAPIDelete(path) {
   var url = apiServer + path;
   const apicall = axiosInstance.delete(url, addAuthHeader({ clear: false }));
@@ -111,4 +112,15 @@ function doAPIDelete(path) {
     });
 }
 
-export { doAPIGet, doAPIPost, doAPIDelete, doAPIPut };
+function doDiscordWebhook (url, data) {
+  const apicall = axiosInstance.post(url, data);
+  return timeoutWatcher(apicall)
+    .then((data) => {
+      return data;
+    })
+    .catch((err) => {
+      return err.response;
+    });
+}
+
+export { doAPIGet, doAPIPost, doAPIDelete, doAPIPut, doDiscordWebhook };
