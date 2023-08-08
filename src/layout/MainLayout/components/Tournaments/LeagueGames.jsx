@@ -7,6 +7,7 @@ import { useForm } from "../../../../hooks/useForm";
 import { Button } from "primereact/button";
 import { useTourneyStore } from "../../../../hooks";
 import { useParams } from "react-router-dom";
+import noLogo from "../../../../assets/img/noLogo.png";
 
 export const LeagueGames = ({ gamesList }) => {
   console.log(gamesList);
@@ -52,7 +53,7 @@ export const LeagueGames = ({ gamesList }) => {
                 <div className="flex justify-content-center flex-wrap">
                   <div className="flex flex-column align-items-center justify-content-center mr-3">
                     <Avatar
-                      image={game.team1?.logoUrl}
+                      image={game.team1?.logoUrl ? game.team1.logoUrl : noLogo}
                       className="mb-2"
                       size="large"
                     />
@@ -97,7 +98,7 @@ export const LeagueGames = ({ gamesList }) => {
 
                   <div className="flex flex-column align-items-center justify-content-center ml-3">
                     <Avatar
-                      image={game.team2?.logoUrl}
+                      image={game.team2?.logoUrl ? game.team2.logoUrl : noLogo}
                       className="mb-2"
                       size="large"
                     />

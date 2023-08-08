@@ -95,7 +95,7 @@ export const useTourneyStore = () => {
         dispatch(initGamesById(res.data));
       } else {
         dispatch(setLoading(false));
-        dispatch(setErrorToast('Something went wrong, check logs'));
+        dispatch(setErrorToast(res.data.message));
       }
     });
   }

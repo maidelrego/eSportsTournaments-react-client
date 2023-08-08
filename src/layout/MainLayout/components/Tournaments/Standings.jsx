@@ -5,6 +5,7 @@ import { AppSpinner } from "../../../../ui/components/AppSpinner";
 import { setAvatarStyle } from "../../../../helper/getStreakStyles";
 import { Avatar } from "primereact/avatar";
 import { AvatarGroup } from "primereact/avatargroup";
+import noLogo from "../../../../assets/img/noLogo.png";
 
 export const Standings = ({ standings }) => {
   console.log(standings);
@@ -19,7 +20,7 @@ export const Standings = ({ standings }) => {
     return (
       <div className="flex align-items-center">
         <img
-          src={rowData.team?.logoUrl}
+          src={rowData.team?.logoUrl ? rowData.team.logoUrl : noLogo}
           alt={rowData.team.teamName}
           className="mr-2"
           width="30"
