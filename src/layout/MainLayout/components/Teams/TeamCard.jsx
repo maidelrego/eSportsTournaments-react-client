@@ -2,19 +2,9 @@ import { Tag } from "primereact/tag";
 import PropTypes from "prop-types";
 import { Avatar } from 'primereact/avatar';
 import { AvatarGroup } from 'primereact/avatargroup';
+import { setAvatarStyle } from "../../../../helper/getStreakStyles";
 
 export const TeamCard = (props) => {
-  console.log("TEAMS", props);
-  const setAvatarStyle = (name) => {
-    switch (name) {
-    case 'W':
-      return { backgroundColor: '#16a757', color: '#ffffff' };
-    case 'L':
-      return { backgroundColor: '#ea5455', color: '#ffffff' };
-    default:
-      return { backgroundColor: '#4caf50', color: '#ffffff' };
-    }
-  }
   return (
     <>
       <div className="grid">

@@ -2,6 +2,9 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import PropTypes from "prop-types";
 import { AppSpinner } from "../../../../ui/components/AppSpinner";
+import { setAvatarStyle } from "../../../../helper/getStreakStyles";
+import { Avatar } from "primereact/avatar";
+import { AvatarGroup } from "primereact/avatargroup";
 
 export const Standings = ({ standings }) => {
   console.log(standings);
@@ -26,11 +29,16 @@ export const Standings = ({ standings }) => {
     );
   }
 
-  const streakTemplate = (rowData) => {
+  const streakTemplate = ({lastFiveGameResults}) => {
     return (
       <div className="flex align-items-center">
-        <span className={`badge ${rowData.streak === "W" ? "badge-success" : "badge-danger"} mr-2`}>{rowData.streak}</span>
-        <span>{rowData.streakCount}</span>
+        <AvatarGroup>
+          {
+            lastFiveGameResults.map((result, index) =>(
+              <Avatar className="mr-3" shape="circle" label={result.value} style={setAvatarStyle(result.value)} key={index} />
+            ))
+          }
+        </AvatarGroup>
       </div>
     );
   }

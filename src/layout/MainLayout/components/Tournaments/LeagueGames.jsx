@@ -25,6 +25,7 @@ export const LeagueGames = ({ gamesList }) => {
     delete game.id;
     delete game.logoUrl;
     delete game.createdAt;
+    delete game.updatedAt;
     await startSaveGames(gameId, game);
     await startGetTournamentStandings(id);
     await startGetGamesByTournament(id);
