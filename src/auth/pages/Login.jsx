@@ -5,13 +5,20 @@ import logo from "../../assets/img/logo.png";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useAuthStore } from "../../hooks";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const { startLogin } = useAuthStore();
 
-  const onLogin = async(data) => {
+  const onLogin = async (data) => {
     await startLogin(data);
   };
+
+  const navigate = useNavigate();
+
+  const navigateToRegister = () => {
+    navigate("/register");
+  }
 
   return (
     <>
@@ -57,7 +64,7 @@ export const Login = () => {
                   <span className="text-600 font-medium line-height-3">
                     Don&apos;t have an account?
                   </span>
-                  <a className="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
+                  <a onClick={() => navigateToRegister()} className="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
                     Create today!
                   </a>
                 </div>
@@ -79,7 +86,11 @@ export const Login = () => {
                     onBlur={handleBlur}
                   />
                   {touched.email && errors.email && (
-                    <Message severity="error" className="mb-5" text={errors.email} />
+                    <Message
+                      severity="error"
+                      className="mb-5"
+                      text={errors.email}
+                    />
                   )}
 
                   <label
@@ -92,13 +103,19 @@ export const Login = () => {
                     id="password"
                     type="password"
                     placeholder="Password"
-                    className={`w-full mb-3 ${ touched.password && errors.password ? 'p-invalid' : '' }` }
+                    className={`w-full mb-3 ${
+                      touched.password && errors.password ? "p-invalid" : ""
+                    }`}
                     value={values.password}
                     onChange={handleChange}
                     onBlur={handleBlur}
                   />
                   {touched.password && errors.password && (
-                    <Message severity="error" className="mb-5" text={errors.password} />
+                    <Message
+                      severity="error"
+                      className="mb-5"
+                      text={errors.password}
+                    />
                   )}
 
                   <div className="flex align-items-center justify-content-end mb-6">
@@ -108,8 +125,22 @@ export const Login = () => {
                   </div>
 
                   <Button
-                    label="Sign In"
+                    label="Login"
                     icon="pi pi-user"
+                    className="w-full"
+                    type="submit"
+                  />
+
+                  <div className="p-divider p-component p-divider-horizontal p-divider-solid p-divider-center my-6">
+                    <div className="p-divider-content">
+                      <span className="text-600 font-normal text-sm">OR</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    label="Sign In with Google"
+                    icon="pi pi-google"
+                    severity="danger"
                     className="w-full"
                     type="submit"
                   />
