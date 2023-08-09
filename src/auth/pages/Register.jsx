@@ -5,19 +5,19 @@ import logo from "../../assets/img/logo.png";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useAuthStore } from "../../hooks";
+import { Avatar } from "primereact/avatar";
+import google from "../../assets/img/google.avif";
 
 export const Register = () => {
-  const { startRegister,startRegisterGoogle } = useAuthStore();
-
+  const { startRegister, startRegisterGoogle } = useAuthStore();
 
   const onRegister = async (data) => {
     await startRegister(data);
   };
 
-
   const onGoogleSingIn = async () => {
     await startRegisterGoogle();
-  }
+  };
 
   return (
     <>
@@ -66,12 +66,18 @@ export const Register = () => {
               <div className="w-full surface-card">
                 <div className="flex justify-content-center">
                   <Button
-                    label="Sign up with Google"
-                    icon="pi pi-google"
-                    severity="danger"
+                    severity="secondary"
+                    outlined
                     className="px-4 py-3 p-button-raised p-button-rounded"
                     onClick={() => onGoogleSingIn()}
-                  />
+                  >
+                    <Avatar
+                      className="mr-3"
+                      image={google}
+                      style={{ width: "18px", height: "18px" }}
+                    />
+                    <span>Continue in With Google</span>
+                  </Button>
                 </div>
                 <div
                   className="p-divider p-component p-divider-horizontal p-divider-solid p-divider-center my-4"
@@ -156,18 +162,23 @@ export const Register = () => {
                         text={errors.password}
                       />
                     )}
-
-                    <div className="flex align-items-center justify-content-end mb-6">
-                      <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
-                        Forgot your password?
+                    <div className="flex flex-column justify-content-center">
+                      <Button
+                        label="Register"
+                        icon="pi pi-arrow-right"
+                        iconPos="right"
+                        outlined
+                        severity="secondary"
+                        className="px-4 py-3 p-button-raised p-button-rounded w-full mt-3"
+                        type="submit"
+                      />
+                      <a
+                        className="font-bold no-underline text-blue-500 cursor-pointer text-center mt-2"
+                        href="/login"
+                      >
+                        Already have an account? Sign in
                       </a>
                     </div>
-                    <Button
-                      label="Sign In"
-                      icon="pi pi-user"
-                      className="px-4 py-3 p-button-raised p-button-rounded w-full"
-                      type="submit"
-                    />
                   </div>
                 </form>
               </div>

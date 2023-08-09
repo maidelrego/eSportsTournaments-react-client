@@ -6,6 +6,8 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { useAuthStore } from "../../hooks";
 import { useNavigate } from "react-router-dom";
+import { Avatar } from "primereact/avatar";
+import google from "../../assets/img/google.avif";
 
 export const Login = () => {
   const { startLogin, startLoginGoogle } = useAuthStore();
@@ -15,16 +17,14 @@ export const Login = () => {
     await startLogin(data);
   };
 
-  
   const onGoogleSingIn = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     await startLoginGoogle();
-  }
-
+  };
 
   const navigateToRegister = () => {
     navigate("/register");
-  }
+  };
 
   return (
     <>
@@ -61,20 +61,47 @@ export const Login = () => {
           touched,
           values,
         }) => (
-          <form noValidate onSubmit={handleSubmit}>
-            <div className="flex align-items-center justify-content-center px-4 py-8 md:px-6 lg:px-8">
-              <div className="surface-card p-4 border-round w-full lg:w-6">
-                <div className="text-center mb-5">
-                  <img src={logo} alt="hyper" height={50} className="mb-3" />
-                  <div className="text-color text-3xl mb-3">Welcome Back</div>
-                  <span className="text-600 font-medium line-height-3">
-                    Don&apos;t have an account?
-                  </span>
-                  <a onClick={() => navigateToRegister()} className="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
-                    Create today!
-                  </a>
-                </div>
+          <div className="flex align-items-center justify-content-center px-4 py-8 md:px-6 lg:px-8">
+            <div className="surface-card p-4 border-round w-full lg:w-6">
+              <div className="text-center mb-5">
+                <img src={logo} alt="hyper" height={50} className="mb-3" />
+                <div className="text-color text-3xl mb-3">Welcome Back</div>
+                <span className="text-600 font-medium line-height-3">
+                  Don&apos;t have an account?
+                </span>
+                <a
+                  onClick={() => navigateToRegister()}
+                  className="font-bold no-underline ml-2 text-blue-500 cursor-pointer"
+                >
+                  Create today!
+                </a>
+              </div>
 
+              <div className="flex justify-content-center">
+                <Button
+                  severity="secondary"
+                  outlined
+                  className="px-4 py-3 p-button-raised p-button-rounded"
+                  onClick={onGoogleSingIn}
+                >
+                  <Avatar
+                    className="mr-3"
+                    image={google}
+                    style={{ width: "18px", height: "18px" }}
+                  />
+                  <span>Continue in With Google</span>
+                </Button>
+              </div>
+
+              <div
+                className="p-divider p-component p-divider-horizontal p-divider-solid p-divider-center my-4"
+                role="separator"
+              >
+                <div className="p-divider-content">
+                  <span className="text-600 font-normal text-sm">OR</span>
+                </div>
+              </div>
+              <form noValidate onSubmit={handleSubmit}>
                 <div>
                   <label
                     htmlFor="email"
@@ -124,7 +151,7 @@ export const Login = () => {
                     />
                   )}
 
-                  <div className="flex align-items-center justify-content-end mb-6">
+                  <div className="flex align-items-center justify-content-end mb-3">
                     <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
                       Forgot your password?
                     </a>
@@ -132,29 +159,17 @@ export const Login = () => {
 
                   <Button
                     label="Login"
-                    icon="pi pi-user"
-                    className="w-full"
+                    outlined
+                    severity="secondary"
+                    className="px-4 py-3 p-button-raised p-button-rounded w-full"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
                     type="submit"
                   />
-
-                  <div className="p-divider p-component p-divider-horizontal p-divider-solid p-divider-center my-6">
-                    <div className="p-divider-content">
-                      <span className="text-600 font-normal text-sm">OR</span>
-                    </div>
-                  </div>
-
-                  <Button
-                    label="Sign In with Google"
-                    icon="pi pi-google"
-                    severity="danger"
-                    className="w-full"
-                    type="button"
-                    onClick={onGoogleSingIn}
-                  />
                 </div>
-              </div>
+              </form>
             </div>
-          </form>
+          </div>
         )}
       </Formik>
     </>

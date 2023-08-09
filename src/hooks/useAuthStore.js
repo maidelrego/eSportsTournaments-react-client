@@ -31,8 +31,8 @@ export const useAuthStore = () => {
         dispatch(onLogin(user));
       } else {
         dispatch(setLoading(false));
-        dispatch(onLogout(res.message));
-        dispatch(setErrorToast("Something went wrong, check logs"));
+        dispatch(onLogout(res.data.message));
+        dispatch(setErrorToast(res.data.message));
       }
     });
   };
@@ -108,9 +108,9 @@ export const useAuthStore = () => {
     });
   }
   const startLoginGoogle = async () => {
-   
     dispatch(onChenking());
     const result = await singInWithGoogle();
+    console.log(result);
     if( !result.ok ) return  dispatch(onLogout("Register error action"));
 
     const payload = {
@@ -127,8 +127,8 @@ export const useAuthStore = () => {
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
-        dispatch(onLogout(res.message));
-        dispatch(setErrorToast("Something went wrong, check logs"));
+        dispatch(onLogout(res.data.message));
+        dispatch(setErrorToast(res.data.message));
       }
     });
   }
