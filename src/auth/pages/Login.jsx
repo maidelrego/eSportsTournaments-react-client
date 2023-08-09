@@ -61,8 +61,8 @@ export const Login = () => {
           touched,
           values,
         }) => (
-          <div className="flex align-items-center justify-content-center px-4 py-8 md:px-6 lg:px-8">
-            <div className="surface-card p-4 border-round w-full lg:w-6">
+          <div className="flex align-items-center justify-content-center col md:col-6 md:col-offset-3">
+            <div className="surface-card p-4 border-round w-full lg:w-4" style={{ top: "15%", position: "absolute" }}>
               <div className="text-center mb-5">
                 <img src={logo} alt="hyper" height={50} className="mb-3" />
                 <div className="text-color text-3xl mb-3">Welcome Back</div>

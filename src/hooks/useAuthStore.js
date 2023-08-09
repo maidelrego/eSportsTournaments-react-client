@@ -103,7 +103,7 @@ export const useAuthStore = () => {
       } else {
         dispatch(setLoading(false));
         dispatch(onLogout(res.message));
-        dispatch(setErrorToast("Something went wrong, check logs"));
+        dispatch(setErrorToast("Invalid credentials"));
       }
     });
   }
