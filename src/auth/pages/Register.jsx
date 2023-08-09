@@ -5,47 +5,19 @@ import logo from "../../assets/img/logo.png";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useAuthStore } from "../../hooks";
-import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { Avatar } from "primereact/avatar";
+import google from "../../assets/img/google.avif";
 
 export const Register = () => {
-  const { startRegister } = useAuthStore();
-  const [profile, setProfile] = useState(null);
+  const { startRegister, startRegisterGoogle } = useAuthStore();
 
   const onRegister = async (data) => {
     await startRegister(data);
   };
 
-  const updateProfile = (data) => {
-    console.log("DATAAa", data);
-    setProfile(data.access_token);
+  const onGoogleSingIn = async () => {
+    await startRegisterGoogle();
   };
-
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => updateProfile(codeResponse),
-    onError: (error) => console.log("Login Failed:", error),
-  });
-
-  useEffect(() => {
-    if (profile) {
-      // TODO: MOVE THIS CALL TO THE AUTH STORE
-      axios
-        .get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${profile}`,
-          {
-            headers: {
-              Authorization: `Bearer ${profile}`,
-              Accept: "application/json",
-            },
-          }
-        )
-        .then((res) => {
-          console.log("RES", res);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [profile]);
 
   return (
     <>
@@ -94,12 +66,18 @@ export const Register = () => {
               <div className="w-full surface-card">
                 <div className="flex justify-content-center">
                   <Button
-                    label="Sign up with Google"
-                    icon="pi pi-google"
-                    severity="danger"
+                    severity="secondary"
+                    outlined
                     className="px-4 py-3 p-button-raised p-button-rounded"
-                    onClick={() => login()}
-                  />
+                    onClick={() => onGoogleSingIn()}
+                  >
+                    <Avatar
+                      className="mr-3"
+                      image={google}
+                      style={{ width: "18px", height: "18px" }}
+                    />
+                    <span>Continue in With Google</span>
+                  </Button>
                 </div>
                 <div
                   className="p-divider p-component p-divider-horizontal p-divider-solid p-divider-center my-4"
@@ -184,18 +162,23 @@ export const Register = () => {
                         text={errors.password}
                       />
                     )}
-
-                    <div className="flex align-items-center justify-content-end mb-6">
-                      <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
-                        Forgot your password?
+                    <div className="flex flex-column justify-content-center">
+                      <Button
+                        label="Register"
+                        icon="pi pi-arrow-right"
+                        iconPos="right"
+                        outlined
+                        severity="secondary"
+                        className="px-4 py-3 p-button-raised p-button-rounded w-full mt-3"
+                        type="submit"
+                      />
+                      <a
+                        className="font-bold no-underline text-blue-500 cursor-pointer text-center mt-2"
+                        href="/login"
+                      >
+                        Already have an account? Sign in
                       </a>
                     </div>
-                    <Button
-                      label="Sign In"
-                      icon="pi pi-user"
-                      className="px-4 py-3 p-button-raised p-button-rounded w-full"
-                      type="submit"
-                    />
                   </div>
                 </form>
               </div>

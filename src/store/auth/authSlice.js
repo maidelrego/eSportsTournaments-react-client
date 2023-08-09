@@ -29,6 +29,7 @@ export const authSlice = createSlice({
       state.authStatus = authStatusName.checking;
       state.user = {};
       state.errorMessage = null;
+      state.myTournaments = [];
     },
     onSetMyTournaments: (state, { payload }) => {
       state.myTournaments = payload;

@@ -11,6 +11,7 @@ import {
   setLoading,
 } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
+import { singInWithGoogle } from "../firebase/providers";
 
 export const useAuthStore = () => {
   const { authStatus, user, myTournaments } = useSelector(
@@ -29,20 +30,22 @@ export const useAuthStore = () => {
         localStorage.setItem("tourneyForgeToken", token);
         dispatch(onLogin(user));
       } else {
-        dispatch(onLogout(res.message));
+        dispatch(setLoading(false));
+        dispatch(onLogout(res.data.message));
+        dispatch(setErrorToast(res.data.message));
       }
     });
   };
 
   const startRegister = async ({ email, password, fullName }) => {
     dispatch(setLoading(true));
-
     await doAPIPost("auth/register", { email, password, fullName }).then((res) => {
       if (res.status === 201) {
         dispatch(setLoading(false));
         navigate('/login');
       } else {
         dispatch(setLoading(false));
+        dispatch(onLogout(res.message));
         dispatch(setErrorToast("Something went wrong, check logs"));
       }
     });
@@ -78,6 +81,58 @@ export const useAuthStore = () => {
     });
   };
 
+  const startRegisterGoogle = async () => {
+   
+    dispatch(onChenking());
+    const result = await singInWithGoogle();
+    if( !result.ok ) return  dispatch(onLogout("Register error action"));
+
+    const payload = {
+      email: result.email,
+      fullName: result.displayName,
+      googleId: result.uid
+    }
+   
+    await doAPIPost("auth/register-google", payload).then((res) => {
+      if (res.status === 201) {
+        const { token, ...user } = res.data;
+        delete user.password;
+        localStorage.setItem("tourneyForgeToken", token);
+        dispatch(onLogin(user));
+        dispatch(setLoading(false));
+      } else {
+        dispatch(setLoading(false));
+        dispatch(onLogout(res.message));
+        dispatch(setErrorToast("Something went wrong, check logs"));
+      }
+    });
+  }
+  const startLoginGoogle = async () => {
+    dispatch(onChenking());
+    const result = await singInWithGoogle();
+    console.log(result);
+    if( !result.ok ) return  dispatch(onLogout("Register error action"));
+
+    const payload = {
+      email: result.email,
+      googleId: result.uid
+    }
+   
+    await doAPIPost("auth/login-google", payload).then((res) => {
+      if (res.status === 201) {
+        const { token, ...user } = res.data;
+        delete user.password;
+        localStorage.setItem("tourneyForgeToken", token);
+        dispatch(onLogin(user));
+        dispatch(setLoading(false));
+      } else {
+        dispatch(setLoading(false));
+        dispatch(onLogout(res.data.message));
+        dispatch(setErrorToast(res.data.message));
+      }
+    });
+  }
+
   return {
     //properties
     authStatus,
@@ -89,6 +144,8 @@ export const useAuthStore = () => {
     dispatch,
     startCheckAuthToken,
     startGetMyTournaments,
-    startRegister
+    startRegister,
+    startRegisterGoogle,
+    startLoginGoogle
   };
 };
