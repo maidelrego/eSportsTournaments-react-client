@@ -5,47 +5,19 @@ import logo from "../../assets/img/logo.png";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useAuthStore } from "../../hooks";
-import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
-import { useEffect, useState } from "react";
 
 export const Register = () => {
-  const { startRegister } = useAuthStore();
-  const [profile, setProfile] = useState(null);
+  const { startRegister,startRegisterGoogle } = useAuthStore();
+
 
   const onRegister = async (data) => {
     await startRegister(data);
   };
 
-  const updateProfile = (data) => {
-    console.log("DATAAa", data);
-    setProfile(data.access_token);
-  };
 
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => updateProfile(codeResponse),
-    onError: (error) => console.log("Login Failed:", error),
-  });
-
-  useEffect(() => {
-    if (profile) {
-      // TODO: MOVE THIS CALL TO THE AUTH STORE
-      axios
-        .get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${profile}`,
-          {
-            headers: {
-              Authorization: `Bearer ${profile}`,
-              Accept: "application/json",
-            },
-          }
-        )
-        .then((res) => {
-          console.log("RES", res);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [profile]);
+  const onGoogleSingIn = async () => {
+    await startRegisterGoogle();
+  }
 
   return (
     <>
@@ -98,7 +70,7 @@ export const Register = () => {
                     icon="pi pi-google"
                     severity="danger"
                     className="px-4 py-3 p-button-raised p-button-rounded"
-                    onClick={() => login()}
+                    onClick={() => onGoogleSingIn()}
                   />
                 </div>
                 <div

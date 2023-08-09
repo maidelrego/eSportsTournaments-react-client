@@ -8,13 +8,19 @@ import { useAuthStore } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
-  const { startLogin } = useAuthStore();
+  const { startLogin, startLoginGoogle } = useAuthStore();
+  const navigate = useNavigate();
 
   const onLogin = async (data) => {
     await startLogin(data);
   };
 
-  const navigate = useNavigate();
+  
+  const onGoogleSingIn = async (event) => {
+    event.preventDefault()
+    await startLoginGoogle();
+  }
+
 
   const navigateToRegister = () => {
     navigate("/register");
@@ -142,7 +148,8 @@ export const Login = () => {
                     icon="pi pi-google"
                     severity="danger"
                     className="w-full"
-                    type="submit"
+                    type="button"
+                    onClick={onGoogleSingIn}
                   />
                 </div>
               </div>
