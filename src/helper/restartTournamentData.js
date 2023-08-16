@@ -1,16 +1,11 @@
 export const restartTournamentData = async (tournamentData) => {
-  let { tournamentName, sport, type, teams } = tournamentData;
+  let { tournamentName, sport, type, teams, uniqueId } = tournamentData;
   // change name if it's restared more than once
 
-  if (tournamentName.includes('Restarted')) {
-    tournamentName = tournamentName.split('Restarted')[0].trim();
-  } else {
-    tournamentName = tournamentName + ' (Restarted)';
-  }
-
+  const extractUUID = uniqueId.split('-')[0];
+  tournamentName = tournamentName + ` ${extractUUID}`;
   let newTeams = [];
   
-
   for (const team of teams) {
     // just keep team name and user name 
    

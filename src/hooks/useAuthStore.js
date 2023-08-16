@@ -110,7 +110,6 @@ export const useAuthStore = () => {
   const startLoginGoogle = async () => {
     dispatch(onChenking());
     const result = await singInWithGoogle();
-    console.log(result);
     if( !result.ok ) return  dispatch(onLogout("Register error action"));
 
     const payload = {

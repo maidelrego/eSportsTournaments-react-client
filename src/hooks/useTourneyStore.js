@@ -139,14 +139,8 @@ export const useTourneyStore = () => {
 
   const startRestartTourney = async (tournament) => {
     dispatch(setLoading(true));
-    
-
     const data = await restartTournamentData(tournament);
-
-    console.log(data);
-
     return await startSaveTourney(data, true);
-
   }
 
   return {

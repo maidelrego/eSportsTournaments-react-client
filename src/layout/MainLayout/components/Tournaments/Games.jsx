@@ -3,8 +3,6 @@ import { LeagueGames } from "./LeagueGames";
 import { KnokoutGames } from "./KnokoutGames";
 
 export const Games = ({ gamesList, tournamentType }) => {
-  console.log(gamesList);
-  
   return (
     <>
       {

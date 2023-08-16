@@ -99,6 +99,7 @@ export const KnokoutGames = ({ gamesList }) => {
                                     <InputText
                                       type="number"
                                       name="score1"
+                                      keyfilter={/[0-9]/}
                                       className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
                                       value={form[index].score1 + ''  || ""}
                                       onChange={(e) => handleChange(e, index)}
@@ -109,6 +110,7 @@ export const KnokoutGames = ({ gamesList }) => {
                                     <InputText
                                       type="number"
                                       name="score2"
+                                      keyfilter={/[0-9]/}
                                       className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
                                       value={form[index].score2 + '' || ""}
                                       onChange={(e) => handleChange(e, index)}

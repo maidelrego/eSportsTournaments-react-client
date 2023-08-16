@@ -8,8 +8,6 @@ import { AvatarGroup } from "primereact/avatargroup";
 import noLogo from "../../../../assets/img/noLogo.png";
 
 export const Standings = ({ standings }) => {
-  console.log(standings);
-
   const header = (
     <div className="table-header">
       <h1 className="text-color text-center">Standings</h1>
@@ -56,7 +54,7 @@ export const Standings = ({ standings }) => {
           <Column header="Scored" field="goalsScored"></Column>
           <Column header="Against" field="goalsConceded"></Column>
           <Column header="Points" field="points"></Column>
-          <Column header="Streak" body={streakTemplate}></Column>
+          <Column header="Last 5" body={streakTemplate}></Column>
         </DataTable>
         : <AppSpinner loading={true} />
       }

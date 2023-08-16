@@ -27,7 +27,5 @@ export const generateEliminationStructure = (data = []) => {
     ],
   }));
 
-  console.log('asdasdas', jsonStructure);
-
   return jsonStructure;
 };

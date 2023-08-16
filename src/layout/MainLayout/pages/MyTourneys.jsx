@@ -13,7 +13,6 @@ import { useSelector } from "react-redux";
 
 export const MyTourneys = () => {
   const { myTournaments, startGetMyTournaments } = useAuthStore();
-  console.log(myTournaments);
   const { startDeleteTourney, startRestartTourney } = useTourneyStore();
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();

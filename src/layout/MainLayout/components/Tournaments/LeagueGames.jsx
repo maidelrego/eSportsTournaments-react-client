@@ -10,7 +10,6 @@ import { useParams } from "react-router-dom";
 import noLogo from "../../../../assets/img/noLogo.png";
 
 export const LeagueGames = ({ gamesList }) => {
-  console.log(gamesList);
   const { id = null } = useParams();
   const { form, handleChange } = useForm(gamesList);
   const {
@@ -69,8 +68,9 @@ export const LeagueGames = ({ gamesList }) => {
                       <InputText
                         type="number"
                         name="score1"
+                        keyfilter={/[0-9]/}
                         className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                        value={form[index].score1 || ""}
+                        value={form[index].score1 + ''  || ""}
                         onChange={(e) => handleChange(e, index)}
                       />
                       <span className="flex align-items-center justify-content-center mr-2 ml-2 xl:font-bold">
@@ -79,8 +79,9 @@ export const LeagueGames = ({ gamesList }) => {
                       <InputText
                         type="number"
                         name="score2"
+                        keyfilter={/[0-9]/}
                         className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                        value={form[index].score2 || ""}
+                        value={form[index].score2 + ''  || ""}
                         onChange={(e) => handleChange(e, index)}
                       />
                     </div>
