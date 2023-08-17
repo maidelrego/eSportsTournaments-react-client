@@ -26,6 +26,10 @@ export const Login = () => {
     navigate("/register");
   };
 
+  const navigateToForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
     <>
       <Formik
@@ -152,7 +156,7 @@ export const Login = () => {
                   )}
 
                   <div className="flex align-items-center justify-content-end mb-3">
-                    <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
+                    <a onClick={() => navigateToForgotPassword()} className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
                       Forgot your password?
                     </a>
                   </div>

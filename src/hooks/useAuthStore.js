@@ -8,6 +8,7 @@ import {
 } from "../store/auth/authSlice";
 import {
   setErrorToast,
+  setSuccessToast,
   setLoading,
 } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
@@ -132,6 +133,36 @@ export const useAuthStore = () => {
     });
   }
 
+  const startForgotPassword = async (data) => {
+    const { email } = data;
+    dispatch(setLoading(true));
+    await doAPIPost("auth/forgot-password", { email }).then((res) => {
+      console.log(res);
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast(res.data.message));
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast("If the email is correct, you will receive an email with the instructions to reset your password"));
+      }
+    });
+  }
+
+  const startResetPassword = async (data) => {
+    const { password, token } = data;
+    dispatch(setLoading(true));
+    await doAPIPost("auth/reset-password", { token, password }).then((res) => {
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast('Password changed successfully'));
+        navigate('/login');
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast(res.data.message));
+      }
+    });
+  }
+
   return {
     //properties
     authStatus,
@@ -145,6 +176,8 @@ export const useAuthStore = () => {
     startGetMyTournaments,
     startRegister,
     startRegisterGoogle,
-    startLoginGoogle
+    startLoginGoogle,
+    startForgotPassword,
+    startResetPassword
   };
 };

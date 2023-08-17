@@ -1,7 +1,6 @@
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import { Standings } from "../components/Tournaments";
 import { TabView, TabPanel } from "primereact/tabview";
-import { TeamCard } from "../components/Teams/TeamCard";
 import { Games } from "../components/Tournaments/Games";
 import { useTourneyStore } from "../../../hooks";
 import { useEffect } from "react";
@@ -52,12 +51,9 @@ export const Tournament = () => {
             <TabPanel rightIcon="pi pi-calendar mr-2" header="Calendar" headerTemplate={tab1HeaderTemplate}>
               <Games gamesList={gamesList} tournamentType={state.type} />
             </TabPanel>
-            <TabPanel rightIcon="pi pi-users mr-2" header="Teams" headerTemplate={tab1HeaderTemplate}>
-              <TeamCard teams={state.teams} />
-            </TabPanel>
             {
               state.type === 2 && (
-                <TabPanel rightIcon="pi pi-users mr-2" header="Brackets" headerTemplate={tab1HeaderTemplate}>
+                <TabPanel rightIcon="pi pi-sitemap mr-2" header="Bracket" headerTemplate={tab1HeaderTemplate}>
                   <SingleElimination simpleSmallBracket={generateEliminationStructure(gamesList)} />;
                 </TabPanel>
               )

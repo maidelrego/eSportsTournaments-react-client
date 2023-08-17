@@ -34,6 +34,7 @@
     "sass": "^1.64.0",
     "styled-components": "5.3.5",
     "validator": "^13.9.0",
+    "vite-plugin-rewrite-all": "^1.0.1",
     "yup": "^1.2.0"
   },
   "devDependencies": {
