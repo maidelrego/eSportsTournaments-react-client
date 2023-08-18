@@ -81,33 +81,34 @@ export const useAuthStore = () => {
       }
     });
   };
-
-  const startRegisterGoogle = async () => {
+ 
+  //TODO: This function is not longer necessary!
+  // const startRegisterGoogle = async () => {
    
-    dispatch(onChenking());
-    const result = await singInWithGoogle();
-    if( !result.ok ) return  dispatch(onLogout("Register error action"));
+  //   dispatch(onChenking());
+  //   const result = await singInWithGoogle();
+  //   if( !result.ok ) return  dispatch(onLogout("Register error action"));
 
-    const payload = {
-      email: result.email,
-      fullName: result.displayName,
-      googleId: result.uid
-    }
+  //   const payload = {
+  //     email: result.email,
+  //     fullName: result.displayName,
+  //     googleId: result.uid
+  //   }
    
-    await doAPIPost("auth/register-google", payload).then((res) => {
-      if (res.status === 201) {
-        const { token, ...user } = res.data;
-        delete user.password;
-        localStorage.setItem("tourneyForgeToken", token);
-        dispatch(onLogin(user));
-        dispatch(setLoading(false));
-      } else {
-        dispatch(setLoading(false));
-        dispatch(onLogout(res.message));
-        dispatch(setErrorToast("Invalid credentials"));
-      }
-    });
-  }
+  //   await doAPIPost("auth/register-google", payload).then((res) => {
+  //     if (res.status === 201) {
+  //       const { token, ...user } = res.data;
+  //       delete user.password;
+  //       localStorage.setItem("tourneyForgeToken", token);
+  //       dispatch(onLogin(user));
+  //       dispatch(setLoading(false));
+  //     } else {
+  //       dispatch(setLoading(false));
+  //       dispatch(onLogout(res.message));
+  //       dispatch(setErrorToast("Invalid credentials"));
+  //     }
+  //   });
+  // }
   const startLoginGoogle = async () => {
     dispatch(onChenking());
     const result = await singInWithGoogle();
@@ -115,6 +116,7 @@ export const useAuthStore = () => {
 
     const payload = {
       email: result.email,
+      fullName: result.displayName,
       googleId: result.uid
     }
    
@@ -175,7 +177,6 @@ export const useAuthStore = () => {
     startCheckAuthToken,
     startGetMyTournaments,
     startRegister,
-    startRegisterGoogle,
     startLoginGoogle,
     startForgotPassword,
     startResetPassword

@@ -9,14 +9,14 @@ import { Avatar } from "primereact/avatar";
 import google from "../../assets/img/google.avif";
 
 export const Register = () => {
-  const { startRegister, startRegisterGoogle } = useAuthStore();
+  const { startRegister, startLoginGoogle } = useAuthStore();
 
   const onRegister = async (data) => {
     await startRegister(data);
   };
 
   const onGoogleSingIn = async () => {
-    await startRegisterGoogle();
+    await startLoginGoogle();
   };
 
   return (
