@@ -9,4 +9,5 @@ export const store = configureStore({
     tourney: tourneySlice.reducer,
     ui: uiSlice.reducer,
   },
+  devTools: import.meta.env.VITE_NODE_ENV === "development" ?? false
 });
