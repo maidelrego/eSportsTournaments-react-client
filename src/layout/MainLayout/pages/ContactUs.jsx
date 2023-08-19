@@ -69,7 +69,7 @@ export const ContactUs = () => {
                   onClick={() => joinDiscord()}
                   label="Join Now"
                   icon="pi pi-discord"
-                  className="font-bold px-4 py-3 p-button-raised p-button-rounded white-space-nowrap"
+                  className="font-bold"
                 />
               </div>
 
@@ -104,7 +104,7 @@ export const ContactUs = () => {
                   onClick={() => submit()}
                   label="Contact Us"
                   icon="pi pi-envelope"
-                  className="w-full px-4 py-3 p-button-raised p-button-rounded "
+                  className="w-full font-bold"
                 />
               </div>
             </div>
