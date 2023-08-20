@@ -30,8 +30,8 @@ export const JoinTourney = () => {
               <Button
                 disabled={!tournamentToken}
                 label="Join"
+                className="w-full md:w-auto"
                 icon="pi pi-external-link"
-                rounded
                 onClick={() => join()}
               />
             </div>

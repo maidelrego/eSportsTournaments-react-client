@@ -62,7 +62,7 @@ export const MyTourneys = () => {
       <div className="grid mt-5">
         {myTournaments.map((item) => (
           <div className="col-12 md:col-4" key={item.id}>
-            <div className="bg-primary text-color p-3 flex justify-content-between align-items-center flex-wrap">
+            <div className="bg-primary text-color p-3 flex justify-content-between align-items-center flex-wrap border-round-top">
               <div className="flex flex-column align-items-start">
                 <span style={{color: '#2c3e50' }} className="text-2xl md:text-4xl font-medium mb-1">
                   {item.tournamentName}
@@ -91,7 +91,7 @@ export const MyTourneys = () => {
                 </div>
               )} 
             </div>
-            <div className="surface-card shadow-2 p-3">
+            <div className="surface-card shadow-2 p-3 border-round-bottom">
               <ul className="list-none m-0 p-0 border-bottom-1 surface-border mb-3">
                 <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
                   <span className="text-600 font-medium text-lg">Winner</span>
@@ -132,9 +132,6 @@ export const MyTourneys = () => {
                 <Button
                   label="View"
                   icon="pi pi pi-search"
-                  severity="secondary"
-                  rounded
-                  outlined
                   className="w-full mr-2"
                   onClick={() => handleViewTournament(item.id, item)}
                 />

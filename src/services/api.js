@@ -1,9 +1,18 @@
 import axios from "axios";
+import { Manager } from "socket.io-client";
 
 const axiosInstance = axios.create();
 const baseURL = import.meta.env.VITE_NODE_ENV === "production" ? import.meta.env.VITE_PROD_URL : import.meta.env.VITE_DEV_URL;
 // const baseURL = "http://localhost:3000/";
 const apiServer = baseURL + "api/v1/";
+
+function doConnectToSocket (namespace) {
+  console.log(namespace);
+  const mananger = new Manager('http://localhost:3000/socket.io/socket.io.js')
+  const socket = mananger.socket(namespace);
+
+  return socket;
+}
 
 function timeoutWatcher(promise, options = {}) {
   const ms = options.ms || 90000;
@@ -123,4 +132,4 @@ function doDiscordWebhook (url, data) {
     });
 }
 
-export { doAPIGet, doAPIPost, doAPIDelete, doAPIPut, doDiscordWebhook };
+export { doAPIGet, doAPIPost, doAPIDelete, doAPIPut, doDiscordWebhook, doConnectToSocket };

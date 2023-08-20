@@ -39,9 +39,6 @@ export const ShareTournament = ({ uniqueId }) => {
     <>
       <Button
         label="Share"
-        severity="secondary"
-        rounded
-        outlined
         icon="pi pi-share-alt"
         className="w-full"
         onClick={() => setVisible(true)}

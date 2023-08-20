@@ -61,7 +61,9 @@ export const CreateTourney = () => {
   };
 
   const setKnockoutTeams = async (e) => {
-    await dispatch(onFormChange({ name: "numberOfTeams", value: e.target.value }))
+    await dispatch(
+      onFormChange({ name: "numberOfTeams", value: e.target.value })
+    );
     setKnokoutTeams(e.target.value);
   };
 
@@ -99,7 +101,7 @@ export const CreateTourney = () => {
       type,
       sport,
       teams,
-      numberOfTeams
+      numberOfTeams,
     };
 
     const { checkValues, isValid } = validateRequest(
@@ -220,13 +222,14 @@ export const CreateTourney = () => {
           <div className="col-12">
             <Dropdown
               value={numberOfTeams}
-              onChange={(e) => setKnockoutTeams(e) }
+              onChange={(e) => setKnockoutTeams(e)}
               options={numberOfTeamsInKnockout}
               optionLabel="value"
               optionValue="key"
               placeholder="Number of Teams *"
               className={`w-full md:w-20rem ${
-                checkValidator["numberOfTeams"] && checkValidator["numberOfTeams"] !== null
+                checkValidator["numberOfTeams"] &&
+                checkValidator["numberOfTeams"] !== null
                   ? "p-invalid"
                   : ""
               }`}
@@ -239,7 +242,7 @@ export const CreateTourney = () => {
         <div className="grid justify-content-center mt-5">
           <div className="col-12 md:col-6 mt-2">
             <span className="font-bold text-2xl text-color">
-            Number of players
+              Number of players
             </span>
           </div>
 
@@ -308,7 +311,12 @@ export const CreateTourney = () => {
         ))}
       </div>
       <div className="grid mt-5">
-        <Button label="Create Tourney" className="px-4 py-3 p-button-raised p-button-rounded" icon="pi pi-check" onClick={onSaveTourney} />
+        <Button
+          label="Create Tourney"
+          className="w-full md:w-auto"
+          icon="pi pi-check"
+          onClick={onSaveTourney}
+        />
       </div>
     </>
   );
