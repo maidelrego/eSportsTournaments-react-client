@@ -13,6 +13,7 @@ import {
 } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
 import { singInWithGoogle } from "../firebase/providers";
+import { Manager } from "socket.io-client";
 
 export const useAuthStore = () => {
   const { authStatus, user, myTournaments } = useSelector(
@@ -82,33 +83,6 @@ export const useAuthStore = () => {
     });
   };
  
-  //TODO: This function is not longer necessary!
-  // const startRegisterGoogle = async () => {
-   
-  //   dispatch(onChenking());
-  //   const result = await singInWithGoogle();
-  //   if( !result.ok ) return  dispatch(onLogout("Register error action"));
-
-  //   const payload = {
-  //     email: result.email,
-  //     fullName: result.displayName,
-  //     googleId: result.uid
-  //   }
-   
-  //   await doAPIPost("auth/register-google", payload).then((res) => {
-  //     if (res.status === 201) {
-  //       const { token, ...user } = res.data;
-  //       delete user.password;
-  //       localStorage.setItem("tourneyForgeToken", token);
-  //       dispatch(onLogin(user));
-  //       dispatch(setLoading(false));
-  //     } else {
-  //       dispatch(setLoading(false));
-  //       dispatch(onLogout(res.message));
-  //       dispatch(setErrorToast("Invalid credentials"));
-  //     }
-  //   });
-  // }
   const startLoginGoogle = async () => {
     dispatch(onChenking());
     const result = await singInWithGoogle();
@@ -165,6 +139,26 @@ export const useAuthStore = () => {
     });
   }
 
+  const startConnectToGeneral = async () => {
+    const manager = new Manager("http://localhost:3000/socket.io/socket.io.js")
+    const socket = manager.socket("/general");
+
+    socket.on("connect", () => {
+    });
+
+    socket.on("disconnect", () => {
+    });
+
+    socket.on("newClient", (data) => {
+      console.log('CLIENT CONNECTED', data);
+    });
+
+    socket.on("disconnectedClient", (data) => {
+      console.log('CLIENT DISCONECTED', data);
+    });
+  }
+
+
   return {
     //properties
     authStatus,
@@ -179,6 +173,7 @@ export const useAuthStore = () => {
     startRegister,
     startLoginGoogle,
     startForgotPassword,
-    startResetPassword
+    startResetPassword,
+    startConnectToGeneral
   };
 };

@@ -224,8 +224,8 @@ export const Navbar = () => {
               
             </TabPanel>
             <TabPanel header="Friends" leftIcon="pi pi-users mr-2">
-              <h2 className="text-center">Coming Soon....</h2>
-              {/* <ul className="list-none p-0 m-0 mt-3">
+              
+              <ul className="list-none p-0 m-0 mt-3">
                 <li className="py-2">
                   <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
                     <img
@@ -286,7 +286,7 @@ export const Navbar = () => {
                     <div className="ml-auto border-circle w-1rem h-1rem m-2 bg-green-500"></div>
                   </a>
                 </li>
-              </ul> */}
+              </ul>
             </TabPanel>
           </TabView>
         </div>

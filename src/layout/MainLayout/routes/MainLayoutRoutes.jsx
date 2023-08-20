@@ -4,8 +4,16 @@ import { ContactUs, CreateTourney, JoinTourney } from "../pages";
 import { MyTourneys } from "../pages";
 import { Tournament } from "../pages/Tournament";
 import { HomePage } from "../pages/HomePage";
+import { useAuthStore } from "../../../hooks";
+import { useEffect } from "react";
 
 export const MainLayout = () => {
+  const { startConnectToGeneral } = useAuthStore();
+
+  useEffect(() => {
+    startConnectToGeneral()
+  }, []);
+
   return (
     <div className="grid flex justify-content-center">
       <div className="col-12">
