@@ -10,10 +10,12 @@ import {
   setErrorToast,
   setSuccessToast,
   setLoading,
+  setOnlineActivity,
 } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
 import { singInWithGoogle } from "../firebase/providers";
-import { Manager } from "socket.io-client";
+import { Manager, Socket } from "socket.io-client";
+let socket = Socket;
 
 export const useAuthStore = () => {
   const { authStatus, user, myTournaments } = useSelector(
@@ -21,7 +23,7 @@ export const useAuthStore = () => {
   );
 
   const dispatch = useDispatch();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
 
   const startLogin = async ({ email, password }) => {
     dispatch(onChenking());
@@ -41,18 +43,19 @@ export const useAuthStore = () => {
 
   const startRegister = async ({ email, password, fullName }) => {
     dispatch(setLoading(true));
-    await doAPIPost("auth/register", { email, password, fullName }).then((res) => {
-      if (res.status === 201) {
-        dispatch(setLoading(false));
-        navigate('/login');
-      } else {
-        dispatch(setLoading(false));
-        dispatch(onLogout(res.message));
-        dispatch(setErrorToast("Something went wrong, check logs"));
+    await doAPIPost("auth/register", { email, password, fullName }).then(
+      (res) => {
+        if (res.status === 201) {
+          dispatch(setLoading(false));
+          navigate("/login");
+        } else {
+          dispatch(setLoading(false));
+          dispatch(onLogout(res.message));
+          dispatch(setErrorToast("Something went wrong, check logs"));
+        }
       }
-    });
+    );
   };
-
 
   const startCheckAuthToken = async () => {
     const token = localStorage.getItem("tourneyForgeToken");
@@ -82,18 +85,18 @@ export const useAuthStore = () => {
       }
     });
   };
- 
+
   const startLoginGoogle = async () => {
     dispatch(onChenking());
     const result = await singInWithGoogle();
-    if( !result.ok ) return  dispatch(onLogout("Register error action"));
+    if (!result.ok) return dispatch(onLogout("Register error action"));
 
     const payload = {
       email: result.email,
       fullName: result.displayName,
-      googleId: result.uid
-    }
-   
+      googleId: result.uid,
+    };
+
     await doAPIPost("auth/login-google", payload).then((res) => {
       if (res.status === 201) {
         const { token, ...user } = res.data;
@@ -107,7 +110,7 @@ export const useAuthStore = () => {
         dispatch(setErrorToast(res.data.message));
       }
     });
-  }
+  };
 
   const startForgotPassword = async (data) => {
     const { email } = data;
@@ -119,10 +122,14 @@ export const useAuthStore = () => {
         dispatch(setSuccessToast(res.data.message));
       } else {
         dispatch(setLoading(false));
-        dispatch(setSuccessToast("If the email is correct, you will receive an email with the instructions to reset your password"));
+        dispatch(
+          setSuccessToast(
+            "If the email is correct, you will receive an email with the instructions to reset your password"
+          )
+        );
       }
     });
-  }
+  };
 
   const startResetPassword = async (data) => {
     const { password, token } = data;
@@ -130,34 +137,36 @@ export const useAuthStore = () => {
     await doAPIPost("auth/reset-password", { token, password }).then((res) => {
       if (res.status === 201) {
         dispatch(setLoading(false));
-        dispatch(setSuccessToast('Password changed successfully'));
-        navigate('/login');
+        dispatch(setSuccessToast("Password changed successfully"));
+        navigate("/login");
       } else {
         dispatch(setLoading(false));
         dispatch(setErrorToast(res.data.message));
       }
     });
-  }
+  };
 
   const startConnectToGeneral = async () => {
-    const manager = new Manager("http://localhost:3000/socket.io/socket.io.js")
-    const socket = manager.socket("/general");
+    let manager = null;
+   
+    // Only create a new socket instance if it doesn't exist
+    manager = new Manager("http://localhost:3000/socket.io/socket.io.js", {
+      extraHeaders: { auth: user.id },
+    });
+    
+    socket = manager.socket("/general");
 
-    socket.on("connect", () => {
+    socket.on("connectedClient", (payload) => {
+      dispatch(setOnlineActivity(payload.fullName));
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnectedClient", () => {
     });
+  };
 
-    socket.on("newClient", (data) => {
-      console.log('CLIENT CONNECTED', data);
-    });
-
-    socket.on("disconnectedClient", (data) => {
-      console.log('CLIENT DISCONECTED', data);
-    });
-  }
-
+  const startDisconnectToGeneral = async () => {
+    socket.disconnect();
+  };
 
   return {
     //properties
@@ -174,6 +183,7 @@ export const useAuthStore = () => {
     startLoginGoogle,
     startForgotPassword,
     startResetPassword,
-    startConnectToGeneral
+    startConnectToGeneral,
+    startDisconnectToGeneral,
   };
 };

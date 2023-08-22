@@ -27,11 +27,12 @@ export const Navbar = () => {
     };
   }, []);
 
-  const { user, dispatch } = useAuthStore();
+  const { user, dispatch, startDisconnectToGeneral } = useAuthStore();
 
   const handleLogout = () => {
     dispatch(onLogout());
     localStorage.clear();
+    startDisconnectToGeneral();
   };
 
   const menuRef = useRef(null);
@@ -224,68 +225,26 @@ export const Navbar = () => {
               
             </TabPanel>
             <TabPanel header="Friends" leftIcon="pi pi-users mr-2">
-              
               <ul className="list-none p-0 m-0 mt-3">
-                <li className="py-2">
-                  <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
-                    <img
-                      src="https://blocks.primereact.org/demo/images/blocks/products/skateboard.png"
-                      className="mr-3 flex-shrink-0 p-overlay-badge"
-                      alt="sport-shoe"
-                      style={{ width: "60px", height: "60px" }}
-                    />
-                    <div>
-                      <span className="block text-900 mb-1">Rafete</span>
-                      <p className="m-0 text-600 font-medium text-sm">#47122</p>
-                    </div>
-                    <div className="ml-auto border-circle w-1rem h-1rem m-2 bg-green-500"></div>
-                  </a>
-                </li>
-                <li className="py-2">
-                  <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
-                    <img
-                      src="https://blocks.primereact.org/demo/images/blocks/products/juice.png"
-                      className="mr-3 flex-shrink-0 p-overlay-badge"
-                      alt="sport-shoe"
-                      style={{ width: "60px", height: "60px" }}
-                    />
-                    <div>
-                      <span className="block text-900 mb-1">Alex</span>
-                      <p className="m-0 text-600 font-medium text-sm">#47122</p>
-                    </div>
-                    <div className="ml-auto border-circle w-1rem h-1rem m-2 surface-600"></div>
-                  </a>
-                </li>
-                <li className="py-2">
-                  <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
-                    <img
-                      src="https://blocks.primereact.org/demo/images/blocks/products/skateboard.png"
-                      className="mr-3 flex-shrink-0 p-overlay-badge"
-                      alt="sport-shoe"
-                      style={{ width: "60px", height: "60px" }}
-                    />
-                    <div>
-                      <span className="block text-900 mb-1">Harry</span>
-                      <p className="m-0 text-600 font-medium text-sm">#47122</p>
-                    </div>
-                    <div className="ml-auto border-circle w-1rem h-1rem m-2 surface-600"></div>
-                  </a>
-                </li>
-                <li className="py-2">
-                  <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
-                    <img
-                      src="https://blocks.primereact.org/demo/images/blocks/products/skateboard.png"
-                      className="mr-3 flex-shrink-0 p-overlay-badge"
-                      alt="sport-shoe"
-                      style={{ width: "60px", height: "60px" }}
-                    />
-                    <div>
-                      <span className="block text-900 mb-1">Michel</span>
-                      <p className="m-0 text-600 font-medium text-sm">#47122</p>
-                    </div>
-                    <div className="ml-auto border-circle w-1rem h-1rem m-2 bg-green-500"></div>
-                  </a>
-                </li>
+                {
+                  user?.friends.map((friend) => (
+                    <li className="py-2" key={friend.id}>
+                      <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
+                        <img
+                          src="https://blocks.primereact.org/demo/images/blocks/products/skateboard.png"
+                          className="mr-3 flex-shrink-0 p-overlay-badge"
+                          alt="sport-shoe"
+                          style={{ width: "60px", height: "60px" }}
+                        />
+                        <div>
+                          <span className="block text-900 mb-1">{friend.fullName}</span>
+                          <p className="m-0 text-600 font-medium text-sm">{friend.nickname}</p>
+                        </div>
+                        <div className="ml-auto border-circle w-1rem h-1rem m-2 bg-green-500"></div>
+                      </a>
+                    </li>
+                  ))   
+                } 
               </ul>
             </TabPanel>
           </TabView>
