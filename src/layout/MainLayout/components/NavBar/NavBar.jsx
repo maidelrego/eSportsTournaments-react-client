@@ -9,6 +9,7 @@ import { Sidebar } from "primereact/sidebar";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
+import { Badge } from "primereact/badge";
 
 export const Navbar = () => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -27,7 +28,13 @@ export const Navbar = () => {
     };
   }, []);
 
-  const { user, dispatch, startDisconnectToGeneral } = useAuthStore();
+  const {
+    user,
+    friends,
+    dispatch,
+    startDisconnectToGeneral,
+    startGetConnectedClients,
+  } = useAuthStore();
 
   const handleLogout = () => {
     dispatch(onLogout());
@@ -48,8 +55,14 @@ export const Navbar = () => {
     closeMenu();
   };
 
-  const toggleMenu = () => {
+  const toggleMobileMenu = () => {
     setMenuVisible((prevVisible) => !prevVisible);
+    startGetConnectedClients();
+  };
+
+  const toggleMenu = () => {
+    setVisible((prevVisible) => !prevVisible);
+    startGetConnectedClients();
   };
 
   const closeMenu = () => {
@@ -70,7 +83,7 @@ export const Navbar = () => {
       >
         <img src={logo} alt="logo" height="60" className="mr-0 logo lg:mr-6" />
         <a
-          onClick={() => toggleMenu()}
+          onClick={() => toggleMobileMenu()}
           className="p-ripple cursor-pointer block lg:hidden text-700"
         >
           <i className="pi pi-bars text-4xl"></i>
@@ -158,14 +171,17 @@ export const Navbar = () => {
             <ul className="list-none p-0 m-0 flex lg:align-items-center select-none flex-column lg:flex-row">
               <li className="border-gray-800 lg:border-top-none">
                 <a
-                  onClick={() => setVisible(true)}
-                  className="p-ripple flex px-6 p-3 lg:px-3 lg:py-2 align-items-center hover:bg-gray-800 font-medium border-round cursor-pointer transition-colors transition-duration-150 w-full"
+                  onClick={() => toggleMenu()}
+                  className="p-ripple flex px-6 p-3 lg:px-3 lg:pt-3 align-items-center hover:bg-gray-800 font-medium border-round cursor-pointer transition-colors transition-duration-150 w-full"
                 >
                   <Avatar
                     image="https://cdn.vuetifyjs.com/images/john.jpg"
-                    style={{ width: "40px", height: "40px" }}
+                    style={{ width: "50px", height: "50px" }}
                     shape="circle"
-                  />
+                    className="p-overlay-badge"
+                  >
+                    <Badge value="4" />
+                  </Avatar>
                   <div className="text-white font-medium ml-2 block lg:hidden">
                     {user?.fullName}
                   </div>
@@ -180,6 +196,7 @@ export const Navbar = () => {
         position="right"
         onHide={() => setVisible(false)}
         icons={custonIcons}
+        className="w-full md:w-20rem lg:w-30rem"
         pt={{
           header: {
             className:
@@ -198,6 +215,64 @@ export const Navbar = () => {
               },
             }}
           >
+            <TabPanel header="Friends" leftIcon="pi pi-users mr-2">
+              <ul className="list-none p-0 m-0 mt-3">
+                {friends?.map((friend) => (
+                  <li className="py-2" key={friend.id}>
+                    <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
+                      <img
+                        src="https://blocks.primereact.org/demo/images/blocks/products/skateboard.png"
+                        className="mr-3 flex-shrink-0 p-overlay-badge"
+                        alt="sport-shoe"
+                        style={{ width: "60px", height: "60px" }}
+                      />
+                      <div>
+                        <span className="block text-900 mb-1">
+                          {friend.fullName}
+                        </span>
+                        <p className="m-0 text-600 font-medium text-sm">
+                          {friend.nickname}
+                        </p>
+                      </div>
+                      <div
+                        className={`ml-auto border-circle w-1rem h-1rem m-2 ${
+                          friend.online ? "bg-green-500" : "bg-gray-500"
+                        }`}
+                      ></div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </TabPanel>
+            <TabPanel header="Notifications" leftIcon="pi pi-bell mr-2">
+              <ul className="list-none p-0 m-0 mt-3">
+                {friends?.map((friend) => (
+                  <li className="py-2" key={friend.id}>
+                    <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
+                      <img
+                        src="https://blocks.primereact.org/demo/images/blocks/products/skateboard.png"
+                        className="mr-3 flex-shrink-0 p-overlay-badge"
+                        alt="sport-shoe"
+                        style={{ width: "60px", height: "60px" }}
+                      />
+                      <div>
+                        <span className="block text-900 mb-1">
+                          {friend.fullName}
+                        </span>
+                        <p className="m-0 text-600 font-medium text-sm">
+                          {friend.nickname}
+                        </p>
+                      </div>
+                      <div
+                        className={`ml-auto border-circle w-1rem h-1rem m-2 ${
+                          friend.online ? "bg-green-500" : "bg-gray-500"
+                        }`}
+                      ></div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </TabPanel>
             <TabPanel header="Settings" leftIcon="pi pi-cog mr-2">
               <div className="flex align-items-center justify-content-between flex-column mt-3">
                 <Avatar
@@ -209,7 +284,9 @@ export const Navbar = () => {
                 <span className="mt-3 mb-2 text-xl font-bold">
                   {user?.fullName}
                 </span>
-                <p className="m-0 text-600 font-medium text-sm">{user?.nickname}</p>
+                <p className="m-0 text-600 font-medium text-sm">
+                  {user?.nickname}
+                </p>
                 <div className="mt-5">
                   <FileUpload
                     mode="basic"
@@ -222,31 +299,8 @@ export const Navbar = () => {
                   />
                 </div>
               </div>
-              
             </TabPanel>
-            <TabPanel header="Friends" leftIcon="pi pi-users mr-2">
-              <ul className="list-none p-0 m-0 mt-3">
-                {
-                  user?.friends.map((friend) => (
-                    <li className="py-2" key={friend.id}>
-                      <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
-                        <img
-                          src="https://blocks.primereact.org/demo/images/blocks/products/skateboard.png"
-                          className="mr-3 flex-shrink-0 p-overlay-badge"
-                          alt="sport-shoe"
-                          style={{ width: "60px", height: "60px" }}
-                        />
-                        <div>
-                          <span className="block text-900 mb-1">{friend.fullName}</span>
-                          <p className="m-0 text-600 font-medium text-sm">{friend.nickname}</p>
-                        </div>
-                        <div className="ml-auto border-circle w-1rem h-1rem m-2 bg-green-500"></div>
-                      </a>
-                    </li>
-                  ))   
-                } 
-              </ul>
-            </TabPanel>
+            
           </TabView>
         </div>
         <div className="mx-4 py-4 border-top-1 surface-border flex">

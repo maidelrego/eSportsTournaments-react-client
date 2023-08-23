@@ -5,6 +5,7 @@ import {
   onLogin,
   onLogout,
   onSetMyTournaments,
+  onSetFriendsOnline,
 } from "../store/auth/authSlice";
 import {
   setErrorToast,
@@ -18,7 +19,7 @@ import { Manager, Socket } from "socket.io-client";
 let socket = Socket;
 
 export const useAuthStore = () => {
-  const { authStatus, user, myTournaments } = useSelector(
+  const { authStatus, user, myTournaments, friends } = useSelector(
     (state) => state.auth
   );
 
@@ -149,7 +150,6 @@ export const useAuthStore = () => {
   const startConnectToGeneral = async () => {
     let manager = null;
    
-    // Only create a new socket instance if it doesn't exist
     manager = new Manager("http://localhost:3000/socket.io/socket.io.js", {
       extraHeaders: { auth: user.id },
     });
@@ -157,10 +157,14 @@ export const useAuthStore = () => {
     socket = manager.socket("/general");
 
     socket.on("connectedClient", (payload) => {
-      dispatch(setOnlineActivity(payload.fullName));
+      dispatch(setOnlineActivity(`${payload.fullName} is now online`));
     });
 
     socket.on("disconnectedClient", () => {
+    });
+
+    socket.on("connected-clients", (payload) => {
+      dispatch(onSetFriendsOnline(payload));
     });
   };
 
@@ -168,11 +172,16 @@ export const useAuthStore = () => {
     socket.disconnect();
   };
 
+  const startGetConnectedClients = async () => {
+    socket.emit("get-connected-clients");
+  };
+
   return {
     //properties
     authStatus,
     user,
     myTournaments,
+    friends,
 
     //methods
     startLogin,
@@ -185,5 +194,6 @@ export const useAuthStore = () => {
     startResetPassword,
     startConnectToGeneral,
     startDisconnectToGeneral,
+    startGetConnectedClients
   };
 };

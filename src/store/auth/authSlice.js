@@ -11,6 +11,7 @@ export const authSlice = createSlice({
   initialState: {
     authStatus: authStatusName.checking,
     user: {},
+    friends: [],
     myTournaments: [],
     errorMessage: "",
   },
@@ -18,6 +19,7 @@ export const authSlice = createSlice({
     onLogin: (state, { payload }) => {
       state.authStatus = authStatusName.authenticated;
       state.user = payload;
+      state.friends = payload.friends;
       state.errorMessage = null;
     },
     onLogout: (state, { payload }) => {
@@ -33,8 +35,20 @@ export const authSlice = createSlice({
     },
     onSetMyTournaments: (state, { payload }) => {
       state.myTournaments = payload;
+    },
+    onSetFriendsOnline : (state, { payload }) => {
+      console.log(payload);
+      const updatedFriends = state.friends.map(friend => ({
+        ...friend,
+        online: payload.some(connectedUser => connectedUser.id === friend.id)
+      }));
+    
+      return {
+        ...state,
+        friends: updatedFriends
+      };
     }
   },
 });
 // Action creators are generated for each case reducer function
-export const { onLogin, onChenking, onLogout, onSetMyTournaments } = authSlice.actions;
+export const { onLogin, onChenking, onLogout, onSetMyTournaments, onSetFriendsOnline } = authSlice.actions;

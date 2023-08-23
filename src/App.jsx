@@ -10,17 +10,22 @@ import { PrimeReactProvider } from "primereact/api";
 import { AppRouter } from "./router/AppRouter";
 import { AppSpinner } from "./ui/components/AppSpinner";
 import { useSelector } from "react-redux";
-import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from "react-hot-toast";
 
 function App() {
-  const { loading } = useSelector(state => state.ui)
+  const { loading } = useSelector((state) => state.ui);
 
   return (
     <PrimeReactProvider>
       <AppRouter />
-      { loading && <AppSpinner loading={loading} /> }
-      <ToastContainer autoClose={3000} />
+      {loading && <AppSpinner loading={loading} />}
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+        }}
+      />
     </PrimeReactProvider>
   );
 }
