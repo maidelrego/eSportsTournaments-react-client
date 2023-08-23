@@ -20,12 +20,13 @@ export const uiSlice = createSlice({
       toast.error(payload)
     },
     setOnlineActivity: (state,{ payload }) => {
+      const { fullName, avatar } = payload;
       toast((t) => (
         <>
           <div className="flex flex-wrap flex-row align-items-center justify-content-between">
-            <img src='https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png' alt="logo" height="40" className="mr-3 logo" />
+            <img src={avatar} alt="logo" height="40" className="mr-3 logo" />
             <div>
-              <span className="block text-900 mr-3">{payload}</span>
+              <span className="block text-900 mr-3">{fullName} is now online!</span>
             </div>
             <Button icon="pi pi-times" onClick={() => toast.dismiss(t.id)} className="p-button-text p-button-rounded p-button-plain p-mx-2" />
           </div>

@@ -51,8 +51,8 @@ export const useAuthStore = () => {
           navigate("/login");
         } else {
           dispatch(setLoading(false));
-          dispatch(onLogout(res.message));
-          dispatch(setErrorToast("Something went wrong, check logs"));
+          dispatch(onLogout(res.data.message));
+          dispatch(setErrorToast(res.data.message));
         }
       }
     );
@@ -91,11 +91,12 @@ export const useAuthStore = () => {
     dispatch(onChenking());
     const result = await singInWithGoogle();
     if (!result.ok) return dispatch(onLogout("Register error action"));
-
+    console.log(result);
     const payload = {
       email: result.email,
       fullName: result.displayName,
       googleId: result.uid,
+      avatar: result.photoURL,
     };
 
     await doAPIPost("auth/login-google", payload).then((res) => {
@@ -157,7 +158,7 @@ export const useAuthStore = () => {
     socket = manager.socket("/general");
 
     socket.on("connectedClient", (payload) => {
-      dispatch(setOnlineActivity(`${payload.fullName} is now online`));
+      dispatch(setOnlineActivity(payload));
     });
 
     socket.on("disconnectedClient", () => {
@@ -175,6 +176,40 @@ export const useAuthStore = () => {
   const startGetConnectedClients = async () => {
     socket.emit("get-connected-clients");
   };
+
+  const startUpdateProfile = async (data) => {
+    const { id } = user;  
+
+    dispatch(setLoading(true));
+    await doAPIPost(`auth/update/${id}`, data).then((res) => {
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast("Profile updated successfully"));
+        dispatch(onLogin(res.data));
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast(res.data.message));
+      }
+    }); 
+  }
+
+  const imageUpload = async (image) => {
+    const { id } = user;
+    const form = new FormData();
+    form.append("image", image);
+
+    dispatch(setLoading(true));
+    await doAPIPost(`auth/update/${id}`, form).then((res) => {
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast("Image uploaded successfully"));
+        dispatch(onLogin(res.data));
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast(res.data.message));
+      }
+    }); 
+  }
 
   return {
     //properties
@@ -194,6 +229,8 @@ export const useAuthStore = () => {
     startResetPassword,
     startConnectToGeneral,
     startDisconnectToGeneral,
-    startGetConnectedClients
+    startGetConnectedClients,
+    startUpdateProfile,
+    imageUpload
   };
 };

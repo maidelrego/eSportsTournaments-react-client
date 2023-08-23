@@ -9,6 +9,7 @@ export const AppSpinner = (loading) => {
         overlayColor="rgba(0, 0, 0, 0.5)"
         color="#35b2b2"
         message={"Loading..."}
+        zIndex={9999}
       />
     </>
   )
