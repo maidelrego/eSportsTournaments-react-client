@@ -250,6 +250,21 @@ export const useAuthStore = () => {
     });
   }
 
+  const startSendFriendRequest = async (search) => {
+    let state = null;
+    dispatch(setLoading(true));
+    await doAPIPost(`TODO: AQUI LA RUTA`).then((res) => {
+      if (res.status === 201) {
+        dispatch(setLoading(false));
+        state = 'success'
+      } else {
+        dispatch(setLoading(false));
+        state = 'error'
+      }
+    });
+    return state;
+  }
+
   return {
     //properties
     authStatus,
@@ -273,6 +288,7 @@ export const useAuthStore = () => {
     startUpdateProfile,
     imageUpload,
     startMarkNotificationAsRead,
-    startDeleteNotifications
+    startDeleteNotifications,
+    startSendFriendRequest
   };
 };

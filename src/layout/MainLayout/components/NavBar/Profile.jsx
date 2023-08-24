@@ -8,10 +8,12 @@ import { Avatar } from "primereact/avatar";
 import { Inplace, InplaceDisplay, InplaceContent } from "primereact/inplace";
 import { InputText } from "primereact/inputtext";
 import PropTypes from "prop-types";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Message } from "primereact/message";
 
 export const Profile = ({ visible, onCloseMenu }) => {
-  const [searchFriend, setSearchFriend] = useState();
+  const [searchFriend, setSearchFriend] = useState('');
+  const [friendRequestState, setFriendRequestState] = useState(false);
 
   const {
     user,
@@ -19,6 +21,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
     dispatch,
     startDisconnectToGeneral,
     startUpdateProfile,
+    startSendFriendRequest,
     imageUpload,
   } = useAuthStore();
   const [fullName, setFullName] = useState(user.fullName);
@@ -39,6 +42,16 @@ export const Profile = ({ visible, onCloseMenu }) => {
     await imageUpload(e.files[0]);
     fileUpload.current.clear();
   };
+
+  const sendFriendRequest = async () => {
+    const state = await startSendFriendRequest(searchFriend);
+    setFriendRequestState(state);
+  }
+  
+  // Reset the search friend state
+  useEffect(() => {
+    setFriendRequestState(false);
+  }, [searchFriend]);
 
   const custonIcons = (
     <div className="flex align-items-center justify-content-between">
@@ -108,6 +121,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
                 <span className="p-input-icon-left mt-3">
                   <i className="pi pi-search" />
                   <InputText
+                    name="searchFriend"
                     value={searchFriend}
                     onChange={(e) => setSearchFriend(e.target.value)}
                     placeholder="You can add friends with their nickname"
@@ -117,11 +131,19 @@ export const Profile = ({ visible, onCloseMenu }) => {
                     }}
                   />
                 </span>
+                {
+                  friendRequestState === 'success' ? <Message severity="success" text="Friend Request Sent" className="mt-2" /> : null
+                }
+                {
+                  friendRequestState === 'error' ? <Message severity="error" text="Friend Request Sent" className="mt-2" /> : null
+                }
+                
                 <div className="mt-3">
                   <Button
                     label="Send Friend Request"
                     className="w-full"
                     icon="pi pi-send"
+                    onClick={() => sendFriendRequest()}
                   />
                 </div>
 
