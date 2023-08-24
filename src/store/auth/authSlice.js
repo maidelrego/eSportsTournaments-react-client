@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { generateTemplateMessage } from "../../helper/templatesFactory";
 
 export const authStatusName = {
   authenticated: "authenticated",
@@ -13,6 +14,7 @@ export const authSlice = createSlice({
     user: {},
     friends: [],
     myTournaments: [],
+    myNotifications:[],
     errorMessage: "",
   },
   reducers: {
@@ -37,7 +39,6 @@ export const authSlice = createSlice({
       state.myTournaments = payload;
     },
     onSetFriendsOnline : (state, { payload }) => {
-      console.log(payload);
       const updatedFriends = state.friends.map(friend => ({
         ...friend,
         online: payload.some(connectedUser => connectedUser.id === friend.id)
@@ -47,8 +48,23 @@ export const authSlice = createSlice({
         ...state,
         friends: updatedFriends
       };
+    },
+    onSetNotifications : (state, { payload }) => {
+      console.log(payload);
+      const notifications = payload.map(notification => ({
+        meta: notification.meta,
+        message: generateTemplateMessage(notification.type,{senderName: notification.sender.fullName})
+      }));
+      
+      state.myNotifications = notifications
     }
   },
 });
 // Action creators are generated for each case reducer function
-export const { onLogin, onChenking, onLogout, onSetMyTournaments, onSetFriendsOnline } = authSlice.actions;
+export const { 
+  onLogin,
+  onChenking, 
+  onLogout, 
+  onSetMyTournaments, 
+  onSetFriendsOnline,
+  onSetNotifications } = authSlice.actions;

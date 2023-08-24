@@ -6,6 +6,7 @@ import {
   onLogout,
   onSetMyTournaments,
   onSetFriendsOnline,
+  onSetNotifications,
 } from "../store/auth/authSlice";
 import {
   setErrorToast,
@@ -19,7 +20,7 @@ import { Manager, Socket } from "socket.io-client";
 let socket = Socket;
 
 export const useAuthStore = () => {
-  const { authStatus, user, myTournaments, friends } = useSelector(
+  const { authStatus, user, myTournaments, friends, myNotifications } = useSelector(
     (state) => state.auth
   );
 
@@ -33,7 +34,9 @@ export const useAuthStore = () => {
         const { token, ...user } = res.data;
         delete user.password;
         localStorage.setItem("tourneyForgeToken", token);
+        console.log(user);
         dispatch(onLogin(user));
+        dispatch(onSetNotifications(user.receivedNotifications))
       } else {
         dispatch(setLoading(false));
         dispatch(onLogout(res.data.message));
@@ -67,6 +70,7 @@ export const useAuthStore = () => {
         const { token, ...user } = res.data;
         localStorage.setItem("tourneyForgeToken", token);
         dispatch(onLogin(user));
+        dispatch(onSetNotifications(user.receivedNotifications))
       } else {
         localStorage.clear();
         dispatch(onLogout(res.message));
@@ -105,6 +109,7 @@ export const useAuthStore = () => {
         delete user.password;
         localStorage.setItem("tourneyForgeToken", token);
         dispatch(onLogin(user));
+        dispatch(onSetNotifications(user.receivedNotifications))
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
@@ -164,6 +169,10 @@ export const useAuthStore = () => {
     socket.on("disconnectedClient", () => {
     });
 
+    socket.on("friend-request-notification", (payload) => {
+      console.log(payload);
+    });
+
     socket.on("connected-clients", (payload) => {
       dispatch(onSetFriendsOnline(payload));
     });
@@ -217,6 +226,7 @@ export const useAuthStore = () => {
     user,
     myTournaments,
     friends,
+    myNotifications,
 
     //methods
     startLogin,
