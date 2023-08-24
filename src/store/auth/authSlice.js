@@ -53,11 +53,32 @@ export const authSlice = createSlice({
       console.log(payload);
       const notifications = payload.map(notification => ({
         meta: notification.meta,
-        message: generateTemplateMessage(notification.type,{senderName: notification.sender.fullName})
+        id: notification.id,
+        type: notification.type,
+        read: notification.read,
+        message: generateTemplateMessage(notification.type, {senderName: notification.sender.fullName})
       }));
       
       state.myNotifications = notifications
-    }
+    },
+    onSetNotificationsAfterRead : (state, { payload }) => {
+      const notifications = state.myNotifications.map(notification => {
+        if (notification.id === payload) {
+          return {
+            ...notification,
+            read: true
+          }
+        }
+        return notification;
+      });
+      
+      state.myNotifications = notifications
+    },
+    onSetNotificationsAfterDelete : (state, { payload }) => {
+      const notifications = state.myNotifications.filter(notification => notification.id !== payload);
+      
+      state.myNotifications = notifications
+    },
   },
 });
 // Action creators are generated for each case reducer function
@@ -67,4 +88,6 @@ export const {
   onLogout, 
   onSetMyTournaments, 
   onSetFriendsOnline,
+  onSetNotificationsAfterRead,
+  onSetNotificationsAfterDelete,
   onSetNotifications } = authSlice.actions;

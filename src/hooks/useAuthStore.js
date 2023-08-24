@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { doAPIGet, doAPIPost } from "../services/api";
+import { doAPIGet, doAPIPost, doAPIPut, doAPIDelete } from "../services/api";
 import {
   onChenking,
   onLogin,
@@ -7,6 +7,8 @@ import {
   onSetMyTournaments,
   onSetFriendsOnline,
   onSetNotifications,
+  onSetNotificationsAfterDelete,
+  onSetNotificationsAfterRead,
 } from "../store/auth/authSlice";
 import {
   setErrorToast,
@@ -34,7 +36,6 @@ export const useAuthStore = () => {
         const { token, ...user } = res.data;
         delete user.password;
         localStorage.setItem("tourneyForgeToken", token);
-        console.log(user);
         dispatch(onLogin(user));
         dispatch(onSetNotifications(user.receivedNotifications))
       } else {
@@ -95,7 +96,6 @@ export const useAuthStore = () => {
     dispatch(onChenking());
     const result = await singInWithGoogle();
     if (!result.ok) return dispatch(onLogout("Register error action"));
-    console.log(result);
     const payload = {
       email: result.email,
       fullName: result.displayName,
@@ -123,7 +123,6 @@ export const useAuthStore = () => {
     const { email } = data;
     dispatch(setLoading(true));
     await doAPIPost("auth/forgot-password", { email }).then((res) => {
-      console.log(res);
       if (res.status === 201) {
         dispatch(setLoading(false));
         dispatch(setSuccessToast(res.data.message));
@@ -171,6 +170,7 @@ export const useAuthStore = () => {
 
     socket.on("friend-request-notification", (payload) => {
       console.log(payload);
+      dispatch(setSuccessToast("You have a new friend request"));
     });
 
     socket.on("connected-clients", (payload) => {
@@ -220,6 +220,36 @@ export const useAuthStore = () => {
     }); 
   }
 
+  const startMarkNotificationAsRead = async (id) => {
+    dispatch(setLoading(true));
+    await doAPIPut(`notifications/${id}`).then((res) => {
+      console.log(res);
+      if (res.status === 200) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast("Notification marked as read"));
+        dispatch(onSetNotificationsAfterRead(id))
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast(res.data.message));
+      }
+    });
+  }
+
+  const startDeleteNotifications = async (id) => {
+    dispatch(setLoading(true));
+    await doAPIDelete(`notifications/${id}`).then((res) => {
+      console.log(res);
+      if (res.status === 200) {
+        dispatch(setLoading(false));
+        dispatch(setSuccessToast("Notification deleted"));
+        dispatch(onSetNotificationsAfterDelete(id))
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setErrorToast(res.data.message));
+      }
+    });
+  }
+
   return {
     //properties
     authStatus,
@@ -241,6 +271,8 @@ export const useAuthStore = () => {
     startDisconnectToGeneral,
     startGetConnectedClients,
     startUpdateProfile,
-    imageUpload
+    imageUpload,
+    startMarkNotificationAsRead,
+    startDeleteNotifications
   };
 };

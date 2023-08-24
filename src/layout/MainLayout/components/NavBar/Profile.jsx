@@ -11,6 +11,8 @@ import PropTypes from "prop-types";
 import { useState, useRef } from "react";
 
 export const Profile = ({ visible, onCloseMenu }) => {
+  const [searchFriend, setSearchFriend] = useState();
+
   const {
     user,
     friends,
@@ -53,7 +55,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
           onCloseMenu();
         }}
         icons={custonIcons}
-        className="w-full md:w-20rem"
+        className="w-full md:w-28rem"
         pt={{
           header: {
             className:
@@ -68,7 +70,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
           <TabView
             pt={{
               nav: {
-                className: "flex align-items-center justify-content-between",
+                className: "flex align-items-center justify-content-center",
               },
             }}
           >
@@ -101,20 +103,47 @@ export const Profile = ({ visible, onCloseMenu }) => {
                 ))}
               </ul>
             </TabPanel>
+            <TabPanel header="Add Friends" leftIcon="pi pi-users mr-2">
+              <div className="flex flex-column justify-content-between h-full">
+                <span className="p-input-icon-left mt-3">
+                  <i className="pi pi-search" />
+                  <InputText
+                    value={searchFriend}
+                    onChange={(e) => setSearchFriend(e.target.value)}
+                    placeholder="You can add friends with their nickname"
+                    className="w-full"
+                    pt={{
+                      root: { className: "border-primary-400" },
+                    }}
+                  />
+                </span>
+                <div className="mt-3">
+                  <Button
+                    label="Send Friend Request"
+                    className="w-full"
+                    icon="pi pi-send"
+                  />
+                </div>
+
+                <div className="mt-3">
+                  <h3 className="text-900">Friend Requests</h3>
+                </div>
+              </div>
+            </TabPanel>
             <TabPanel header="Settings" leftIcon="pi pi-cog mr-2">
               <div className="flex align-items-center justify-content-between flex-column mt-3">
                 <Avatar
                   image={user.avatar}
                   style={{
-                    width: "80px",
-                    height: "80px",
+                    width: "130px",
+                    height: "130px",
                     borderRadius: "50%",
                     border: "1px solid #35b2b2",
                   }}
                   shape="circle"
-                  className="mt-3"
+                  className="mt-3 py-2 px-2"
                 />
-             
+
                 <Inplace
                   closable
                   closeIcon="pi pi-check"
@@ -156,7 +185,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
             </TabPanel>
           </TabView>
         </div>
-        <div className="mx-4 py-4 border-top-1 surface-border flex">
+        <div className="py-4 border-top-1 surface-border flex">
           <Button
             onClick={() => {
               handleLogout();

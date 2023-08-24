@@ -6,10 +6,13 @@ import { useRef, useEffect, useState } from "react";
 import { Badge } from "primereact/badge";
 import { Profile } from "./Profile";
 import { Notifications } from "./Notifications";
+
 export const Navbar = () => {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [profileMenu, setProfileMenu] = useState(false);
   const [notificationsMenu, setNotificationsMenu] = useState(false);
+  const { user, startGetConnectedClients, myNotifications } = useAuthStore();
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -23,10 +26,6 @@ export const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const { user, startGetConnectedClients } = useAuthStore();
-
-  const menuRef = useRef(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -164,7 +163,11 @@ export const Navbar = () => {
                     className="pi pi-bell p-overlay-badge text-white"
                     style={{ fontSize: "1.7rem" }}
                   >
-                    <Badge value="2" style={{ fontSize: "13px" }}></Badge>
+                    {
+                      myNotifications.filter(i => !i.read).length > 0 && (
+                        <Badge value={myNotifications.filter(i => !i.read).length} style={{ fontSize: "13px" }}></Badge>
+                      )
+                    }
                   </i>
                   <div className="text-white font-medium ml-2 block lg:hidden">
                     Notifications

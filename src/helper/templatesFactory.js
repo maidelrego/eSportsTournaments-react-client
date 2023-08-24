@@ -1,5 +1,5 @@
 const templates = {
-  friend_request: "{{senderName}} just sent you a friend request.",
+  friend_request: "{{senderName}} sent you a friend request.",
 };
   
 // Helper function to generate template messages
