@@ -44,6 +44,7 @@ export const Notifications = ({ visible, onCloseMenu }) => {
           </span>
           <ul className="list-none m-0 p-0">
             {myNotifications.map((notification, index) => (
+              console.log(notification),
               <li key={notification.id}>
                 <a>
                   <div className="border-2 border-round surface-border mb-3 p-3">
@@ -55,6 +56,7 @@ export const Notifications = ({ visible, onCloseMenu }) => {
                               width: "15px",
                               height: "15px",
                               minWidth: "15px",
+                              marginRight: "20px",
                             }}
                           ></Badge>
                         ) : (
@@ -76,7 +78,7 @@ export const Notifications = ({ visible, onCloseMenu }) => {
                             <span className="p-button-label p-c">Accept</span>
                           </button>
                           <button
-                            aria-label="Not now"
+                            onClick={() => startDeleteNotifications(notification.id)}
                             className="p-button p-component p-button-text text-500 p-2"
                           >
                             <span className="p-button-label p-c">Declined</span>

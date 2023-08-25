@@ -13,7 +13,7 @@ import { Message } from "primereact/message";
 
 export const Profile = ({ visible, onCloseMenu }) => {
   const [searchFriend, setSearchFriend] = useState('');
-  const [friendRequestState, setFriendRequestState] = useState(false);
+  const [friendRequestState, setFriendRequestState] = useState({});
 
   const {
     user,
@@ -34,7 +34,6 @@ export const Profile = ({ visible, onCloseMenu }) => {
   };
 
   const updateProfile = () => {
-    console.log(fullName);
     startUpdateProfile({ fullName: fullName });
   };
 
@@ -47,10 +46,10 @@ export const Profile = ({ visible, onCloseMenu }) => {
     const state = await startSendFriendRequest(searchFriend);
     setFriendRequestState(state);
   }
-  
+
   // Reset the search friend state
   useEffect(() => {
-    setFriendRequestState(false);
+    setFriendRequestState({});
   }, [searchFriend]);
 
   const custonIcons = (
@@ -96,7 +95,12 @@ export const Profile = ({ visible, onCloseMenu }) => {
                         src={friend.avatar}
                         className="mr-3 flex-shrink-0 p-overlay-badge"
                         alt="sport-shoe"
-                        style={{ width: "60px", height: "60px" }}
+                        style={{
+                          width: "60px",
+                          height: "60px",
+                          borderRadius: "50%",
+                          border: "1px solid #35b2b2",
+                        }}
                       />
                       <div>
                         <span className="block text-900 mb-1">
@@ -132,10 +136,10 @@ export const Profile = ({ visible, onCloseMenu }) => {
                   />
                 </span>
                 {
-                  friendRequestState === 'success' ? <Message severity="success" text="Friend Request Sent" className="mt-2" /> : null
+                  friendRequestState.state === 'success' ? <Message severity="success" text="Friend Request Sent" className="mt-2" /> : null
                 }
                 {
-                  friendRequestState === 'error' ? <Message severity="error" text="Friend Request Sent" className="mt-2" /> : null
+                  friendRequestState.state === 'error' ? <Message severity="error" text={friendRequestState.message} className="mt-2" /> : null
                 }
                 
                 <div className="mt-3">

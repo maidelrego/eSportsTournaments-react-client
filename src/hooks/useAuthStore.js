@@ -9,12 +9,14 @@ import {
   onSetNotifications,
   onSetNotificationsAfterDelete,
   onSetNotificationsAfterRead,
+  onSetNewNotification
 } from "../store/auth/authSlice";
 import {
   setErrorToast,
   setSuccessToast,
   setLoading,
   setOnlineActivity,
+  friendRequestToast
 } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
 import { singInWithGoogle } from "../firebase/providers";
@@ -169,8 +171,8 @@ export const useAuthStore = () => {
     });
 
     socket.on("friend-request-notification", (payload) => {
-      console.log(payload);
-      dispatch(setSuccessToast("You have a new friend request"));
+      dispatch(friendRequestToast(payload));
+      dispatch(onSetNewNotification(payload));
     });
 
     socket.on("connected-clients", (payload) => {
@@ -223,7 +225,6 @@ export const useAuthStore = () => {
   const startMarkNotificationAsRead = async (id) => {
     dispatch(setLoading(true));
     await doAPIPut(`notifications/${id}`).then((res) => {
-      console.log(res);
       if (res.status === 200) {
         dispatch(setLoading(false));
         dispatch(setSuccessToast("Notification marked as read"));
@@ -238,7 +239,6 @@ export const useAuthStore = () => {
   const startDeleteNotifications = async (id) => {
     dispatch(setLoading(true));
     await doAPIDelete(`notifications/${id}`).then((res) => {
-      console.log(res);
       if (res.status === 200) {
         dispatch(setLoading(false));
         dispatch(setSuccessToast("Notification deleted"));
@@ -250,19 +250,26 @@ export const useAuthStore = () => {
     });
   }
 
-  const startSendFriendRequest = async (search) => {
-    let state = null;
+  const startSendFriendRequest = async (user) => {
+    const data = {
+      receiver: user,
+      type: 'friend_request'
+    }
+
+    let response = {};
     dispatch(setLoading(true));
-    await doAPIPost(`TODO: AQUI LA RUTA`).then((res) => {
+    await doAPIPost('notifications', data).then((res) => {
       if (res.status === 201) {
         dispatch(setLoading(false));
-        state = 'success'
+        response.state = 'success'
       } else {
         dispatch(setLoading(false));
-        state = 'error'
+        response.state = 'error'
+        response.message = res.data.error
       }
     });
-    return state;
+  
+    return response;
   }
 
   return {

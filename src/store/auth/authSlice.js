@@ -50,7 +50,6 @@ export const authSlice = createSlice({
       };
     },
     onSetNotifications : (state, { payload }) => {
-      console.log(payload);
       const notifications = payload.map(notification => ({
         meta: notification.meta,
         id: notification.id,
@@ -79,6 +78,17 @@ export const authSlice = createSlice({
       
       state.myNotifications = notifications
     },
+    onSetNewNotification : (state, { payload }) => {
+      const notification = {
+        meta: payload.meta,
+        id: payload.id,
+        type: payload.type,
+        read: payload.read,
+        message: generateTemplateMessage(payload.type, {senderName: payload.sender.fullName})
+      }
+      
+      state.myNotifications = [notification, ...state.myNotifications]
+    }
   },
 });
 // Action creators are generated for each case reducer function
@@ -90,4 +100,5 @@ export const {
   onSetFriendsOnline,
   onSetNotificationsAfterRead,
   onSetNotificationsAfterDelete,
+  onSetNewNotification,
   onSetNotifications } = authSlice.actions;
