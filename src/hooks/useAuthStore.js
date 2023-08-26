@@ -250,26 +250,28 @@ export const useAuthStore = () => {
     });
   }
 
-  const startSendFriendRequest = async (user) => {
-    const data = {
-      receiver: user,
-      type: 'friend_request'
-    }
-
-    let response = {};
+  const startSendGenericRequest = async (receiver,type) => {
+    let state = {
+      status: '',
+      msg: ''
+    };
     dispatch(setLoading(true));
-    await doAPIPost('notifications', data).then((res) => {
+    await doAPIPost('notifications',{receiver, type}).then((res) => {
+      dispatch(setLoading(false));
       if (res.status === 201) {
-        dispatch(setLoading(false));
-        response.state = 'success'
+        if(res.data.ok){
+          state.status = 'success';
+        }else{
+          state.status = 'error';
+        }
+        state.msg = res.data.msg;
       } else {
-        dispatch(setLoading(false));
-        response.state = 'error'
-        response.message = res.data.error
+        state.status = 'error';
+        state.msg = res.data.message;
       }
     });
   
-    return response;
+    return state;
   }
 
   return {
@@ -296,6 +298,6 @@ export const useAuthStore = () => {
     imageUpload,
     startMarkNotificationAsRead,
     startDeleteNotifications,
-    startSendFriendRequest
+    startSendGenericRequest
   };
 };

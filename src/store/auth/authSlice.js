@@ -7,6 +7,12 @@ export const authStatusName = {
   checking: "checking",
 };
 
+export const notificationsStatus = {
+  friend_request :'friend_request',
+  tournament_request : 'tournament_request',
+  invitation_tournament : 'invitation_tournament',
+};
+
 export const authSlice = createSlice({
   name: "auth",
   initialState: {

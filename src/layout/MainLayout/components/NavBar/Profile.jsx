@@ -1,19 +1,22 @@
+import { useState, useRef, useEffect } from "react";
+import { Inplace, InplaceDisplay, InplaceContent } from "primereact/inplace";
+import PropTypes from "prop-types";
+import { Message } from "primereact/message";
+import { Avatar } from "primereact/avatar";
 import { Sidebar } from "primereact/sidebar";
+import { InputText } from "primereact/inputtext";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
-import { onLogout } from "../../../../store/auth/authSlice";
+import { notificationsStatus, onLogout } from "../../../../store/auth/authSlice";
 import { useAuthStore } from "../../../../hooks";
-import { Avatar } from "primereact/avatar";
-import { Inplace, InplaceDisplay, InplaceContent } from "primereact/inplace";
-import { InputText } from "primereact/inputtext";
-import PropTypes from "prop-types";
-import { useState, useRef, useEffect } from "react";
-import { Message } from "primereact/message";
 
 export const Profile = ({ visible, onCloseMenu }) => {
   const [searchFriend, setSearchFriend] = useState('');
-  const [friendRequestState, setFriendRequestState] = useState({});
+  const [friendRequestState, setFriendRequestState] = useState({
+    status: '',
+    msg: ''
+  });
 
   const {
     user,
@@ -21,7 +24,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
     dispatch,
     startDisconnectToGeneral,
     startUpdateProfile,
-    startSendFriendRequest,
+    startSendGenericRequest,
     imageUpload,
   } = useAuthStore();
   const [fullName, setFullName] = useState(user.fullName);
@@ -43,7 +46,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
   };
 
   const sendFriendRequest = async () => {
-    const state = await startSendFriendRequest(searchFriend);
+    const state = await startSendGenericRequest(searchFriend, notificationsStatus.friend_request);
     setFriendRequestState(state);
   }
 
@@ -136,10 +139,10 @@ export const Profile = ({ visible, onCloseMenu }) => {
                   />
                 </span>
                 {
-                  friendRequestState.state === 'success' ? <Message severity="success" text="Friend Request Sent" className="mt-2" /> : null
+                  friendRequestState.status === 'success' ? <Message severity="success" text={friendRequestState.msg} className="mt-2" /> : null
                 }
                 {
-                  friendRequestState.state === 'error' ? <Message severity="error" text={friendRequestState.message} className="mt-2" /> : null
+                  friendRequestState.status === 'error' ? <Message severity="error" text={friendRequestState.msg} className="mt-2" /> : null
                 }
                 
                 <div className="mt-3">
