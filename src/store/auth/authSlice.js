@@ -21,6 +21,7 @@ export const authSlice = createSlice({
     friends: [],
     myTournaments: [],
     myNotifications:[],
+    pendingFriendRequests:[],
     errorMessage: "",
   },
   reducers: {
@@ -94,6 +95,9 @@ export const authSlice = createSlice({
       }
       
       state.myNotifications = [notification, ...state.myNotifications]
+    },
+    onSetPendingFriendRequests : (state, { payload }) => {
+      state.pendingFriendRequests = payload
     }
   },
 });
@@ -107,4 +111,5 @@ export const {
   onSetNotificationsAfterRead,
   onSetNotificationsAfterDelete,
   onSetNewNotification,
+  onSetPendingFriendRequests,
   onSetNotifications } = authSlice.actions;

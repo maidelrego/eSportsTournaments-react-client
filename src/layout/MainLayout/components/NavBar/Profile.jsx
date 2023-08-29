@@ -8,24 +8,30 @@ import { InputText } from "primereact/inputtext";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
-import { notificationsStatus, onLogout } from "../../../../store/auth/authSlice";
+import {
+  notificationsStatus,
+  onLogout,
+} from "../../../../store/auth/authSlice";
 import { useAuthStore } from "../../../../hooks";
 
 export const Profile = ({ visible, onCloseMenu }) => {
-  const [searchFriend, setSearchFriend] = useState('');
+  const [searchFriend, setSearchFriend] = useState("");
   const [friendRequestState, setFriendRequestState] = useState({
-    status: '',
-    msg: ''
+    status: "",
+    msg: "",
   });
 
   const {
     user,
     friends,
+    pendingFriendRequests,
     dispatch,
     startDisconnectToGeneral,
     startUpdateProfile,
     startSendGenericRequest,
     imageUpload,
+    startGetPendingFriendRequests,
+    startDeletePendingFriendRequest,
   } = useAuthStore();
   const [fullName, setFullName] = useState(user.fullName);
   const fileUpload = useRef(null);
@@ -46,14 +52,30 @@ export const Profile = ({ visible, onCloseMenu }) => {
   };
 
   const sendFriendRequest = async () => {
-    const state = await startSendGenericRequest(searchFriend, notificationsStatus.friend_request);
+    const state = await startSendGenericRequest(
+      searchFriend,
+      notificationsStatus.friend_request
+    );
     setFriendRequestState(state);
-  }
+    startGetPendingFriendRequests();
+  };
+
+  const deletePendingFriendRequest = async (id) => {
+    await startDeletePendingFriendRequest(id).then(() => {
+      startGetPendingFriendRequests();
+    })
+  };
 
   // Reset the search friend state
   useEffect(() => {
     setFriendRequestState({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchFriend]);
+
+  useEffect(() => {
+    startGetPendingFriendRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) 
 
   const custonIcons = (
     <div className="flex align-items-center justify-content-between">
@@ -138,13 +160,21 @@ export const Profile = ({ visible, onCloseMenu }) => {
                     }}
                   />
                 </span>
-                {
-                  friendRequestState.status === 'success' ? <Message severity="success" text={friendRequestState.msg} className="mt-2" /> : null
-                }
-                {
-                  friendRequestState.status === 'error' ? <Message severity="error" text={friendRequestState.msg} className="mt-2" /> : null
-                }
-                
+                {friendRequestState.status === "success" ? (
+                  <Message
+                    severity="success"
+                    text={friendRequestState.msg}
+                    className="mt-2"
+                  />
+                ) : null}
+                {friendRequestState.status === "error" ? (
+                  <Message
+                    severity="error"
+                    text={friendRequestState.msg}
+                    className="mt-2"
+                  />
+                ) : null}
+
                 <div className="mt-3">
                   <Button
                     label="Send Friend Request"
@@ -153,10 +183,51 @@ export const Profile = ({ visible, onCloseMenu }) => {
                     onClick={() => sendFriendRequest()}
                   />
                 </div>
+              </div>
+              <div className="mt-3">
+                <h3 className="text-900">Friend Requests</h3>
+              </div>
 
-                <div className="mt-3">
-                  <h3 className="text-900">Friend Requests</h3>
-                </div>
+              <div>
+                <ul className="list-none p-0 m-0 mt-3">
+                  {pendingFriendRequests && pendingFriendRequests.length > 0
+                    ? pendingFriendRequests.map((request) => (
+                      <li className="py-2" key={request.id}>
+                        <a className="flex align-items-center p-2">
+                          <img
+                            src={request.receiver.avatar}
+                            className="mr-3 flex-shrink-0 p-overlay-badge"
+                            alt="sport-shoe"
+                            style={{
+                              width: "60px",
+                              height: "60px",
+                              borderRadius: "50%",
+                              border: "1px solid #35b2b2",
+                            }}
+                          />
+                          <div>
+                            <span className="block text-900 mb-1">
+                              {request.receiver.fullName}
+                            </span>
+                            <p className="m-0 text-600 font-medium text-sm">
+                                Outgoing Friend Request
+                            </p>
+                          </div>
+                          <div className="ml-auto">
+                            <Button
+                              rounded
+                              outlined
+                              icon="pi pi-times"
+                              onClick={() => {
+                                deletePendingFriendRequest(request.id);
+                              }}
+                            />
+                          </div>
+                        </a>
+                      </li>
+                    ))
+                    : null}
+                </ul>
               </div>
             </TabPanel>
             <TabPanel header="Settings" leftIcon="pi pi-cog mr-2">

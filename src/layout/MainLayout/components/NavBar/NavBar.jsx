@@ -6,11 +6,15 @@ import { useRef, useEffect, useState } from "react";
 import { Badge } from "primereact/badge";
 import { Profile } from "./Profile";
 import { Notifications } from "./Notifications";
+import { onSetNotificationsSidebar, onSetProfileSidebar } from "../../../../store/ui/uiSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 export const Navbar = () => {
+  const dispatch = useDispatch();
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [profileMenu, setProfileMenu] = useState(false);
-  const [notificationsMenu, setNotificationsMenu] = useState(false);
+  // const [profileMenu, setProfileMenu] = useState(false);
+  // const [notificationsMenu, setNotificationsMenu] = useState(false);
+  const { notificationsSidebar, profileSidebar } = useSelector((state) => state.ui);
   const { user, startGetConnectedClients, myNotifications } = useAuthStore();
   const menuRef = useRef(null);
 
@@ -44,20 +48,20 @@ export const Navbar = () => {
   };
 
   const toggleProfile = () => {
-    setProfileMenu((prevVisible) => !prevVisible);
+    dispatch(onSetProfileSidebar(!profileSidebar));
     startGetConnectedClients();
   };
 
   const closeProfile = () => {
-    setProfileMenu(false);
+    dispatch(onSetProfileSidebar(false));
   };
 
   const toggleNotifications = () => {
-    setNotificationsMenu((prevVisible) => !prevVisible);
+    dispatch(onSetNotificationsSidebar(!notificationsSidebar));
   };
 
   const closeNotificationsMenu = () => {
-    setNotificationsMenu(false);
+    dispatch(onSetNotificationsSidebar(false));
   };
 
   return (
@@ -200,9 +204,9 @@ export const Navbar = () => {
           </div>
         </div>
       </div>
-      <Profile visible={profileMenu} onCloseMenu={closeProfile} />
+      <Profile visible={profileSidebar} onCloseMenu={closeProfile} />
       <Notifications
-        visible={notificationsMenu}
+        visible={notificationsSidebar}
         onCloseMenu={closeNotificationsMenu}
       />
     </>

@@ -9,27 +9,36 @@ import {
   onSetNotifications,
   onSetNotificationsAfterDelete,
   onSetNotificationsAfterRead,
-  onSetNewNotification
+  onSetNewNotification,
+  onSetPendingFriendRequests,
 } from "../store/auth/authSlice";
-import {
-  setErrorToast,
-  setSuccessToast,
-  setLoading,
-  setOnlineActivity,
-  friendRequestToast
-} from "../store/ui/uiSlice";
+
+import { useUIStore } from "./useUIStore";
+
 import { useNavigate } from "react-router-dom";
 import { singInWithGoogle } from "../firebase/providers";
 import { Manager, Socket } from "socket.io-client";
 let socket = Socket;
 
 export const useAuthStore = () => {
-  const { authStatus, user, myTournaments, friends, myNotifications } = useSelector(
-    (state) => state.auth
-  );
+  const {
+    authStatus,
+    user,
+    myTournaments,
+    friends,
+    myNotifications,
+    pendingFriendRequests,
+  } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const {
+    startLoading,
+    startErrorToast,
+    startSuccessToast,
+    startOnlineActivity,
+    startFriendRequestToast,
+  } = useUIStore();
 
   const startLogin = async ({ email, password }) => {
     dispatch(onChenking());
@@ -39,26 +48,26 @@ export const useAuthStore = () => {
         delete user.password;
         localStorage.setItem("tourneyForgeToken", token);
         dispatch(onLogin(user));
-        dispatch(onSetNotifications(user.receivedNotifications))
+        dispatch(onSetNotifications(user.receivedNotifications));
       } else {
-        dispatch(setLoading(false));
+        startLoading(false);
         dispatch(onLogout(res.data.message));
-        dispatch(setErrorToast(res.data.message));
+        startErrorToast(res.data.message);
       }
     });
   };
 
   const startRegister = async ({ email, password, fullName }) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPost("auth/register", { email, password, fullName }).then(
       (res) => {
         if (res.status === 201) {
-          dispatch(setLoading(false));
+          startLoading(false);
           navigate("/login");
         } else {
-          dispatch(setLoading(false));
+          startLoading(false);
           dispatch(onLogout(res.data.message));
-          dispatch(setErrorToast(res.data.message));
+          startErrorToast(res.data.message);
         }
       }
     );
@@ -73,7 +82,7 @@ export const useAuthStore = () => {
         const { token, ...user } = res.data;
         localStorage.setItem("tourneyForgeToken", token);
         dispatch(onLogin(user));
-        dispatch(onSetNotifications(user.receivedNotifications))
+        dispatch(onSetNotifications(user.receivedNotifications));
       } else {
         localStorage.clear();
         dispatch(onLogout(res.message));
@@ -82,14 +91,14 @@ export const useAuthStore = () => {
   };
 
   const startGetMyTournaments = async () => {
-    dispatch(setLoading(true));
+    startLoading(true);
     doAPIGet("tournaments/byAdminId").then((res) => {
       if (res.status === 200) {
         dispatch(onSetMyTournaments(res.data));
-        dispatch(setLoading(false));
+        startLoading(false);
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast("Something went wrong, check logs"));
+        startLoading(false);
+        startErrorToast("Something went wrong, check logs");
       }
     });
   };
@@ -111,29 +120,27 @@ export const useAuthStore = () => {
         delete user.password;
         localStorage.setItem("tourneyForgeToken", token);
         dispatch(onLogin(user));
-        dispatch(onSetNotifications(user.receivedNotifications))
-        dispatch(setLoading(false));
+        dispatch(onSetNotifications(user.receivedNotifications));
+        startLoading(false);
       } else {
-        dispatch(setLoading(false));
+        startLoading(false);
         dispatch(onLogout(res.data.message));
-        dispatch(setErrorToast(res.data.message));
+        startErrorToast(res.data.message);
       }
     });
   };
 
   const startForgotPassword = async (data) => {
     const { email } = data;
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPost("auth/forgot-password", { email }).then((res) => {
       if (res.status === 201) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       } else {
-        dispatch(setLoading(false));
-        dispatch(
-          setSuccessToast(
-            "If the email is correct, you will receive an email with the instructions to reset your password"
-          )
+        startLoading(false);
+        startSuccessToast(
+          "If the email is correct, you will receive an email with the instructions to reset your password"
         );
       }
     });
@@ -141,37 +148,36 @@ export const useAuthStore = () => {
 
   const startResetPassword = async (data) => {
     const { password, token } = data;
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPost("auth/reset-password", { token, password }).then((res) => {
       if (res.status === 201) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast("Password changed successfully"));
+        startLoading(false);
+        startSuccessToast("Password changed successfully")
         navigate("/login");
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       }
     });
   };
 
   const startConnectToGeneral = async () => {
     let manager = null;
-   
+
     manager = new Manager("http://localhost:3000/socket.io/socket.io.js", {
       extraHeaders: { auth: user.id },
     });
-    
+
     socket = manager.socket("/general");
 
     socket.on("connectedClient", (payload) => {
-      dispatch(setOnlineActivity(payload));
+      startOnlineActivity(payload);
     });
 
-    socket.on("disconnectedClient", () => {
-    });
+    socket.on("disconnectedClient", () => {});
 
     socket.on("friend-request-notification", (payload) => {
-      dispatch(friendRequestToast(payload));
+      startFriendRequestToast(payload);
       dispatch(onSetNewNotification(payload));
     });
 
@@ -189,90 +195,114 @@ export const useAuthStore = () => {
   };
 
   const startUpdateProfile = async (data) => {
-    const { id } = user;  
-
-    dispatch(setLoading(true));
+    const { id } = user;
+    startLoading(true);
     await doAPIPost(`auth/update/${id}`, data).then((res) => {
       if (res.status === 201) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast("Profile updated successfully"));
+        startLoading(false);
+        startSuccessToast("Profile updated successfully");
         dispatch(onLogin(res.data));
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       }
-    }); 
-  }
+    });
+  };
 
   const imageUpload = async (image) => {
     const { id } = user;
     const form = new FormData();
     form.append("image", image);
 
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPost(`auth/update/${id}`, form).then((res) => {
       if (res.status === 201) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast("Image uploaded successfully"));
+        startLoading(false);
+        startSuccessToast("Profile updated successfully");
         dispatch(onLogin(res.data));
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       }
-    }); 
-  }
+    });
+  };
 
   const startMarkNotificationAsRead = async (id) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPut(`notifications/${id}`).then((res) => {
       if (res.status === 200) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast("Notification marked as read"));
-        dispatch(onSetNotificationsAfterRead(id))
+        startLoading(false);
+        startSuccessToast("Notification marked as read");
+        dispatch(onSetNotificationsAfterRead(id));
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       }
     });
-  }
+  };
 
   const startDeleteNotifications = async (id) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIDelete(`notifications/${id}`).then((res) => {
       if (res.status === 200) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast("Notification deleted"));
-        dispatch(onSetNotificationsAfterDelete(id))
+        startLoading(false);
+        startSuccessToast("Notification deleted");
+        dispatch(onSetNotificationsAfterDelete(id));
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       }
     });
-  }
+  };
 
-  const startSendGenericRequest = async (receiver,type) => {
+  const startSendGenericRequest = async (receiver, type) => {
     let state = {
-      status: '',
-      msg: ''
+      status: "",
+      msg: "",
     };
-    dispatch(setLoading(true));
-    await doAPIPost('notifications',{receiver, type}).then((res) => {
-      dispatch(setLoading(false));
+
+    startLoading(true);
+    await doAPIPost("notifications", { receiver, type }).then((res) => {
+      startLoading(false);
       if (res.status === 201) {
-        if(res.data.ok){
-          state.status = 'success';
-        }else{
-          state.status = 'error';
+        if (res.data.ok) {
+          state.status = "success";
+        } else {
+          state.status = "error";
         }
         state.msg = res.data.msg;
       } else {
-        state.status = 'error';
+        state.status = "error";
         state.msg = res.data.message;
       }
     });
-  
     return state;
-  }
+  };
+
+  const startGetPendingFriendRequests = async () => {
+    startLoading(true);
+    await doAPIGet("friends/pendingFriendRequests").then((res) => {
+      startLoading(false);
+      if (res.status === 200) {
+        dispatch(onSetPendingFriendRequests(res.data));
+      } else {
+        startErrorToast(res.data.message);
+      }
+    });
+  };
+
+  const startDeletePendingFriendRequest = async (id) => {
+    startLoading(true);
+    await doAPIDelete(`friends/${id}`).then((res) => {
+      startLoading(false);
+      if (res.status === 200) {
+        startSuccessToast('Friend request deleted');
+        dispatch(onSetPendingFriendRequests(res.data));
+      } else {
+        startErrorToast(res.data.message);
+      }
+    });
+  };
 
   return {
     //properties
@@ -281,6 +311,7 @@ export const useAuthStore = () => {
     myTournaments,
     friends,
     myNotifications,
+    pendingFriendRequests,
 
     //methods
     startLogin,
@@ -298,6 +329,8 @@ export const useAuthStore = () => {
     imageUpload,
     startMarkNotificationAsRead,
     startDeleteNotifications,
-    startSendGenericRequest
+    startSendGenericRequest,
+    startGetPendingFriendRequests,
+    startDeletePendingFriendRequest,
   };
 };

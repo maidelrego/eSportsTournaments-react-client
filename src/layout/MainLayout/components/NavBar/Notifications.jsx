@@ -44,7 +44,6 @@ export const Notifications = ({ visible, onCloseMenu }) => {
           </span>
           <ul className="list-none m-0 p-0">
             {myNotifications.map((notification, index) => (
-              console.log(notification),
               <li key={notification.id}>
                 <a>
                   <div className="border-2 border-round surface-border mb-3 p-3">
