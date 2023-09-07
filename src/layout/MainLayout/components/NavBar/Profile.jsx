@@ -118,8 +118,8 @@ export const Profile = ({ visible, onCloseMenu }) => {
                     <a className="p-ripple flex align-items-center p-2 cursor-pointer border-round hover:surface-200 transition-colors transition-duration-150">
                       <img
                         src={friend.avatar}
-                        className="mr-3 flex-shrink-0 p-overlay-badge"
-                        alt="sport-shoe"
+                        className="mr-3"
+                        alt="Profile"
                         style={{
                           width: "60px",
                           height: "60px",
@@ -196,8 +196,8 @@ export const Profile = ({ visible, onCloseMenu }) => {
                         <a className="flex align-items-center p-2">
                           <img
                             src={request.receiver.avatar}
-                            className="mr-3 flex-shrink-0 p-overlay-badge"
-                            alt="sport-shoe"
+                            className="mr-3"
+                            alt="Profile"
                             style={{
                               width: "60px",
                               height: "60px",

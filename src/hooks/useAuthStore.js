@@ -241,12 +241,12 @@ export const useAuthStore = () => {
     });
   };
 
-  const startDeleteNotifications = async (id) => {
+  const startDeleteNotifications = async (id, dontNotify = false) => {
     startLoading(true);
     await doAPIDelete(`notifications/${id}`).then((res) => {
       if (res.status === 200) {
         startLoading(false);
-        startSuccessToast("Notification deleted");
+        if (!dontNotify) startSuccessToast("Notification deleted");
         dispatch(onSetNotificationsAfterDelete(id));
       } else {
         startLoading(false);
@@ -304,6 +304,19 @@ export const useAuthStore = () => {
     });
   };
 
+  const startAcceptFriendRequest = async (id, notificationId) => {
+    startLoading(true);
+    await doAPIPost(`friends/approve/${id}`).then((res) => {
+      startLoading(false);
+      if (res.status === 201) {
+        startSuccessToast('Friend request accepted');
+        startDeleteNotifications(notificationId, true);
+      } else {
+        startErrorToast(res.data.message);
+      }
+    });
+  }
+
   return {
     //properties
     authStatus,
@@ -332,5 +345,6 @@ export const useAuthStore = () => {
     startSendGenericRequest,
     startGetPendingFriendRequests,
     startDeletePendingFriendRequest,
+    startAcceptFriendRequest
   };
 };

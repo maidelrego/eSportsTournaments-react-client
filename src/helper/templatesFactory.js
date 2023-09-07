@@ -1,5 +1,6 @@
 const templates = {
   friend_request: "{{senderName}} sent you a friend request.",
+  online_activity: "{{senderName}} is now online.",
 };
   
 // Helper function to generate template messages

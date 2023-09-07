@@ -27,14 +27,13 @@ export const useUIStore = () => {
   };
 
   const startOnlineActivity = (payload) => {
-    console.log(payload);
-    const { sender } = payload;
-    const msg = generateTemplateMessage(payload.type, {senderName: sender.fullName})
-    toast.success(msg);
+    const msg = generateTemplateMessage('online_activity', {senderName: payload.fullName})
+    toast(msg, {
+      icon: '🤝',
+    });
   };
 
   const startFriendRequestToast = (payload) => {
-    console.log(payload);
     const { sender } = payload;
     const msg = generateTemplateMessage(payload.type, {senderName: sender.fullName})
     toast.success(msg);

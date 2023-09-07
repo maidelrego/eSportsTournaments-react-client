@@ -62,10 +62,11 @@ export const authSlice = createSlice({
         id: notification.id,
         type: notification.type,
         read: notification.read,
+        createdAt: notification.createdAt,
         message: generateTemplateMessage(notification.type, {senderName: notification.sender.fullName})
       }));
       
-      state.myNotifications = notifications
+      state.myNotifications = notifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     },
     onSetNotificationsAfterRead : (state, { payload }) => {
       const notifications = state.myNotifications.map(notification => {
@@ -91,6 +92,7 @@ export const authSlice = createSlice({
         id: payload.id,
         type: payload.type,
         read: payload.read,
+        createdAt: payload.createdAt,
         message: generateTemplateMessage(payload.type, {senderName: payload.sender.fullName})
       }
       
