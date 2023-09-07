@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { doAPIGet, doAPIPost, doAPIPut, doAPIDelete } from "../services/api";
+import { doAPIGet, doAPIPost, doAPIPut, doAPIDelete, baseURL } from "../services/api";
 import {
   onChenking,
   onLogin,
@@ -164,7 +164,7 @@ export const useAuthStore = () => {
   const startConnectToGeneral = async () => {
     let manager = null;
 
-    manager = new Manager("http://localhost:3000/socket.io/socket.io.js", {
+    manager = new Manager(`${baseURL}/socket.io/socket.io.js`, {
       extraHeaders: { auth: user.id },
     });
 
