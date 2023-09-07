@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create();
-const baseURL = import.meta.env.VITE_NODE_ENV === "production" ? import.meta.env.VITE_PROD_URL : import.meta.env.VITE_DEV_URL;
+export const baseURL = import.meta.env.VITE_NODE_ENV === "production" ? import.meta.env.VITE_PROD_URL : import.meta.env.VITE_DEV_URL;
 // const baseURL = "http://localhost:3000/";
 const apiServer = baseURL + "api/v1/";
 
