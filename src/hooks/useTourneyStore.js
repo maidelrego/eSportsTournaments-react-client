@@ -2,13 +2,18 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { onResetState, onSetGames, initGamesById, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
 import { doAPIDelete, doAPIGet, doAPIPost, doAPIPut } from "../services/api";
-import { setErrorToast, setLoading, setSuccessToast } from "../store/ui/uiSlice";
 import { useNavigate } from "react-router-dom";
 import { restartTournamentData } from "../helper/restartTournamentData";
+import { useUIStore } from "./useUIStore";
  
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const {
+    startLoading,
+    startErrorToast,
+    startSuccessToast,
+  } = useUIStore();
   const { tournamentName, sport, type, numberOfTeams, players, games, teams, gamesList, standings } =
     useSelector((state) => state.tourney);
 
@@ -34,71 +39,71 @@ export const useTourneyStore = () => {
   };
 
   const startSaveTourney = async( data, restart = false ) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPost("tournaments",data).then((res) => {
       if (res.status === 201) {
-        dispatch(setLoading(false));
+        startLoading(false);
         dispatch(onResetState())
-        dispatch(setSuccessToast('Tournament created successfully!'));
+        startSuccessToast('Tournament saved successfully!');
         if (!restart) {
           navigate('/my-tourneys');
         }  
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast('Something went wrong, check logs'));
+        startLoading(false);
+        startErrorToast('Something went wrong, check logs');
       }  
     });
   }
 
   const startDeleteTourney = async( id ) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIDelete(`tournaments/${id}`).then((res) => {
       if (res.status === 200) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast('Tournament deleted successfully!'));   
+        startLoading(false);
+        startSuccessToast('Tournament deleted successfully!');   
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast('Something went wrong, check logs'));
+        startLoading(false);
+        startErrorToast('Something went wrong, check logs');
       }
     });
   }
 
   const startGetGamesByTournament = async( id ) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIGet(`/games/tournament/${id}`).then((res) => {
       if (res.status === 200) {
-        dispatch(setLoading(false));
+        startLoading(false);
         dispatch(onSetGames(res.data))
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast('Something went wrong, check logs'));
+        startLoading(false);
+        startErrorToast('Something went wrong, check logs');
       }
     });
   }
 
   const startGetTournamentStandings = async ( id ) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     doAPIGet(`/tournaments/standings/${id}`).then((res) => {
       if (res.status === 200) {
         dispatch(onSetStandings(res.data))
-        dispatch(setLoading(false));
+        startLoading(false);
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast('Something went wrong, check logs'));
+        startLoading(true);
+        startErrorToast('Something went wrong, check logs');
       }
     });
   }
 
   const startSaveGames = async( id, game ) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPut(`games/${id}`,game).then((res) => {
       if (res.status === 200) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast('Game saved successfully!')); 
+        startLoading(false);
+        startSuccessToast('Game saved successfully!'); 
         dispatch(initGamesById(res.data));
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       }
     });
   }
@@ -124,21 +129,21 @@ export const useTourneyStore = () => {
   }
 
   const startJoinTournament = async (token) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     await doAPIPost('tournaments/join', token).then((res) => {
       if (res.status === 201) {
-        dispatch(setLoading(false));
-        dispatch(setSuccessToast('Tournament joined successfully!'));
+        startLoading(false);
+        startSuccessToast('Tournament joined successfully'); 
         navigate('/my-tourneys');
       } else {
-        dispatch(setLoading(false));
-        dispatch(setErrorToast(res.data.message));
+        startLoading(false);
+        startErrorToast(res.data.message);
       }
     });
   }
 
   const startRestartTourney = async (tournament) => {
-    dispatch(setLoading(true));
+    startLoading(true);
     const data = await restartTournamentData(tournament);
     return await startSaveTourney(data, true);
   }
