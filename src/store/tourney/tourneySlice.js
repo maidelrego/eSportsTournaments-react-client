@@ -80,6 +80,13 @@ export const tourneySlice = createSlice({
       }
       state.gamesList[index] = payload;
     },
+    onSetGamePitcher: (state, { payload }) => {
+      const { id, side, name, pitcherId } = payload;
+      const game = state.gamesList.find((item) => item.id === id);
+      if (!game) return;
+      game[`pitcher${side}Name`] = name;
+      game[`pitcher${side}Id`] = pitcherId;
+    },
     onResetState: (state) => {
       state.tournamentName = "";
       state.type = null;
@@ -119,6 +126,7 @@ export const {
   onResetState,
   onSetGames,
   initGamesById,
+  onSetGamePitcher,
   onSetStandings,
   onPushNumberOfTeams,
   onResetGamesList,

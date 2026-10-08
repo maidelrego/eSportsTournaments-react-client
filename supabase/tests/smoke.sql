@@ -20,6 +20,9 @@ declare
   v_game public.games;
   v_gid bigint;
   v_gid2 bigint;
+  v_lgid bigint;
+  v_ng bigint;
+  v_n8 bigint;
   v_final bigint;
   v_team1 bigint;
   v_team2 bigint;
@@ -153,6 +156,49 @@ begin
   -- (t_ko4 is sport 1 / knockout so use a quick sport 1 league)
   v_gid2 := null;
 
+  -- ---------------------------------------------------------------- starting pitchers (MLB only)
+  select id into v_lgid from public.games where tournament_id = t_league order by id limit 1;
+  v_game := public.set_game_pitchers(v_lgid, 1::smallint, '  Gerrit Cole ', 543037);
+  assert v_game.pitcher1_name = 'Gerrit Cole' and v_game.pitcher1_id = 543037 and v_game.pitcher2_name is null, 'pitcher 1 saved';
+  v_game := public.set_game_pitchers(v_lgid, 2::smallint, 'Typed By Hand');
+  assert v_game.pitcher2_name = 'Typed By Hand' and v_game.pitcher2_id is null, 'pitcher 2 saved without id';
+  v_game := public.set_game_pitchers(v_lgid, 1::smallint, '   ', 543037);
+  assert v_game.pitcher1_name is null and v_game.pitcher1_id is null, 'blank clears pitcher and id';
+  v_game := public.set_game_pitchers(v_lgid, 1::smallint, 'Gerrit Cole', 543037);
+
+  v_failed := false;
+  begin
+    perform public.set_game_pitchers(v_lgid, 3::smallint, 'x');
+  exception when others then v_failed := true;
+  end;
+  assert v_failed, 'invalid side rejected';
+
+  select id into v_ng from public.games where tournament_id = t_ko4 order by id limit 1;
+  v_failed := false;
+  begin
+    perform public.set_game_pitchers(v_ng, 1::smallint, 'x');
+  exception when others then v_failed := true; v_msg := sqlerrm;
+  end;
+  assert v_failed and v_msg like '%MLB%', 'FIFA tournaments do not track pitchers';
+
+  -- MLB knockout: a different winner clears the pitcher of that slot, the same winner keeps it
+  select g.id, g.next_match_id into v_ng, v_n8
+  from public.games g
+  where g.tournament_id = t_ko8 and g.round_text = '1' and g.next_match_place = 'home'
+  order by g.id limit 1;
+  v_failed := false;
+  begin
+    perform public.set_game_pitchers(v_n8, 1::smallint, 'Too Early');
+  exception when others then v_failed := true; v_msg := sqlerrm;
+  end;
+  assert v_failed and v_msg like '%not defined%', 'cannot set a pitcher for an undefined team';
+  perform public.save_game_result(v_ng, 2, 1);
+  perform public.set_game_pitchers(v_n8, 1::smallint, 'Slot Pitcher', 1);
+  perform public.save_game_result(v_ng, 5, 1);
+  assert (select pitcher1_name from public.games where id = v_n8) = 'Slot Pitcher', 'same winner keeps pitcher';
+  perform public.save_game_result(v_ng, 0, 1);
+  assert (select pitcher1_name from public.games where id = v_n8) is null, 'new winner clears pitcher';
+
   -- ---------------------------------------------------------------- knockout flow (4 teams)
   select id into v_final from public.games where tournament_id = t_ko4 and round_text = '2';
   select id into v_gid from public.games where tournament_id = t_ko4 and round_text = '1' and next_match_place = 'home';
@@ -219,6 +265,12 @@ begin
   assert v_failed, 'C cannot edit A game';
   v_failed := false;
   begin
+    perform public.set_game_pitchers(v_lgid, 1::smallint, 'Nope');
+  exception when others then v_failed := true;
+  end;
+  assert v_failed, 'C cannot set pitchers';
+  v_failed := false;
+  begin
     perform public.create_tournament_invite((select unique_id from public.tournaments where id = t_league), 'guest');
   exception when others then v_failed := true;
   end;
@@ -259,6 +311,13 @@ begin
   exception when others then v_failed := true;
   end;
   assert v_failed, 'guest cannot save results';
+  assert (select pitcher1_name from public.games where id = v_lgid) = 'Gerrit Cole', 'guest can read pitchers';
+  v_failed := false;
+  begin
+    perform public.set_game_pitchers(v_lgid, 1::smallint, 'Nope');
+  exception when others then v_failed := true;
+  end;
+  assert v_failed, 'guest cannot set pitchers';
 
   delete from public.tournaments where id = t_league;
   get diagnostics v_rows = row_count;

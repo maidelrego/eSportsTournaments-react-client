@@ -9,8 +9,9 @@ import { useTourneyStore } from "../../../../hooks";
 import { useParams } from "react-router-dom";
 import noLogo from "../../../../assets/img/noLogo.png";
 import { SPORT } from "../../../../lib/formSelections";
+import { PitcherPicker } from "./PitcherPicker";
 
-export const LeagueGames = ({ gamesList, sport }) => {
+export const LeagueGames = ({ gamesList, sport, canEdit = true }) => {
   const { id = null } = useParams();
   const { form, handleChange } = useForm(gamesList);
   const {
@@ -21,13 +22,11 @@ export const LeagueGames = ({ gamesList, sport }) => {
 
   const handleSave = async (gameId) => {
     const game = form.find((game) => game.id === gameId);
-    game.score1 = parseInt(game.score1);
-    game.score2 = parseInt(game.score2);
-    delete game.id;
-    delete game.logoUrl;
-    delete game.createdAt;
-    delete game.updatedAt;
-    await startSaveGames(gameId, game);
+    // do not mutate `game`: it is the state the inputs and the pitcher pickers render from
+    await startSaveGames(gameId, {
+      score1: parseInt(game.score1),
+      score2: parseInt(game.score2),
+    });
     await startGetTournamentStandings(id);
     await startGetGamesByTournament(id);
   };
@@ -66,6 +65,13 @@ export const LeagueGames = ({ gamesList, sport }) => {
                     <span className="mt-2 text-xs xl:text-lg">
                       ({game.team1?.userName})
                     </span>
+                    {sport === SPORT.MLB && game.team1 && (
+                      <PitcherPicker
+                        gameId={game.id}
+                        side={1}
+                        disabled={!canEdit}
+                      />
+                    )}
                   </div>
                   <div>
                     <div className="flex flex-wrap flex-row">
@@ -113,6 +119,13 @@ export const LeagueGames = ({ gamesList, sport }) => {
                     <span className="mt-2 text-xs xl:text-lg">
                       ({game.team2?.userName})
                     </span>
+                    {sport === SPORT.MLB && game.team2 && (
+                      <PitcherPicker
+                        gameId={game.id}
+                        side={2}
+                        disabled={!canEdit}
+                      />
+                    )}
                   </div>
                 </div>
               </Fieldset>
@@ -129,4 +142,5 @@ export const LeagueGames = ({ gamesList, sport }) => {
 LeagueGames.propTypes = {
   gamesList: PropTypes.array.isRequired,
   sport: PropTypes.number,
+  canEdit: PropTypes.bool,
 };

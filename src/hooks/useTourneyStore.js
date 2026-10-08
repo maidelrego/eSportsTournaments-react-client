@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onResetState, onSetGames, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
+import { onResetState, onSetGames, onSetGamePitcher, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
 import { supabase } from "../services/supabase";
 import { mapGame, mapStanding } from "../services/mappers";
 import { searchMlbTeams } from "../services/mlbApi";
@@ -119,6 +119,30 @@ export const useTourneyStore = () => {
     startSuccessToast('Game saved successfully!');
   }
 
+  // side: 1 = team1 (home), 2 = team2 (away). A blank name clears the pitcher.
+  const startSetGamePitcher = async (gameId, side, name, pitcherId = null) => {
+    const { data, error } = await supabase.rpc("set_game_pitchers", {
+      p_game_id: gameId,
+      p_side: side,
+      p_pitcher_name: name,
+      p_pitcher_id: pitcherId,
+    });
+
+    if (error) {
+      startErrorToast(error.message);
+      return false;
+    }
+    dispatch(
+      onSetGamePitcher({
+        id: gameId,
+        side,
+        name: data[`pitcher${side}_name`],
+        pitcherId: data[`pitcher${side}_id`],
+      })
+    );
+    return true;
+  }
+
   const setKnokoutTeams = (number) => {
     switch (number) {
     case 1:
@@ -184,6 +208,7 @@ export const useTourneyStore = () => {
     startDeleteTourney,
     startGetGamesByTournament,
     startSaveGames,
+    startSetGamePitcher,
     startGetTournamentStandings,
     setKnokoutTeams,
     startGenerateJWT,

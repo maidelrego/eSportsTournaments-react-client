@@ -11,8 +11,10 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { getKnokoutStages } from "../../../../helper/getKnokoutStages";
 import { useEffect } from "react";
 import noLogo from "../../../../assets/img/noLogo.png";
+import { SPORT } from "../../../../lib/formSelections";
+import { PitcherPicker } from "./PitcherPicker";
 
-export const KnokoutGames = ({ gamesList }) => {
+export const KnokoutGames = ({ gamesList, sport, canEdit = true }) => {
   const { id = null } = useParams();
   const { form, handleChange, setForm } = useForm(gamesList);
   const {
@@ -21,10 +23,16 @@ export const KnokoutGames = ({ gamesList }) => {
     startGetGamesByTournament,
   } = useTourneyStore();
 
+  // Re-sync the inputs only when scores or teams change, not when just a pitcher was picked
+  // (that would wipe scores typed into other games that are not saved yet).
+  const gamesSignature = JSON.stringify(
+    gamesList.map((game) => [game.id, game.score1, game.score2, game.team1?.id, game.team2?.id])
+  );
+
   useEffect(() => {
     setForm(gamesList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gamesList]);
+  }, [gamesSignature]);
 
   const arrayOfRounds = [
     ...new Set(form.map((game) => game.tournamentRoundText)),
@@ -32,13 +40,11 @@ export const KnokoutGames = ({ gamesList }) => {
 
   const handleSave = async (gameId) => {
     const game = form.find((game) => game.id === gameId);
-    game.score1 = parseInt(game.score1);
-    game.score2 = parseInt(game.score2);
-    delete game.id;
-    delete game.logoUrl;
-    delete game.createdAt;
-    delete game.updatedAt;
-    await startSaveGames(gameId, game);
+    // do not mutate `game`: it is the state the inputs and the pitcher pickers render from
+    await startSaveGames(gameId, {
+      score1: parseInt(game.score1),
+      score2: parseInt(game.score2),
+    });
     await startGetTournamentStandings(id);
     await startGetGamesByTournament(id);
   };
@@ -93,6 +99,13 @@ export const KnokoutGames = ({ gamesList }) => {
                                   <span className="mt-2 text-xs xl:text-lg">
                                     ({game.team1?.userName})
                                   </span>
+                                  {sport === SPORT.MLB && game.team1 && (
+                                    <PitcherPicker
+                                      gameId={game.id}
+                                      side={1}
+                                      disabled={!canEdit}
+                                    />
+                                  )}
                                 </div>
                                 <div>
                                   <div className="flex flex-wrap flex-row">
@@ -144,6 +157,13 @@ export const KnokoutGames = ({ gamesList }) => {
                                   <span className="mt-2 text-xs xl:text-lg">
                                     ({game.team2?.userName})
                                   </span>
+                                  {sport === SPORT.MLB && game.team2 && (
+                                    <PitcherPicker
+                                      gameId={game.id}
+                                      side={2}
+                                      disabled={!canEdit}
+                                    />
+                                  )}
                                 </div>
                               </div>
                             </Fieldset>
@@ -165,4 +185,6 @@ export const KnokoutGames = ({ gamesList }) => {
 
 KnokoutGames.propTypes = {
   gamesList: PropTypes.array.isRequired,
+  sport: PropTypes.number,
+  canEdit: PropTypes.bool,
 };

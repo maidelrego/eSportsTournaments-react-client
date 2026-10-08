@@ -9,7 +9,7 @@ A React-based platform to create and manage video game tournaments for sports ti
 - **Brackets Visualization**: Display tournament brackets using @g-loot/react-tournament-brackets.
 - **Friend Invitations**: Invite friends to join tournaments via links or email.
 - **Real-time Updates**: Supabase Realtime for friend notifications and online presence.
-- **Game modes**: FIFA (club search via api-sports) and MLB The Show (all 30 MLB teams from the free MLB Stats API). Baseball games cannot end in a tie.
+- **Game modes**: FIFA (club search via api-sports) and MLB The Show (all 30 MLB teams from the free MLB Stats API). Baseball games cannot end in a tie. Each side of an MLB game can have a starting pitcher (searched in the MLB Stats API), and the Rotation tab shows each player's starters and how many games ago each pitched.
 - **Responsive UI**: Styled with PrimeReact, PrimeFlex, and styled-components.
 - **Form Handling & Validation**: Formik + Yup for robust form workflows.
 - **Notifications**: Toast notifications via react-hot-toast.

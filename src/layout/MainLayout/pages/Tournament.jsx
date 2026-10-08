@@ -6,10 +6,15 @@ import { useTourneyStore } from "../../../hooks";
 import { useEffect } from "react";
 import { SingleElimination } from "../components/Tournaments/SingleEliminationBracket";
 import { generateEliminationStructure } from "../../../helper/generateEliminationStructure";
+import { Rotation } from "../components/Tournaments/Rotation";
+import { permission } from "../../../helper/getRoles";
+import { SPORT } from "../../../lib/formSelections";
+import { useSelector } from "react-redux";
 
 export const Tournament = () => {
   const { id = null } = useParams();
   const { state } = useLocation();
+  const { user } = useSelector((store) => store.auth);
   const { startGetGamesByTournament, startGetTournamentStandings, gamesList, standings, dispatch, onResetGamesList, onResetStandings } = useTourneyStore();
   
   useEffect(() => {
@@ -49,8 +54,20 @@ export const Tournament = () => {
               <Standings standings={standings} sport={state.sport} />
             </TabPanel>
             <TabPanel rightIcon="pi pi-calendar mr-2" header="Calendar" headerTemplate={tab1HeaderTemplate}>
-              <Games gamesList={gamesList} tournamentType={state.type} sport={state.sport} />
+              <Games
+                gamesList={gamesList}
+                tournamentType={state.type}
+                sport={state.sport}
+                canEdit={permission(state.sharedAdmins ?? [], state.sharedGuests ?? [], user.id)}
+              />
             </TabPanel>
+            {
+              state.sport === SPORT.MLB && (
+                <TabPanel rightIcon="pi pi-users mr-2" header="Rotation" headerTemplate={tab1HeaderTemplate}>
+                  <Rotation games={gamesList} teams={state.teams ?? []} />
+                </TabPanel>
+              )
+            }
             {
               state.type === 2 && (
                 <TabPanel rightIcon="pi pi-sitemap mr-2" header="Bracket" headerTemplate={tab1HeaderTemplate}>
