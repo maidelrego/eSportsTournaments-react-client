@@ -8,8 +8,9 @@ import { Button } from "primereact/button";
 import { useTourneyStore } from "../../../../hooks";
 import { useParams } from "react-router-dom";
 import noLogo from "../../../../assets/img/noLogo.png";
+import { SPORT } from "../../../../lib/formSelections";
 
-export const LeagueGames = ({ gamesList }) => {
+export const LeagueGames = ({ gamesList, sport }) => {
   const { id = null } = useParams();
   const { form, handleChange } = useForm(gamesList);
   const {
@@ -34,7 +35,10 @@ export const LeagueGames = ({ gamesList }) => {
   const disable = (index) => {
     if (
       [null, ""].includes(form[index].score1) ||
-      [null, ""].includes(form[index].score2)
+      [null, ""].includes(form[index].score2) ||
+      // baseball games always have a winner
+      (sport === SPORT.MLB &&
+        Number(form[index].score1) === Number(form[index].score2))
     ) {
       return true;
     } else {
@@ -124,4 +128,5 @@ export const LeagueGames = ({ gamesList }) => {
 
 LeagueGames.propTypes = {
   gamesList: PropTypes.array.isRequired,
+  sport: PropTypes.number,
 };

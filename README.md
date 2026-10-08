@@ -1,14 +1,15 @@
 # eSports Tournaments React Client
 
 ## Description
-A React-based platform to create and manage video game tournaments focused on sports titles like FIFA (EA FC). Users can register accounts, invite friends, and join tournaments. The client communicates with a backend API for authentication, tournament management, and real-time updates.
+A React-based platform to create and manage video game tournaments for sports titles: FIFA (EA FC) and MLB The Show. Users can register accounts, invite friends, and join tournaments. There is no custom server: the whole backend (auth, database, business logic, realtime, file storage) runs on Supabase.
 
 ## Features
 - **User Authentication**: Sign up, log in, and manage profile.
 - **Tournament Creation**: Create, edit, and delete tournaments.
 - **Brackets Visualization**: Display tournament brackets using @g-loot/react-tournament-brackets.
 - **Friend Invitations**: Invite friends to join tournaments via links or email.
-- **Real-time Updates**: Socket.IO for real-time match results and bracket progression.
+- **Real-time Updates**: Supabase Realtime for friend notifications and online presence.
+- **Game modes**: FIFA (club search via api-sports) and MLB The Show (all 30 MLB teams from the free MLB Stats API). Baseball games cannot end in a tie.
 - **Responsive UI**: Styled with PrimeReact, PrimeFlex, and styled-components.
 - **Form Handling & Validation**: Formik + Yup for robust form workflows.
 - **Notifications**: Toast notifications via react-hot-toast.
@@ -20,10 +21,9 @@ A React-based platform to create and manage video game tournaments focused on sp
 - **State Management**: Redux Toolkit (react-redux)
 - **UI Components**: PrimeReact, PrimeFlex, styled-components
 - **Icons**: FontAwesome
-- **Network**: Axios, Socket.IO Client
+- **Network**: supabase-js, Axios
 - **Forms**: Formik, Yup
-- **Authentication**: Firebase Auth
-- **Realtime**: Socket.IO
+- **Backend**: Supabase (Auth, Postgres + RLS, SQL functions, Realtime, Storage)
 - **Utilities**: moment, validator
 - **Notifications**: react-hot-toast
 - **ReCAPTCHA**: react-google-recaptcha
@@ -31,8 +31,7 @@ A React-based platform to create and manage video game tournaments focused on sp
 ## Prerequisites
 - Node.js >= 16
 - npm or yarn
-- Backend API endpoint (provided via environment variables)
-- Firebase project for authentication
+- A Supabase project (free tier works)
 - Google ReCAPTCHA site key
 
 ## Installation
@@ -50,16 +49,32 @@ A React-based platform to create and manage video game tournaments focused on sp
    ```
 
 3. **Configure environment variables**  
-   Create a `.env` file in the project root:
+   Copy `.env.example` to `.env` and fill it in:
    ```env
-   VITE_NODE_ENV= 
-   VITE_PROD_URL= 
-   VITE_DEV_URL=
-   VITE_RECAPTCHA_SITE_KEY= 
-   VITE_RECAPTCHA_SECRET_KEY= 
+   VITE_NODE_ENV=development
+   VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<anon / publishable key>
+   VITE_FOOTBALL_API_KEY=<api-sports.io key, FIFA team search>
+   VITE_RECAPTCHA_SITE_KEY=
    VITE_DISCORD_WEBHOOK=
-   VITE_GOOGLE_CLIENT_ID=
    ```
+   Never put the `service_role` key in the client.
+
+## Supabase setup
+All database objects live in [`supabase/migrations`](supabase/migrations) (tables, RLS policies, SQL functions, storage bucket, realtime). No Docker is needed, they are pushed straight to your hosted project:
+```bash
+npx supabase login
+npx supabase link --project-ref <project-ref>
+npx supabase db push
+```
+Then, in the Supabase dashboard (Authentication):
+- **URL Configuration**: set Site URL to `http://localhost:5173` (and your Vercel URL when deployed) and add both to Redirect URLs. Password reset and email confirmation links use them.
+- **Sign In / Providers**: decide whether "Confirm email" is on. Optional: enable Google with your Google OAuth client ID and secret.
+
+Smoke test of schema, RLS and functions (runs in a transaction that is always rolled back):
+```bash
+npx supabase db query --linked -f supabase/tests/smoke.sql
+```
 
 ## Development
 Start the development server:
@@ -78,6 +93,8 @@ Preview the production build locally:
 ```bash
 npm run preview
 ```
+Deploy on Vercel (`vercel.json` already rewrites everything to the SPA): set the same `VITE_*` variables in the project settings.
+Note: Supabase free projects pause after 7 days without activity.
 
 ## Code Quality
 - **Linting**: ESLint configured for React and hooks  

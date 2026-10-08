@@ -8,10 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
-import {
-  notificationsStatus,
-  onLogout,
-} from "../../../../store/auth/authSlice";
+import { notificationsStatus } from "../../../../store/auth/authSlice";
 import { useAuthStore } from "../../../../hooks";
 
 export const Profile = ({ visible, onCloseMenu }) => {
@@ -25,8 +22,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
     user,
     friends,
     pendingFriendRequests,
-    dispatch,
-    startDisconnectToGeneral,
+    startLogout,
     startUpdateProfile,
     startSendGenericRequest,
     imageUpload,
@@ -37,9 +33,7 @@ export const Profile = ({ visible, onCloseMenu }) => {
   const fileUpload = useRef(null);
 
   const handleLogout = () => {
-    dispatch(onLogout());
-    localStorage.clear();
-    startDisconnectToGeneral();
+    startLogout();
   };
 
   const updateProfile = () => {
@@ -69,7 +63,6 @@ export const Profile = ({ visible, onCloseMenu }) => {
   // Reset the search friend state
   useEffect(() => {
     setFriendRequestState({});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchFriend]);
 
   useEffect(() => {

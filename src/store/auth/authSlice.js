@@ -45,6 +45,9 @@ export const authSlice = createSlice({
     onSetMyTournaments: (state, { payload }) => {
       state.myTournaments = payload;
     },
+    onSetFriends: (state, { payload }) => {
+      state.friends = payload;
+    },
     onSetFriendsOnline : (state, { payload }) => {
       const updatedFriends = state.friends.map(friend => ({
         ...friend,
@@ -108,7 +111,8 @@ export const {
   onLogin,
   onChenking, 
   onLogout, 
-  onSetMyTournaments, 
+  onSetMyTournaments,
+  onSetFriends,
   onSetFriendsOnline,
   onSetNotificationsAfterRead,
   onSetNotificationsAfterDelete,

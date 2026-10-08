@@ -9,10 +9,19 @@ const tournamentTypeOptions = [
   }
 ];
 
+export const SPORT = {
+  FIFA: 1,
+  MLB: 2,
+};
+
 const sportTypeOptions = [
   {
     value: "FIFA",
-    key: 1,
+    key: SPORT.FIFA,
+  },
+  {
+    value: "MLB The Show",
+    key: SPORT.MLB,
   }
 ];
 

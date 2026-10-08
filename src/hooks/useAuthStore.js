@@ -1,10 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
-import { doAPIGet, doAPIPost, doAPIPut, doAPIDelete, baseURL } from "../services/api";
+import { supabase } from "../services/supabase";
+import { mapProfile, mapNotification } from "../services/mappers";
+import { store } from "../store/store";
 import {
   onChenking,
   onLogin,
   onLogout,
   onSetMyTournaments,
+  onSetFriends,
   onSetFriendsOnline,
   onSetNotifications,
   onSetNotificationsAfterDelete,
@@ -16,9 +19,41 @@ import {
 import { useUIStore } from "./useUIStore";
 
 import { useNavigate } from "react-router-dom";
-import { singInWithGoogle } from "../firebase/providers";
-import { Manager, Socket } from "socket.io-client";
-let socket = Socket;
+
+const AVATARS_BUCKET = "avatars";
+
+// Realtime state lives outside React so it survives re-renders.
+let notificationsChannel = null;
+let presenceChannel = null;
+let onlineIds = [];
+let authListenerRegistered = false;
+
+const notificationSelect = "*, sender:profiles!sender_id(*)";
+
+const loadUserBundle = async (authUser) => {
+  const [profileRes, friendsRes, notificationsRes] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", authUser.id).single(),
+    supabase
+      .from("friendships")
+      .select("friend:profiles!friend_id(*)")
+      .eq("user_id", authUser.id),
+    supabase
+      .from("notifications")
+      .select(notificationSelect)
+      .order("created_at", { ascending: false })
+      .limit(50),
+  ]);
+
+  if (profileRes.error) throw profileRes.error;
+
+  const friends = (friendsRes.data ?? []).map((row) => mapProfile(row.friend));
+  const notifications = (notificationsRes.data ?? []).map(mapNotification);
+
+  return {
+    user: { ...mapProfile(profileRes.data), email: authUser.email, friends },
+    notifications,
+  };
+};
 
 export const useAuthStore = () => {
   const {
@@ -40,282 +75,368 @@ export const useAuthStore = () => {
     startFriendRequestToast,
   } = useUIStore();
 
+  const applyBundle = ({ user: loadedUser, notifications }) => {
+    dispatch(onLogin(loadedUser));
+    dispatch(onSetNotifications(notifications));
+  };
+
   const startLogin = async ({ email, password }) => {
     dispatch(onChenking());
-    await doAPIPost("auth/login", { email, password }).then((res) => {
-      if (res.status === 201) {
-        const { token, ...user } = res.data;
-        delete user.password;
-        localStorage.setItem("tourneyForgeToken", token);
-        dispatch(onLogin(user));
-        dispatch(onSetNotifications(user.receivedNotifications));
-      } else {
-        startLoading(false);
-        dispatch(onLogout(res.data.message));
-        startErrorToast(res.data.message);
-      }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
+
+    if (error) {
+      startLoading(false);
+      dispatch(onLogout(error.message));
+      return startErrorToast(error.message);
+    }
+
+    try {
+      applyBundle(await loadUserBundle(data.user));
+    } catch (err) {
+      await supabase.auth.signOut();
+      dispatch(onLogout(err.message));
+      startErrorToast(err.message);
+    }
   };
 
   const startRegister = async ({ email, password, fullName }) => {
     startLoading(true);
-    await doAPIPost("auth/register", { email, password, fullName }).then(
-      (res) => {
-        if (res.status === 201) {
-          startLoading(false);
-          navigate("/login");
-        } else {
-          startLoading(false);
-          dispatch(onLogout(res.data.message));
-          startErrorToast(res.data.message);
-        }
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: window.location.origin,
+      },
+    });
+    startLoading(false);
+
+    if (error) {
+      dispatch(onLogout(error.message));
+      return startErrorToast(error.message);
+    }
+
+    // Supabase hides duplicate emails when "Confirm email" is on: the fake user has no identities.
+    if (data.user && data.user.identities?.length === 0) {
+      return startErrorToast("This email is already registered");
+    }
+
+    if (data.session) {
+      try {
+        applyBundle(await loadUserBundle(data.user));
+        startSuccessToast("Welcome to TourneyForge!");
+      } catch (err) {
+        startErrorToast(err.message);
       }
-    );
+      return;
+    }
+
+    startSuccessToast("Check your email to confirm your account");
+    navigate("/login");
+  };
+
+  const registerAuthListener = () => {
+    if (authListenerRegistered) return;
+    authListenerRegistered = true;
+    // Keep this callback synchronous: no supabase calls inside onAuthStateChange.
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        dispatch(onLogout());
+      }
+    });
   };
 
   const startCheckAuthToken = async () => {
-    const token = localStorage.getItem("tourneyForgeToken");
-    if (!token) return dispatch(onLogout());
+    registerAuthListener();
 
-    await doAPIGet("auth/check-auth-status").then((res) => {
-      if (res.status === 200) {
-        const { token, ...user } = res.data;
-        localStorage.setItem("tourneyForgeToken", token);
-        dispatch(onLogin(user));
-        dispatch(onSetNotifications(user.receivedNotifications));
-      } else {
-        localStorage.clear();
-        dispatch(onLogout(res.message));
-      }
-    });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) return dispatch(onLogout());
+
+    try {
+      applyBundle(await loadUserBundle(session.user));
+    } catch (err) {
+      await supabase.auth.signOut();
+      dispatch(onLogout(err.message));
+    }
+  };
+
+  const startLogout = async () => {
+    await startDisconnectToGeneral();
+    await supabase.auth.signOut();
+    dispatch(onLogout());
   };
 
   const startGetMyTournaments = async () => {
     startLoading(true);
-    doAPIGet("tournaments/byAdminId").then((res) => {
-      if (res.status === 200) {
-        dispatch(onSetMyTournaments(res.data));
-        startLoading(false);
-      } else {
-        startLoading(false);
-        startErrorToast("Something went wrong, check logs");
-      }
-    });
+    const { data, error } = await supabase.rpc("get_my_tournaments");
+    startLoading(false);
+    if (error) return startErrorToast(error.message);
+    dispatch(onSetMyTournaments(data));
   };
 
   const startLoginGoogle = async () => {
     dispatch(onChenking());
-    const result = await singInWithGoogle();
-    if (!result.ok) return dispatch(onLogout("Register error action"));
-    const payload = {
-      email: result.email,
-      fullName: result.displayName,
-      googleId: result.uid,
-      avatar: result.photoURL,
-    };
-
-    await doAPIPost("auth/login-google", payload).then((res) => {
-      if (res.status === 201) {
-        const { token, ...user } = res.data;
-        delete user.password;
-        localStorage.setItem("tourneyForgeToken", token);
-        dispatch(onLogin(user));
-        dispatch(onSetNotifications(user.receivedNotifications));
-        startLoading(false);
-      } else {
-        startLoading(false);
-        dispatch(onLogout(res.data.message));
-        startErrorToast(res.data.message);
-      }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
     });
+    if (error) {
+      dispatch(onLogout(error.message));
+      startErrorToast(error.message);
+    }
   };
 
-  const startForgotPassword = async (data) => {
-    const { email } = data;
+  const startForgotPassword = async ({ email }) => {
     startLoading(true);
-    await doAPIPost("auth/forgot-password", { email }).then((res) => {
-      if (res.status === 201) {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      } else {
-        startLoading(false);
-        startSuccessToast(
-          "If the email is correct, you will receive an email with the instructions to reset your password"
-        );
-      }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    startSuccessToast(
+      "If the email is correct, you will receive an email with the instructions to reset your password"
+    );
   };
 
-  const startResetPassword = async (data) => {
-    const { password, token } = data;
+  const startResetPassword = async ({ password }) => {
     startLoading(true);
-    await doAPIPost("auth/reset-password", { token, password }).then((res) => {
-      if (res.status === 201) {
-        startLoading(false);
-        startSuccessToast("Password changed successfully")
-        navigate("/login");
-      } else {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      }
-    });
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      startLoading(false);
+      return startErrorToast(
+        error.message === "Auth session missing!"
+          ? "This reset link is invalid or expired. Request a new one."
+          : error.message
+      );
+    }
+    await supabase.auth.signOut();
+    dispatch(onLogout());
+    startLoading(false);
+    startSuccessToast("Password changed successfully");
+    navigate("/login");
   };
 
-  const startConnectToGeneral = async () => {
-    let manager = null;
+  // ---- Realtime: notifications + online friends (replaces the Socket.IO gateway) ----
 
-    manager = new Manager(`${baseURL}/socket.io/socket.io.js`, {
-      extraHeaders: { auth: user.id },
-    });
-
-    socket = manager.socket("/general");
-
-    socket.on("connectedClient", (payload) => {
-      startOnlineActivity(payload);
-    });
-
-    socket.on("disconnectedClient", () => {});
-
-    socket.on("friend-request-notification", (payload) => {
-      startFriendRequestToast(payload);
-      dispatch(onSetNewNotification(payload));
-    });
-
-    socket.on("connected-clients", (payload) => {
-      dispatch(onSetFriendsOnline(payload));
-    });
+  const dispatchOnlineFriends = () => {
+    dispatch(onSetFriendsOnline(onlineIds.map((id) => ({ id }))));
   };
 
   const startDisconnectToGeneral = async () => {
-    socket.disconnect();
+    const channels = [notificationsChannel, presenceChannel].filter(Boolean);
+    notificationsChannel = null;
+    presenceChannel = null;
+    onlineIds = [];
+    await Promise.all(channels.map((channel) => supabase.removeChannel(channel)));
+  };
+
+  const startConnectToGeneral = async () => {
+    if (!user?.id) return;
+    await startDisconnectToGeneral();
+
+    notificationsChannel = supabase
+      .channel(`notifications:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `receiver_id=eq.${user.id}`,
+        },
+        async ({ new: row }) => {
+          const { data } = await supabase
+            .from("notifications")
+            .select(notificationSelect)
+            .eq("id", row.id)
+            .single();
+          if (!data) return;
+          const notification = mapNotification(data);
+          startFriendRequestToast(notification);
+          dispatch(onSetNewNotification(notification));
+        }
+      )
+      .subscribe();
+
+    // Presence only carries the user id (the channel key); names come from the friends list.
+    presenceChannel = supabase.channel("general", {
+      config: { private: true, presence: { key: user.id } },
+    });
+    presenceChannel
+      .on("presence", { event: "sync" }, () => {
+        onlineIds = Object.keys(presenceChannel.presenceState());
+        dispatchOnlineFriends();
+      })
+      .on("presence", { event: "join" }, ({ key }) => {
+        if (key === user.id) return;
+        const friend = store.getState().auth.friends?.find((f) => f.id === key);
+        if (friend) startOnlineActivity({ fullName: friend.fullName });
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await presenceChannel.track({ online_at: new Date().toISOString() });
+        }
+      });
+  };
+
+  const refreshFriends = async () => {
+    const { data, error } = await supabase
+      .from("friendships")
+      .select("friend:profiles!friend_id(*)")
+      .eq("user_id", user.id);
+    if (error) return;
+    dispatch(onSetFriends(data.map((row) => mapProfile(row.friend))));
+    dispatchOnlineFriends();
   };
 
   const startGetConnectedClients = async () => {
-    socket.emit("get-connected-clients");
+    await refreshFriends();
   };
 
-  const startUpdateProfile = async (data) => {
-    const { id } = user;
+  // ---- Profile ----
+
+  const startUpdateProfile = async ({ fullName }) => {
     startLoading(true);
-    await doAPIPost(`auth/update/${id}`, data).then((res) => {
-      if (res.status === 201) {
-        startLoading(false);
-        startSuccessToast("Profile updated successfully");
-        dispatch(onLogin(res.data));
-      } else {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      }
-    });
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ full_name: fullName })
+      .eq("id", user.id)
+      .select()
+      .single();
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    startSuccessToast("Profile updated successfully");
+    dispatch(onLogin({ ...user, ...mapProfile(data), friends }));
   };
 
   const imageUpload = async (image) => {
-    const { id } = user;
-    const form = new FormData();
-    form.append("image", image);
-
     startLoading(true);
-    await doAPIPost(`auth/update/${id}`, form).then((res) => {
-      if (res.status === 201) {
-        startLoading(false);
-        startSuccessToast("Profile updated successfully");
-        dispatch(onLogin(res.data));
-      } else {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      }
-    });
+    const extension = (image.type.split("/")[1] || "png").replace("jpeg", "jpg");
+    const path = `${user.id}/${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(AVATARS_BUCKET)
+      .upload(path, image, { contentType: image.type });
+    if (uploadError) {
+      startLoading(false);
+      return startErrorToast(uploadError.message);
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(AVATARS_BUCKET).getPublicUrl(path);
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ avatar_url: publicUrl })
+      .eq("id", user.id)
+      .select()
+      .single();
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+
+    // Remove the previous avatar if it was one of ours.
+    const marker = `/${AVATARS_BUCKET}/`;
+    if (user.avatar?.includes(marker)) {
+      const oldPath = user.avatar.split(marker)[1];
+      await supabase.storage.from(AVATARS_BUCKET).remove([oldPath]);
+    }
+
+    startSuccessToast("Profile updated successfully");
+    dispatch(onLogin({ ...user, ...mapProfile(data), friends }));
   };
+
+  // ---- Notifications and friends ----
 
   const startMarkNotificationAsRead = async (id) => {
     startLoading(true);
-    await doAPIPut(`notifications/${id}`).then((res) => {
-      if (res.status === 200) {
-        startLoading(false);
-        startSuccessToast("Notification marked as read");
-        dispatch(onSetNotificationsAfterRead(id));
-      } else {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      }
-    });
+    const { error } = await supabase
+      .from("notifications")
+      .update({ read: true })
+      .eq("id", id);
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    startSuccessToast("Notification marked as read");
+    dispatch(onSetNotificationsAfterRead(id));
   };
 
   const startDeleteNotifications = async (id, dontNotify = false) => {
     startLoading(true);
-    await doAPIDelete(`notifications/${id}`).then((res) => {
-      if (res.status === 200) {
-        startLoading(false);
-        if (!dontNotify) startSuccessToast("Notification deleted");
-        dispatch(onSetNotificationsAfterDelete(id));
-      } else {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      }
-    });
+    const { error } = await supabase.from("notifications").delete().eq("id", id);
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    if (!dontNotify) startSuccessToast("Notification deleted");
+    dispatch(onSetNotificationsAfterDelete(id));
   };
 
-  const startSendGenericRequest = async (receiver, type) => {
-    let state = {
-      status: "",
-      msg: "",
-    };
+  const startSendGenericRequest = async (receiver) => {
+    const state = { status: "", msg: "" };
 
     startLoading(true);
-    await doAPIPost("notifications", { receiver, type }).then((res) => {
-      startLoading(false);
-      if (res.status === 201) {
-        if (res.data.ok) {
-          state.status = "success";
-        } else {
-          state.status = "error";
-        }
-        state.msg = res.data.msg;
-      } else {
-        state.status = "error";
-        state.msg = res.data.message;
-      }
+    const { data, error } = await supabase.rpc("send_friend_request", {
+      p_nickname: receiver,
     });
+    startLoading(false);
+
+    if (error) {
+      state.status = "error";
+      state.msg = error.message;
+    } else {
+      state.status = data.ok ? "success" : "error";
+      state.msg = data.msg;
+    }
     return state;
   };
 
   const startGetPendingFriendRequests = async () => {
     startLoading(true);
-    await doAPIGet("friends/pendingFriendRequests").then((res) => {
-      startLoading(false);
-      if (res.status === 200) {
-        dispatch(onSetPendingFriendRequests(res.data));
-      } else {
-        startErrorToast(res.data.message);
-      }
-    });
+    const { data, error } = await supabase
+      .from("friend_requests")
+      .select("id, receiver:profiles!receiver_id(*)")
+      .eq("creator_id", user.id)
+      .order("created_at", { ascending: false });
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    dispatch(
+      onSetPendingFriendRequests(
+        data.map((row) => ({ id: row.id, receiver: mapProfile(row.receiver) }))
+      )
+    );
   };
 
   const startDeletePendingFriendRequest = async (id) => {
     startLoading(true);
-    await doAPIDelete(`friends/${id}`).then((res) => {
-      startLoading(false);
-      if (res.status === 200) {
-        startSuccessToast('Friend request deleted');
-        dispatch(onSetPendingFriendRequests(res.data));
-      } else {
-        startErrorToast(res.data.message);
-      }
-    });
+    const { error } = await supabase.from("friend_requests").delete().eq("id", id);
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    startSuccessToast("Friend request deleted");
   };
 
   const startAcceptFriendRequest = async (id, notificationId) => {
     startLoading(true);
-    await doAPIPost(`friends/approve/${id}`).then((res) => {
-      startLoading(false);
-      if (res.status === 201) {
-        startSuccessToast('Friend request accepted');
-        startDeleteNotifications(notificationId, true);
-      } else {
-        startErrorToast(res.data.message);
-      }
+    const { error } = await supabase.rpc("accept_friend_request", {
+      p_request_id: id,
     });
-  }
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    startSuccessToast("Friend request accepted");
+    // The RPC already removed the request and its notification.
+    dispatch(onSetNotificationsAfterDelete(notificationId));
+    await refreshFriends();
+  };
 
   return {
     //properties
@@ -330,6 +451,7 @@ export const useAuthStore = () => {
     startLogin,
     dispatch,
     startCheckAuthToken,
+    startLogout,
     startGetMyTournaments,
     startRegister,
     startLoginGoogle,
@@ -345,6 +467,6 @@ export const useAuthStore = () => {
     startSendGenericRequest,
     startGetPendingFriendRequests,
     startDeletePendingFriendRequest,
-    startAcceptFriendRequest
+    startAcceptFriendRequest,
   };
 };

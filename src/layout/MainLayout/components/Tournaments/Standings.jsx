@@ -6,8 +6,10 @@ import { setAvatarStyle } from "../../../../helper/getStreakStyles";
 import { Avatar } from "primereact/avatar";
 import { AvatarGroup } from "primereact/avatargroup";
 import noLogo from "../../../../assets/img/noLogo.png";
+import { SPORT } from "../../../../lib/formSelections";
 
-export const Standings = ({ standings }) => {
+export const Standings = ({ standings, sport }) => {
+  const isBaseball = sport === SPORT.MLB;
   const header = (
     <div className="table-header">
       <h1 className="text-color text-center">Standings</h1>
@@ -49,11 +51,11 @@ export const Standings = ({ standings }) => {
           <Column header="Team" body={teamNameTemplate}></Column>
           <Column header="Played" field="gamesPlayed"></Column>
           <Column header="Wins" field="wins"></Column>
-          <Column header="Draws" field="draws"></Column>
+          {!isBaseball && <Column header="Draws" field="draws"></Column>}
           <Column header="Lost" field="losses"></Column>
-          <Column header="Scored" field="goalsScored"></Column>
-          <Column header="Against" field="goalsConceded"></Column>
-          <Column header="Points" field="points"></Column>
+          <Column header={isBaseball ? "Runs For" : "Scored"} field="goalsScored"></Column>
+          <Column header={isBaseball ? "Runs Against" : "Against"} field="goalsConceded"></Column>
+          {!isBaseball && <Column header="Points" field="points"></Column>}
           <Column header="Last 5" body={streakTemplate}></Column>
         </DataTable>
         : <AppSpinner loading={true} />
@@ -64,4 +66,5 @@ export const Standings = ({ standings }) => {
 
 Standings.propTypes = {
   standings: PropTypes.array.isRequired,
+  sport: PropTypes.number,
 };

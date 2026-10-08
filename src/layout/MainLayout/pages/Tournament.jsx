@@ -46,10 +46,10 @@ export const Tournament = () => {
         <div className="col-12 mt-5">
           <TabView>
             <TabPanel rightIcon="pi pi-table mr-2" header="Standings" headerTemplate={tab1HeaderTemplate}>
-              <Standings standings={standings} />
+              <Standings standings={standings} sport={state.sport} />
             </TabPanel>
             <TabPanel rightIcon="pi pi-calendar mr-2" header="Calendar" headerTemplate={tab1HeaderTemplate}>
-              <Games gamesList={gamesList} tournamentType={state.type} />
+              <Games gamesList={gamesList} tournamentType={state.type} sport={state.sport} />
             </TabPanel>
             {
               state.type === 2 && (

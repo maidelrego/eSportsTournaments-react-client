@@ -100,6 +100,12 @@ export const MyTourneys = () => {
                   </span>
                 </li>
                 <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
+                  <span className="text-600 font-medium text-lg">Game</span>
+                  <span className="text-900 font-medium text-lg">
+                    {translateFormSelection(item.sport, "sportTypeOptions")}
+                  </span>
+                </li>
+                <li className="px-0 py-2 flex justify-content-between align-items-center border-bottom-1 surface-border">
                   <span className="text-600 font-medium text-lg">Type</span>
                   <span className="text-900 font-medium text-lg">
                     {translateFormSelection(item.type, "tournamentTypeOptions")}

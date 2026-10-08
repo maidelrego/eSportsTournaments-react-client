@@ -16,7 +16,7 @@ import {
 } from "../../../store/tourney/tourneySlice";
 import { gamesIsValid } from "../../../helper/gamesValidator";
 import { setErrorToast } from "../../../store/ui/uiSlice";
-import formSelections from "../../../lib/formSelections";
+import formSelections, { SPORT } from "../../../lib/formSelections";
 
 const tournamentTypeOptions = formSelections.tournamentTypeOptions;
 const sportTypeOptions = formSelections.sportTypeOptions;
@@ -76,9 +76,20 @@ export const CreateTourney = () => {
   };
 
   const search = async (event) => {
-    startSearchTeam(event.query).then((data) => {
+    startSearchTeam(event.query, sport).then((data) => {
       setFilteredTeams(data);
     });
+  };
+
+  // Teams are sport specific (football clubs vs MLB clubs), so changing the sport clears the picks.
+  const onSportChange = (e) => {
+    const newSport = e.target.value;
+    if (sport !== null && sport !== newSport) {
+      teams.forEach((_, index) => {
+        dispatch(onFormChange({ name: "teamName", value: "", index }));
+      });
+    }
+    dispatch(onFormChange({ name: "sport", value: newSport }));
   };
 
   const itemTemplate = (item) => {
@@ -185,9 +196,7 @@ export const CreateTourney = () => {
         <div className="col-12">
           <Dropdown
             value={sport}
-            onChange={(e) =>
-              dispatch(onFormChange({ name: "sport", value: e.target.value }))
-            }
+            onChange={onSportChange}
             options={sportTypeOptions}
             optionLabel="value"
             optionValue="key"
@@ -291,6 +300,7 @@ export const CreateTourney = () => {
               </div>
               <AutoComplete
                 field="name"
+                dropdown={sport === SPORT.MLB}
                 placeholder="Team Name *"
                 value={teams[index].teamName}
                 suggestions={filteredTeams}

@@ -56,14 +56,8 @@ export const AppRouter = () => {
           }
         />
 
-        <Route
-          path="reset-password/:token/*"
-          element={
-            <PublicRoutes>
-              <ResetPassword />
-            </PublicRoutes>
-          }
-        />
+        {/* The recovery link signs the user in temporarily, so this route is not wrapped in PublicRoutes */}
+        <Route path="reset-password" element={<ResetPassword />} />
 
         {/* PRIVATE ROUTES */}
         <Route

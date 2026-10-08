@@ -58,7 +58,7 @@ export const ShareTournament = ({ uniqueId }) => {
                   <Dropdown
                     placeholder="Select a role"
                     options={[
-                      { label: "Shared Admin", value: "sharedAdmins" },
+                      { label: "Shared Admin", value: "shared_admin" },
                       { label: "Guest", value: "guest" },
                     ]}
                     className="w-auto md:w-15rem"

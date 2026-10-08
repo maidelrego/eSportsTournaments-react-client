@@ -1,11 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onResetState, onSetGames, initGamesById, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
-import { doAPIDelete, doAPIGet, doAPIPost, doAPIPut } from "../services/api";
+import { onResetState, onSetGames, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
+import { supabase } from "../services/supabase";
+import { mapGame, mapStanding } from "../services/mappers";
+import { searchMlbTeams } from "../services/mlbApi";
 import { useNavigate } from "react-router-dom";
 import { restartTournamentData } from "../helper/restartTournamentData";
 import { useUIStore } from "./useUIStore";
- 
+import { SPORT } from "../lib/formSelections";
+
 export const useTourneyStore = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,95 +20,103 @@ export const useTourneyStore = () => {
   const { tournamentName, sport, type, numberOfTeams, players, games, teams, gamesList, standings } =
     useSelector((state) => state.tourney);
 
-  const startSearchTeam = async (query) => {
+  const searchFootballTeams = async (query) => {
     const headers = {
-      "x-rapidapi-key": "4ada01814adea2bb727b810423982de7",
+      "x-rapidapi-key": import.meta.env.VITE_FOOTBALL_API_KEY,
       "x-rapidapi-host": "v3.football.api-sports.io",
     };
 
     const teams = await axios.get(
-      `https://v3.football.api-sports.io/teams?search=${query}`,
+      `https://v3.football.api-sports.io/teams?search=${encodeURIComponent(query)}`,
       { headers }
     );
 
-    const teamsArray = teams.data.response.map((team) => {
-      return {
-        name: team.team.name,
-        logo: team.team.logo,
-      };
-    });
+    return teams.data.response.map((team) => ({
+      name: team.team.name,
+      logo: team.team.logo,
+    }));
+  };
 
-    return teamsArray;
+  const startSearchTeam = async (query, selectedSport = SPORT.FIFA) => {
+    try {
+      return selectedSport === SPORT.MLB
+        ? await searchMlbTeams(query)
+        : await searchFootballTeams(query);
+    } catch (error) {
+      console.error("Team search failed", error);
+      startErrorToast("Could not load teams, try again");
+      return [];
+    }
   };
 
   const startSaveTourney = async( data, restart = false ) => {
     startLoading(true);
-    await doAPIPost("tournaments",data).then((res) => {
-      if (res.status === 201) {
-        startLoading(false);
-        dispatch(onResetState())
-        startSuccessToast('Tournament saved successfully!');
-        if (!restart) {
-          navigate('/my-tourneys');
-        }  
-      } else {
-        startLoading(false);
-        startErrorToast('Something went wrong, check logs');
-      }  
+    const { error } = await supabase.rpc("create_tournament", {
+      p_name: data.tournamentName,
+      p_type: data.type,
+      p_sport: data.sport,
+      p_teams: data.teams,
     });
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+
+    dispatch(onResetState());
+    startSuccessToast('Tournament saved successfully!');
+    if (!restart) {
+      navigate('/my-tourneys');
+    }
   }
 
   const startDeleteTourney = async( id ) => {
     startLoading(true);
-    await doAPIDelete(`tournaments/${id}`).then((res) => {
-      if (res.status === 200) {
-        startLoading(false);
-        startSuccessToast('Tournament deleted successfully!');   
-      } else {
-        startLoading(false);
-        startErrorToast('Something went wrong, check logs');
-      }
-    });
+    const { data, error } = await supabase
+      .from("tournaments")
+      .delete()
+      .eq("id", id)
+      .select("id");
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    if (!data.length) return startErrorToast("You are not allowed to delete this tournament");
+    startSuccessToast('Tournament deleted successfully!');
   }
 
   const startGetGamesByTournament = async( id ) => {
     startLoading(true);
-    await doAPIGet(`/games/tournament/${id}`).then((res) => {
-      if (res.status === 200) {
-        startLoading(false);
-        dispatch(onSetGames(res.data))
-      } else {
-        startLoading(false);
-        startErrorToast('Something went wrong, check logs');
-      }
-    });
+    const { data, error } = await supabase
+      .from("games")
+      .select("*, team1:teams!team1_id(*), team2:teams!team2_id(*)")
+      .eq("tournament_id", id)
+      .order("id", { ascending: false });
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    dispatch(onSetGames(data.map(mapGame)));
   }
 
   const startGetTournamentStandings = async ( id ) => {
     startLoading(true);
-    doAPIGet(`/tournaments/standings/${id}`).then((res) => {
-      if (res.status === 200) {
-        dispatch(onSetStandings(res.data))
-        startLoading(false);
-      } else {
-        startLoading(true);
-        startErrorToast('Something went wrong, check logs');
-      }
+    const { data, error } = await supabase.rpc("get_tournament_standings", {
+      p_tournament_id: id,
     });
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    dispatch(onSetStandings(data.map(mapStanding)));
   }
 
   const startSaveGames = async( id, game ) => {
     startLoading(true);
-    await doAPIPut(`games/${id}`,game).then((res) => {
-      if (res.status === 200) {
-        startLoading(false);
-        startSuccessToast('Game saved successfully!'); 
-        dispatch(initGamesById(res.data));
-      } else {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      }
+    const { error } = await supabase.rpc("save_game_result", {
+      p_game_id: id,
+      p_score1: game.score1,
+      p_score2: game.score2,
     });
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    startSuccessToast('Game saved successfully!');
   }
 
   const setKnokoutTeams = (number) => {
@@ -122,24 +133,31 @@ export const useTourneyStore = () => {
     }
   }
 
-  const startGenerateJWT = async (data) => {
-    const res = await doAPIPost("tournaments/generateJWT", data)
-    if (!res.data) return
-    return res.data
+  const startGenerateJWT = async ({ uniqueId, accessType }) => {
+    const { data, error } = await supabase.rpc("create_tournament_invite", {
+      p_unique_id: uniqueId,
+      p_access_type: accessType,
+    });
+    if (error) {
+      startErrorToast(error.message);
+      return;
+    }
+    return data;
   }
 
-  const startJoinTournament = async (token) => {
+  const startJoinTournament = async ({ token }) => {
     startLoading(true);
-    await doAPIPost('tournaments/join', token).then((res) => {
-      if (res.status === 201) {
-        startLoading(false);
-        startSuccessToast('Tournament joined successfully'); 
-        navigate('/my-tourneys');
-      } else {
-        startLoading(false);
-        startErrorToast(res.data.message);
-      }
+    const { error } = await supabase.rpc("join_tournament", {
+      p_token: token.trim(),
     });
+    startLoading(false);
+
+    if (error) {
+      // Postgres code 22P02 = the pasted text is not a valid uuid
+      return startErrorToast(error.code === "22P02" ? "Invalid or expired invitation." : error.message);
+    }
+    startSuccessToast('Tournament joined successfully');
+    navigate('/my-tourneys');
   }
 
   const startRestartTourney = async (tournament) => {

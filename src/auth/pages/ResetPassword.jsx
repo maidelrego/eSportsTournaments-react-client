@@ -4,15 +4,13 @@ import * as Yup from "yup";
 import { InputText } from "primereact/inputtext";
 import { Message } from "primereact/message";
 import { Button } from "primereact/button";
-import { useParams } from "react-router-dom";
 import { useAuthStore } from "../../hooks";
 
 export const ResetPassword = () => {
-  const { token = null } = useParams();
   const { startResetPassword } = useAuthStore();
 
   const onPasswordReset = async (data) => {
-    await startResetPassword({ token, ...data });
+    await startResetPassword(data);
   }
 
   return (
