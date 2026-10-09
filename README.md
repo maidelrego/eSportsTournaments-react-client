@@ -10,6 +10,7 @@ A React-based platform to create and manage video game tournaments for sports ti
 - **Friend Invitations**: Invite friends to join tournaments via links or email.
 - **Real-time Updates**: Supabase Realtime for friend notifications and online presence.
 - **Game modes**: FIFA (club search via api-sports) and MLB The Show (all 30 MLB teams from the free MLB Stats API). Baseball games cannot end in a tie. Each side of an MLB game can have a starting pitcher (searched in the MLB Stats API), and the Rotation tab shows each player's starters and how many games ago each pitched.
+- **MLB Season + Playoffs**: everybody plays everybody once (any number of players, 3 or more), standings are ranked by wins then run differential, then the top teams (configurable, default by player count) enter a wild card style bracket where the best seeds get byes. Playoff series are best of 1, 3, 5 or 7 (default 3).
 - **Responsive UI**: Styled with PrimeReact, PrimeFlex, and styled-components.
 - **Form Handling & Validation**: Formik + Yup for robust form workflows.
 - **Notifications**: Toast notifications via react-hot-toast.
@@ -74,6 +75,7 @@ Then, in the Supabase dashboard (Authentication):
 Smoke test of schema, RLS and functions (runs in a transaction that is always rolled back):
 ```bash
 npx supabase db query --linked -f supabase/tests/smoke.sql
+npx supabase db query --linked -f supabase/tests/smoke_season.sql
 ```
 
 ## Development

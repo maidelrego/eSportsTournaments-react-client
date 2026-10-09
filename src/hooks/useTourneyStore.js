@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { onResetState, onSetGames, onSetGamePitcher, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
+import { onResetState, onSetGames, onSetGamePitcher, onSetSeries, onResetSeries, onSetStandings, onPushNumberOfTeams, onResetGamesList, onResetStandings } from "../store/tourney/tourneySlice";
 import { supabase } from "../services/supabase";
-import { mapGame, mapStanding } from "../services/mappers";
+import { mapGame, mapSeries, mapStanding } from "../services/mappers";
 import { searchMlbTeams } from "../services/mlbApi";
 import { useNavigate } from "react-router-dom";
 import { restartTournamentData } from "../helper/restartTournamentData";
@@ -17,7 +17,7 @@ export const useTourneyStore = () => {
     startErrorToast,
     startSuccessToast,
   } = useUIStore();
-  const { tournamentName, sport, type, numberOfTeams, players, games, teams, gamesList, standings } =
+  const { tournamentName, sport, type, numberOfTeams, playoffTeams, bestOf, players, games, teams, gamesList, series, standings } =
     useSelector((state) => state.tourney);
 
   const searchFootballTeams = async (query) => {
@@ -56,6 +56,8 @@ export const useTourneyStore = () => {
       p_type: data.type,
       p_sport: data.sport,
       p_teams: data.teams,
+      p_playoff_teams: data.playoffTeams ?? null,
+      p_best_of: data.bestOf ?? null,
     });
     startLoading(false);
 
@@ -104,6 +106,32 @@ export const useTourneyStore = () => {
 
     if (error) return startErrorToast(error.message);
     dispatch(onSetStandings(data.map(mapStanding)));
+  }
+
+  const startGetPlayoffSeries = async ( id ) => {
+    const { data, error } = await supabase
+      .from("playoff_series")
+      .select("*, team1:teams!team1_id(*), team2:teams!team2_id(*)")
+      .eq("tournament_id", id)
+      .order("round", { ascending: true })
+      .order("slot", { ascending: true });
+
+    if (error) return startErrorToast(error.message);
+    dispatch(onSetSeries(data.map(mapSeries)));
+  }
+
+  const startStartPlayoffs = async ( id ) => {
+    startLoading(true);
+    const { error } = await supabase.rpc("start_playoffs", { p_tournament_id: id });
+    startLoading(false);
+
+    if (error) return startErrorToast(error.message);
+    startSuccessToast("The playoffs have started!");
+    await Promise.all([
+      startGetPlayoffSeries(id),
+      startGetGamesByTournament(id),
+      startGetTournamentStandings(id),
+    ]);
   }
 
   const startSaveGames = async( id, game ) => {
@@ -196,10 +224,13 @@ export const useTourneyStore = () => {
     sport,  
     type,
     numberOfTeams,
+    playoffTeams,
+    bestOf,
     players,
     games,
     teams,
     gamesList,
+    series,
     standings,
     //methods
     startSearchTeam,
@@ -210,11 +241,14 @@ export const useTourneyStore = () => {
     startSaveGames,
     startSetGamePitcher,
     startGetTournamentStandings,
+    startGetPlayoffSeries,
+    startStartPlayoffs,
     setKnokoutTeams,
     startGenerateJWT,
     startJoinTournament,
     startRestartTourney,
     onResetGamesList,
+    onResetSeries,
     onResetStandings
   };
 };

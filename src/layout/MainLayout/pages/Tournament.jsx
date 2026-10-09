@@ -8,23 +8,27 @@ import { SingleElimination } from "../components/Tournaments/SingleEliminationBr
 import { generateEliminationStructure } from "../../../helper/generateEliminationStructure";
 import { Rotation } from "../components/Tournaments/Rotation";
 import { permission } from "../../../helper/getRoles";
-import { SPORT } from "../../../lib/formSelections";
+import { SPORT, TYPE } from "../../../lib/formSelections";
+import { Playoffs } from "../components/Tournaments/Playoffs";
 import { useSelector } from "react-redux";
 
 export const Tournament = () => {
   const { id = null } = useParams();
   const { state } = useLocation();
   const { user } = useSelector((store) => store.auth);
-  const { startGetGamesByTournament, startGetTournamentStandings, gamesList, standings, dispatch, onResetGamesList, onResetStandings } = useTourneyStore();
+  const { startGetGamesByTournament, startGetTournamentStandings, startGetPlayoffSeries, gamesList, series, standings, dispatch, onResetGamesList, onResetSeries, onResetStandings } = useTourneyStore();
+  const canEdit = permission(state?.sharedAdmins ?? [], state?.sharedGuests ?? [], user.id);
   
   useEffect(() => {
     if (!state) return;
     startGetGamesByTournament(id)
     startGetTournamentStandings(id)
+    if (state.type === TYPE.SEASON) startGetPlayoffSeries(id)
     
     return () => {
       dispatch(onResetGamesList())
       dispatch(onResetStandings())
+      dispatch(onResetSeries())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -58,9 +62,22 @@ export const Tournament = () => {
                 gamesList={gamesList}
                 tournamentType={state.type}
                 sport={state.sport}
-                canEdit={permission(state.sharedAdmins ?? [], state.sharedGuests ?? [], user.id)}
+                canEdit={canEdit}
               />
             </TabPanel>
+            {
+              state.type === TYPE.SEASON && (
+                <TabPanel rightIcon="pi pi-trophy mr-2" header="Playoffs" headerTemplate={tab1HeaderTemplate}>
+                  <Playoffs
+                    tournament={state}
+                    games={gamesList}
+                    series={series}
+                    standings={standings}
+                    canEdit={canEdit}
+                  />
+                </TabPanel>
+              )
+            }
             {
               state.sport === SPORT.MLB && (
                 <TabPanel rightIcon="pi pi-users mr-2" header="Rotation" headerTemplate={tab1HeaderTemplate}>

@@ -1,5 +1,5 @@
 export const restartTournamentData = async (tournamentData) => {
-  let { tournamentName, sport, type, teams, uniqueId } = tournamentData;
+  let { tournamentName, sport, type, teams, uniqueId, playoffTeams, bestOf } = tournamentData;
   // change name if it's restared more than once
 
   const extractUUID = uniqueId.split('-')[0];
@@ -22,6 +22,8 @@ export const restartTournamentData = async (tournamentData) => {
     sport,
     type,
     teams: newTeams,
+    playoffTeams,
+    bestOf,
   };
 
   return data;

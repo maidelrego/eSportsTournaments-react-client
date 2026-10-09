@@ -16,11 +16,12 @@ import {
 } from "../../../store/tourney/tourneySlice";
 import { gamesIsValid } from "../../../helper/gamesValidator";
 import { setErrorToast } from "../../../store/ui/uiSlice";
-import formSelections, { SPORT } from "../../../lib/formSelections";
+import formSelections, { SPORT, TYPE, defaultPlayoffTeams } from "../../../lib/formSelections";
 
 const tournamentTypeOptions = formSelections.tournamentTypeOptions;
 const sportTypeOptions = formSelections.sportTypeOptions;
 const numberOfTeamsInKnockout = formSelections.numberOfTeamsInKnockout;
+const bestOfOptions = formSelections.bestOfOptions;
 
 const requestValidations = {
   tournamentName: [
@@ -47,7 +48,26 @@ export const CreateTourney = () => {
     sport,
     players,
     teams,
+    playoffTeams,
+    bestOf,
   } = useTourneyStore();
+
+  // League and season share the "number of players" counter (a season needs at least 3).
+  const hasPlayerCounter = type === TYPE.LEAGUE || type === TYPE.SEASON;
+  const minPlayers = type === TYPE.SEASON ? 3 : 2;
+  // null = automatic. Never more playoff teams than players.
+  const effectivePlayoffTeams = Math.min(
+    playoffTeams ?? defaultPlayoffTeams(players),
+    players
+  );
+  const playoffTeamsOptions = Array.from(
+    { length: Math.max(players - 1, 0) },
+    (_, index) => ({ value: `${index + 2} teams`, key: index + 2 })
+  );
+  // Season + Playoffs only exists for MLB The Show
+  const typeOptions = tournamentTypeOptions.filter(
+    (option) => option.key !== TYPE.SEASON || sport === SPORT.MLB
+  );
 
   const playerCountIncrement = () => {
     dispatch(onAddPlayer());
@@ -68,7 +88,7 @@ export const CreateTourney = () => {
   };
 
   const playerCountDecrement = () => {
-    if (players === 2) {
+    if (players <= minPlayers) {
       return;
     }
     dispatch(onRemovePlayer());
@@ -89,7 +109,18 @@ export const CreateTourney = () => {
         dispatch(onFormChange({ name: "teamName", value: "", index }));
       });
     }
+    if (type === TYPE.SEASON && newSport !== SPORT.MLB) {
+      dispatch(onFormChange({ name: "type", value: null }));
+    }
     dispatch(onFormChange({ name: "sport", value: newSport }));
+  };
+
+  const onTypeChange = (e) => {
+    const newType = e.target.value;
+    if (newType === TYPE.SEASON && players < 3) {
+      playerCountIncrement();
+    }
+    dispatch(onFormChange({ name: "type", value: newType }));
   };
 
   const itemTemplate = (item) => {
@@ -113,6 +144,10 @@ export const CreateTourney = () => {
       sport,
       teams,
       numberOfTeams,
+      ...(type === TYPE.SEASON && {
+        playoffTeams: effectivePlayoffTeams,
+        bestOf,
+      }),
     };
 
     const { checkValues, isValid } = validateRequest(
@@ -160,7 +195,7 @@ export const CreateTourney = () => {
   };
 
   useEffect(() => {
-    if (type === 1) {
+    if (type === TYPE.LEAGUE || type === TYPE.SEASON) {
       dispatch(onFormChange({ name: "numberOfTeams", value: null }));
     }
   }, [type, dispatch]);
@@ -212,10 +247,8 @@ export const CreateTourney = () => {
         <div className="col-12">
           <Dropdown
             value={type}
-            onChange={(e) =>
-              dispatch(onFormChange({ name: "type", value: e.target.value }))
-            }
-            options={tournamentTypeOptions}
+            onChange={onTypeChange}
+            options={typeOptions}
             optionLabel="value"
             optionValue="key"
             placeholder="Tournament Type *"
@@ -247,7 +280,7 @@ export const CreateTourney = () => {
         )}
       </div>
 
-      {type === 1 && (
+      {hasPlayerCounter && (
         <div className="grid justify-content-center mt-5">
           <div className="col-12 md:col-6 mt-2">
             <span className="font-bold text-2xl text-color">
@@ -267,6 +300,49 @@ export const CreateTourney = () => {
               />
               <Button icon="pi pi-plus" onClick={playerCountIncrement} />
             </div>
+          </div>
+        </div>
+      )}
+
+      {type === TYPE.SEASON && (
+        <div className="grid justify-content-center mt-2">
+          <div className="col-12 md:col-6">
+            <p className="text-color-secondary mt-0">
+              Everybody plays everybody once, then the top teams go to the
+              playoffs. Seeds without an opponent in the first round get a bye.
+            </p>
+          </div>
+          <div className="col-12 md:col-3">
+            <label className="block text-color font-medium mb-2">
+              Playoff teams
+            </label>
+            <Dropdown
+              value={effectivePlayoffTeams}
+              onChange={(e) =>
+                dispatch(
+                  onFormChange({ name: "playoffTeams", value: e.target.value })
+                )
+              }
+              options={playoffTeamsOptions}
+              optionLabel="value"
+              optionValue="key"
+              className="w-full"
+            />
+          </div>
+          <div className="col-12 md:col-3">
+            <label className="block text-color font-medium mb-2">
+              Playoff series
+            </label>
+            <Dropdown
+              value={bestOf}
+              onChange={(e) =>
+                dispatch(onFormChange({ name: "bestOf", value: e.target.value }))
+              }
+              options={bestOfOptions}
+              optionLabel="value"
+              optionValue="key"
+              className="w-full"
+            />
           </div>
         </div>
       )}

@@ -77,7 +77,7 @@ export const Rotation = ({ games, teams }) => {
                 className="mr-2"
                 width="30"
               />
-              <span className="font-bold text-lg">
+              <span className="font-bold text-lg text-color">
                 {team.teamName} ({team.userName})
               </span>
               <span className="ml-auto text-color-secondary text-sm">

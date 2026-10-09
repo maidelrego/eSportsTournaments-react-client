@@ -8,9 +8,12 @@ export const tourneySlice = createSlice({
     type: null,
     numberOfTeams: null,
     sport: null,
+    playoffTeams: null, // null = automatic (default for the number of players)
+    bestOf: 3,
     players: 2,
     games: 1,
     gamesList: [],
+    series: [],
     standings: [],
     teams: [
       {
@@ -69,6 +72,12 @@ export const tourneySlice = createSlice({
     onSetGames: (state, {payload}) => {
       state.gamesList = payload;
     },
+    onSetSeries: (state, {payload}) => {
+      state.series = payload;
+    },
+    onResetSeries: (state) => {
+      state.series = [];
+    },
     onSetStandings: (state, {payload}) => {
       state.standings = payload;
     },
@@ -91,6 +100,8 @@ export const tourneySlice = createSlice({
       state.tournamentName = "";
       state.type = null;
       state.sport = null;
+      state.playoffTeams = null;
+      state.bestOf = 3;
       state.players = 2;
       state.games = 1;
       state.teams = [
@@ -128,6 +139,8 @@ export const {
   initGamesById,
   onSetGamePitcher,
   onSetStandings,
+  onSetSeries,
+  onResetSeries,
   onPushNumberOfTeams,
   onResetGamesList,
   onResetStandings,

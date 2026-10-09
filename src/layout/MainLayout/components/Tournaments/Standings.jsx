@@ -10,6 +10,13 @@ import { SPORT } from "../../../../lib/formSelections";
 
 export const Standings = ({ standings, sport }) => {
   const isBaseball = sport === SPORT.MLB;
+  const hasSeeds = standings.some((row) => row.playoffSeed);
+
+  const seedTemplate = ({ playoffSeed }) =>
+    playoffSeed ? `#${playoffSeed}` : "-";
+
+  const runDiffTemplate = ({ runDiff }) => (runDiff > 0 ? `+${runDiff}` : runDiff);
+
   const header = (
     <div className="table-header">
       <h1 className="text-color text-center">Standings</h1>
@@ -47,7 +54,12 @@ export const Standings = ({ standings, sport }) => {
   return (
     <div className="mt-5">
       {standings.length > 0 ? 
-        <DataTable value={standings} header={header}>
+        <DataTable
+          value={standings}
+          header={header}
+          rowClassName={(row) => ({ "font-bold": hasSeeds && !!row.playoffSeed })}
+        >
+          {hasSeeds && <Column header="Seed" body={seedTemplate}></Column>}
           <Column header="Team" body={teamNameTemplate}></Column>
           <Column header="Played" field="gamesPlayed"></Column>
           <Column header="Wins" field="wins"></Column>
@@ -55,6 +67,7 @@ export const Standings = ({ standings, sport }) => {
           <Column header="Lost" field="losses"></Column>
           <Column header={isBaseball ? "Runs For" : "Scored"} field="goalsScored"></Column>
           <Column header={isBaseball ? "Runs Against" : "Against"} field="goalsConceded"></Column>
+          {isBaseball && <Column header="Run Diff" body={runDiffTemplate}></Column>}
           {!isBaseball && <Column header="Points" field="points"></Column>}
           <Column header="Last 5" body={streakTemplate}></Column>
         </DataTable>

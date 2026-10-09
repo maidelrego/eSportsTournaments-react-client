@@ -6,8 +6,19 @@ const tournamentTypeOptions = [
   {
     value: "Knockout",
     key: 2,
+  },
+  {
+    // MLB only: single round robin season, then wild card style playoffs
+    value: "Season + Playoffs",
+    key: 3,
   }
 ];
+
+export const TYPE = {
+  LEAGUE: 1,
+  KNOCKOUT: 2,
+  SEASON: 3,
+};
 
 export const SPORT = {
   FIFA: 1,
@@ -40,8 +51,25 @@ const numberOfTeamsInKnockout = [
   }
 ];
 
+const bestOfOptions = [
+  { value: "Best of 1", key: 1 },
+  { value: "Best of 3", key: 3 },
+  { value: "Best of 5", key: 5 },
+  { value: "Best of 7", key: 7 },
+];
+
+// Mirrors the SQL function default_playoff_teams(): used as the form default only,
+// the server validates whatever is sent.
+export const defaultPlayoffTeams = (players) => {
+  if (players <= 3) return 2;
+  if (players <= 5) return 4;
+  if (players <= 8) return 5;
+  return 6;
+};
+
 export default {
   tournamentTypeOptions,
   sportTypeOptions,
-  numberOfTeamsInKnockout
+  numberOfTeamsInKnockout,
+  bestOfOptions,
 }

@@ -7,7 +7,7 @@ import {
 } from "@g-loot/react-tournament-brackets";
 import {useWindowSize} from '@react-hook/window-size'
   
-export const SingleElimination = ({simpleSmallBracket}) =>{
+export const SingleElimination = ({simpleSmallBracket, roundTextGenerator}) =>{
   const [width, height] = useWindowSize({initialWidth: 400, initialHeight: 400})
 
   return(
@@ -16,6 +16,11 @@ export const SingleElimination = ({simpleSmallBracket}) =>{
         <SingleEliminationBracket
           theme={GlootTheme}
           matches={simpleSmallBracket}
+          options={
+            roundTextGenerator
+              ? { style: { roundHeader: { roundTextGenerator } } }
+              : undefined
+          }
           matchComponent={Match}
           svgWrapper={({ children, ...props }) => (
             <SVGViewer
@@ -60,5 +65,7 @@ const GlootTheme = createTheme({
 
 SingleElimination.propTypes = {
   simpleSmallBracket: PropTypes.array.isRequired,
+  // (round, totalRounds) => header text, e.g. "Wild Card" for playoffs with byes
+  roundTextGenerator: PropTypes.func,
 };
   
