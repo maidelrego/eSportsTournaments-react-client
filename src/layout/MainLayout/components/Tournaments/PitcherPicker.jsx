@@ -92,15 +92,15 @@ export const PitcherPicker = ({ gameId, side, disabled }) => {
 
   return (
     <AutoComplete
-      className="mt-2"
-      inputClassName="w-10rem text-sm"
+      className="w-full"
+      inputClassName="w-full text-sm"
       value={text}
       suggestions={suggestions}
       completeMethod={search}
       field="name"
       dropdown
       disabled={disabled}
-      placeholder="Search any pitcher"
+      placeholder="Starting pitcher"
       itemTemplate={itemTemplate}
       onFocus={() => {
         selectedRef.current = false;

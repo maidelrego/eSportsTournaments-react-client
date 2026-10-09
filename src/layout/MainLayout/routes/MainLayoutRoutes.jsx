@@ -15,7 +15,7 @@ export const MainLayout = () => {
   }, []);
 
   return (
-    <div className="grid flex justify-content-center">
+    <div className="grid m-0 flex justify-content-center">
       <div className="col-12">
         <Navbar />
       </div>

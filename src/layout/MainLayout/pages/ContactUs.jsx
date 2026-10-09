@@ -5,6 +5,8 @@ import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { doDiscordWebhook } from "../../../services/api";
 
+const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
 export const ContactUs = () => {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
@@ -15,7 +17,8 @@ export const ContactUs = () => {
   };
 
   const validate = () => {
-    return name.length === 0 || message.length === 0 || !captcha;
+    // without a site key the captcha cannot render (it would crash the page), so it is not required
+    return name.length === 0 || message.length === 0 || (!!recaptchaSiteKey && !captcha);
   };
 
   const resetForm = () => {
@@ -94,11 +97,11 @@ export const ContactUs = () => {
                   autoResize
                   className="w-full mb-3"
                 />
-                <ReCAPTCHA
-                  className="mb-3"
-                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                  onChange={onChange}
-                />
+                {recaptchaSiteKey && (
+                  <div className="mb-3 overflow-x-auto">
+                    <ReCAPTCHA sitekey={recaptchaSiteKey} onChange={onChange} />
+                  </div>
+                )}
                 <Button
                   disabled={validate()}
                   onClick={() => submit()}

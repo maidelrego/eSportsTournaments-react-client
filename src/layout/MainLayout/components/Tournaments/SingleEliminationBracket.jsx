@@ -2,47 +2,35 @@ import PropTypes from "prop-types";
 import {
   SingleEliminationBracket,
   Match,
-  SVGViewer,
   createTheme
 } from "@g-loot/react-tournament-brackets";
-import {useWindowSize} from '@react-hook/window-size'
-  
-export const SingleElimination = ({simpleSmallBracket, roundTextGenerator}) =>{
-  const [width, height] = useWindowSize({initialWidth: 400, initialHeight: 400})
+import { useWindowSize } from "@react-hook/window-size";
 
-  return(
-    <>
-      <div className="w-full">
-        <SingleEliminationBracket
-          theme={GlootTheme}
-          matches={simpleSmallBracket}
-          options={
-            roundTextGenerator
-              ? { style: { roundHeader: { roundTextGenerator } } }
-              : undefined
-          }
-          matchComponent={Match}
-          svgWrapper={({ children, ...props }) => (
-            <SVGViewer
-              width={width}
-              height={height}
-              background="rgb(11, 13, 19)"
-              SVGBackground="rgb(11, 13, 19)"
-              {...props}
-            >
-              {children}
-            </SVGViewer>
-          )}
-          onMatchClick={(match) => console.log(match)}
-          onPartyClick={(match) => console.log(match)}
-        />
-      </div>
-      
-    </>
-  )
+export const SingleElimination = ({ simpleSmallBracket, roundTextGenerator }) => {
+  const [width] = useWindowSize({ initialWidth: 1024, initialHeight: 768 });
+  const compact = width < 768;
 
+  // narrower matches on phones; the bracket scrolls sideways inside its own box
+  const style = {
+    ...(compact && { width: 300, spaceBetweenColumns: 30, canvasPadding: 12 }),
+    ...(roundTextGenerator && { roundHeader: { roundTextGenerator } }),
+  };
+
+  return (
+    <div className="w-full">
+      <SingleEliminationBracket
+        theme={GlootTheme}
+        matches={simpleSmallBracket}
+        options={Object.keys(style).length > 0 ? { style } : undefined}
+        matchComponent={Match}
+        svgWrapper={({ children }) => (
+          <div className="bracket-scroll">{children}</div>
+        )}
+      />
+    </div>
+  );
 };
-  
+
 const GlootTheme = createTheme({
   textColor: { main: "#000000", highlighted: "#F4F2FE", dark: "#707582" },
   matchBackground: { wonColor: "#2D2D59", lostColor: "#1B1D2D" },
@@ -68,4 +56,3 @@ SingleElimination.propTypes = {
   // (round, totalRounds) => header text, e.g. "Wild Card" for playoffs with byes
   roundTextGenerator: PropTypes.func,
 };
-  

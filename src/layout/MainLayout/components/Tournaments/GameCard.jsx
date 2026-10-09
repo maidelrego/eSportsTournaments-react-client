@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
@@ -11,8 +10,17 @@ import { PitcherPicker } from "./PitcherPicker";
 
 const isEmpty = (value) => [null, undefined, ""].includes(value);
 
-// One game with its score inputs, Save button and (MLB) starting pitchers. Used by the playoff series.
-export const GameCard = ({ game, legend, sport, canEdit = true, onSaved, colClassName = "col-12 md:col-6" }) => {
+// One game: teams, score inputs, Save and (MLB) starting pitchers.
+// The layout is a 3 column grid (team | score | team) that works from 320px up.
+export const GameCard = ({
+  game,
+  legend,
+  sport,
+  canEdit = true,
+  allowTie = false,
+  onSaved,
+  colClassName = "col-12 md:col-6",
+}) => {
   const [score1, setScore1] = useState(game.score1 ?? "");
   const [score2, setScore2] = useState(game.score2 ?? "");
   const { startSaveGames } = useTourneyStore();
@@ -22,14 +30,16 @@ export const GameCard = ({ game, legend, sport, canEdit = true, onSaved, colClas
     setScore2(game.score2 ?? "");
   }, [game.score1, game.score2]);
 
+  const teamsReady = !!game.team1 && !!game.team2;
+  const editable = canEdit && teamsReady;
   const played = !isEmpty(game.score1) && !isEmpty(game.score2);
   const unchanged =
     played && Number(score1) === game.score1 && Number(score2) === game.score2;
   const disabled =
-    !canEdit ||
+    !editable ||
     isEmpty(score1) ||
     isEmpty(score2) ||
-    Number(score1) === Number(score2) || // series games always have a winner
+    (!allowTie && Number(score1) === Number(score2)) ||
     unchanged;
 
   const save = async () => {
@@ -40,68 +50,76 @@ export const GameCard = ({ game, legend, sport, canEdit = true, onSaved, colClas
     if (onSaved) await onSaved();
   };
 
-  const team = (side) => (
-    <div className={`flex flex-column align-items-center justify-content-center ${side === 1 ? "mr-3" : "ml-3"}`}>
-      <Avatar
-        image={game[`team${side}`]?.logoUrl ? game[`team${side}`].logoUrl : noLogo}
-        className="mb-2"
-        size="large"
-      />
-      <span className="text-xs xl:text-xl">{game[`team${side}`]?.teamName}</span>
-      <span className="mt-2 text-xs xl:text-lg">
-        ({game[`team${side}`]?.userName})
-      </span>
-      {sport === SPORT.MLB && game[`team${side}`] && (
-        <PitcherPicker
-          gameId={game.id}
-          side={side}
-          disabled={!canEdit}
-        />
-      )}
-    </div>
-  );
+  const team = (side) => {
+    const current = game[`team${side}`];
+    return (
+      <div className="game-card__team">
+        <Avatar image={current?.logoUrl ? current.logoUrl : noLogo} size="large" />
+        <span className="game-card__name">{current ? current.teamName : "TBD"}</span>
+        {current && <span className="game-card__player">({current.userName})</span>}
+      </div>
+    );
+  };
 
   return (
     <div className={colClassName}>
-      <Fieldset legend={legend} className="ma-0 pa-0">
-        <div className="flex justify-content-center flex-wrap">
+      <div className="surface-card border-round shadow-1 p-3 h-full">
+        <div className="game-card__header">
+          <span>{legend}</span>
+          {played && (
+            <span className="text-green-600">
+              <i className="pi pi-check-circle mr-1"></i>Played
+            </span>
+          )}
+        </div>
+
+        <div className="game-card__match">
           {team(1)}
-          <div>
-            <div className="flex flex-wrap flex-row">
-              <InputText
-                type="number"
-                keyfilter={/[0-9]/}
-                className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                value={score1}
-                disabled={!canEdit}
-                onChange={(e) => setScore1(e.target.value)}
-              />
-              <span className="flex align-items-center justify-content-center mr-2 ml-2 xl:font-bold">
-                -
-              </span>
-              <InputText
-                type="number"
-                keyfilter={/[0-9]/}
-                className="p-inputtext-sm mt-6 mb-6 w-2rem xl:w-4rem text-center xl:text-4xl xl:font-bold"
-                value={score2}
-                disabled={!canEdit}
-                onChange={(e) => setScore2(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-wrap flex-row align-items-center justify-content-center">
-              <Button
-                label="Save"
-                icon="pi pi-check"
-                size="small"
-                rounded
-                disabled={disabled}
-                onClick={save}
-              />
-            </div>
+          <div className="game-card__scores">
+            <InputText
+              type="number"
+              inputMode="numeric"
+              min={0}
+              keyfilter={/[0-9]/}
+              aria-label="Score team 1"
+              value={score1}
+              disabled={!editable}
+              onChange={(e) => setScore1(e.target.value)}
+            />
+            <span className="font-bold">-</span>
+            <InputText
+              type="number"
+              inputMode="numeric"
+              min={0}
+              keyfilter={/[0-9]/}
+              aria-label="Score team 2"
+              value={score2}
+              disabled={!editable}
+              onChange={(e) => setScore2(e.target.value)}
+            />
           </div>
           {team(2)}
         </div>
-      </Fieldset>
+
+        {sport === SPORT.MLB && teamsReady && (
+          <div className="game-card__pitchers">
+            <PitcherPicker gameId={game.id} side={1} disabled={!canEdit} />
+            <PitcherPicker gameId={game.id} side={2} disabled={!canEdit} />
+          </div>
+        )}
+
+        <div className="flex justify-content-center mt-3">
+          <Button
+            label="Save"
+            icon="pi pi-check"
+            size="small"
+            rounded
+            className="w-full md:w-auto"
+            disabled={disabled}
+            onClick={save}
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -111,6 +129,7 @@ GameCard.propTypes = {
   legend: PropTypes.string.isRequired,
   sport: PropTypes.number,
   canEdit: PropTypes.bool,
+  allowTie: PropTypes.bool,
   onSaved: PropTypes.func,
   colClassName: PropTypes.string,
 };

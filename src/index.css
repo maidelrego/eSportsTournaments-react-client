@@ -1,8 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   overflow-x: hidden;
   margin: 0;
+  /* the pages are designed for a light canvas: do not depend on the browser/OS color scheme */
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+  font-family: var(--font-family);
 }
 
 .createCard {
@@ -38,4 +46,171 @@ input[type=number] {
   .logo {
    height: 50px;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive helpers and mobile tweaks                                */
+/* ------------------------------------------------------------------ */
+.show-sm {
+  display: none !important;
+}
+
+@media screen and (max-width: 767px) {
+  .hide-sm {
+    display: none !important;
+  }
+
+  .show-sm {
+    display: inline !important;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  /* tabs of the tournament page: smaller headers, they scroll when they do not fit */
+  .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 0.9rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* standings table */
+.standings-table .p-datatable-header {
+  padding: 0.5rem 0;
+}
+
+@media screen and (max-width: 767px) {
+  .standings-table .p-datatable-thead > tr > th,
+  .standings-table .p-datatable-tbody > tr > td {
+    padding: 0.6rem 0.35rem;
+    font-size: 0.82rem;
+  }
+
+  .standings-table .p-datatable-header h1 {
+    font-size: 1.3rem;
+  }
+}
+
+/* game card (score entry) */
+.game-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.game-card__match {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-card__team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 0;
+}
+
+.game-card__name {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.game-card__player {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+  overflow-wrap: anywhere;
+}
+
+.game-card__scores {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.game-card__scores input {
+  width: 3.25rem;
+  height: 3rem;
+  padding: 0;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.game-card__pitchers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.game-card__pitchers .p-autocomplete {
+  width: 100%;
+}
+
+.game-card__pitchers .p-autocomplete .p-inputtext {
+  min-width: 0;
+  width: 100%;
+  font-size: 0.8rem;
+}
+
+@media screen and (min-width: 768px) {
+  .game-card__scores input {
+    width: 4rem;
+    height: 3.5rem;
+    font-size: 1.8rem;
+  }
+
+  .game-card__name {
+    font-size: 1.05rem;
+  }
+}
+
+/* bracket: scrolls sideways with the finger instead of overflowing the page */
+.bracket-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: rgb(11, 13, 19);
+  border-radius: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bracket-scroll > svg {
+  display: block;
+}
+
+/* login, register and password pages */
+.auth-card {
+  position: absolute;
+  top: 15%;
+}
+
+.auth-logo {
+  height: 100px;
+}
+
+@media screen and (max-width: 767px) {
+  .auth-card {
+    position: static;
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .auth-logo {
+    height: 70px;
+  }
+}
+
+/* pitcher search suggestions never wider than the screen */
+.p-autocomplete-panel {
+  max-width: 92vw;
 }

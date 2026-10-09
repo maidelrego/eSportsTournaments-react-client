@@ -66,9 +66,9 @@ export const Login = () => {
           values,
         }) => (
           <div className="flex align-items-center justify-content-center col md:col-6 md:col-offset-3">
-            <div className="surface-card p-4 border-round w-full lg:w-4" style={{ top: "15%", position: "absolute" }}>
+            <div className="auth-card surface-card p-4 border-round w-full lg:w-4">
               <div className="text-center mb-5">
-                <img src={logo} alt="hyper" height={100} className="mb-6" />
+                <img src={logo} alt="Tourney Forge" className="auth-logo mb-4" />
                 <div className="text-color text-3xl mb-3">Welcome Back</div>
                 <span className="text-600 font-medium line-height-3">
                   Don&apos;t have an account?
